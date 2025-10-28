@@ -1,7 +1,7 @@
 import React from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import useUserStore from "@stores/userStore";
-import { formatPhoneKR } from "@utils/phone";
+import { formatPhoneKR } from "@utils/formatPhone";
 
 const linkBase = "px-2 py-1 rounded-md transition-colors text-sm";
 const linkActive = "text-primary-orange font-semibold";

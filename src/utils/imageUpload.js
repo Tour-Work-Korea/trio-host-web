@@ -270,6 +270,7 @@ export async function uploadSensitiveImage({ adaptive = false } = {}) {
         "[uploadSensitiveImage] adaptive compress failed → original used:",
         e
       );
+      throw Error(e);
     }
   }
 
@@ -281,6 +282,6 @@ export async function uploadSensitiveImage({ adaptive = false } = {}) {
     return url;
   } catch (err) {
     console.error("민감 이미지 업로드 실패:", err);
-    return null;
+    throw Error(err);
   }
 }

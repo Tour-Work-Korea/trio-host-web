@@ -13,10 +13,10 @@ const api = axios.create({
 api.interceptors.request.use((config) => {
   const state = useUserStore.getState();
   const token = state.accessToken;
-  const isAuth = typeof state.isAuth === "boolean" ? state.isAuth : !!token;
+  const withAuth = typeof state.isAuth === "boolean" ? state.isAuth : !!token;
 
-  if (isAuth) config.headers.Authorization = `Bearer ${token}`;
-  config.withCredentials = !!isAuth;
+  if (withAuth) config.headers.Authorization = `Bearer ${token}`;
+  config.withCredentials = !!withAuth;
   return config;
 });
 

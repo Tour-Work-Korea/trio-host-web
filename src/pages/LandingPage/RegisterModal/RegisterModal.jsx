@@ -1,7 +1,5 @@
 /* eslint-disable react/prop-types */
 import React, { useState } from "react";
-import ButtonOrange from "@components/ButtonOrange";
-import ButtonWhite from "@components/ButtonWhite";
 import xBtn from "@assets/images/x_gray.svg";
 
 import RegisterForm1 from "./RegisterForm1";
