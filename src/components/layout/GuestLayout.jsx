@@ -8,7 +8,7 @@ export default function GuestLayout() {
       <header className="w-full">
         <Header />
       </header>
-      <main className="flex flex-grow flex-col min-h-screen w-full">
+      <main className="flex flex-grow flex-col w-full ">
         <Outlet />
       </main>
       <footer className="w-full">

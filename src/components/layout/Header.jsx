@@ -22,8 +22,13 @@ export default function Header() {
     }
   }, [navigate]);
   return (
-    <header className="w-full flex bg-white py-4 px-6 justify-between items-center">
-      <img src={WaLogo} alt="WorkAway" className="h-10 w-auto" />
+    <header className="w-full flex bg-white py-4 px-6 justify-between items-center cursor-pointer">
+      <img
+        src={WaLogo}
+        alt="WorkAway"
+        className="h-10 w-auto"
+        onClick={() => (isLoggedIn ? navigate("guesthouse/my") : navigate("/"))}
+      />
       <div>
         {isLoggedIn ? (
           <ButtonOrange title="로그아웃" onPress={onLogout} />

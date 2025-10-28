@@ -29,46 +29,67 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-[60vh] flex items-center justify-center p-6">
+    <div className="flex items-center justify-center p-6 flex-1">
       <form
         onSubmit={onSubmit}
-        className="w-full max-w-sm bg-white shadow rounded-xl p-6 space-y-4"
+        className="w-full max-w-sm bg-white  p-6 space-y-4"
       >
-        <h1 className="text-xl font-semibold text-gray-800">로그인</h1>
+        <h1 className="text-3xl font-semibold mb-8">로그인해주세요</h1>
 
-        <label className="block">
-          <span className="text-sm text-gray-600">이메일</span>
-          <input
-            type="email"
-            className="mt-1 w-full rounded-md border px-3 py-2 outline-none focus:ring"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            autoComplete="email"
-            required
-          />
-        </label>
+        <div className="form-group">
+          <label className="form-label">이메일</label>
+          <div className="form-input-wrap">
+            <input
+              type="email"
+              className="form-input"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+              required
+            />
+          </div>
+        </div>
 
-        <label className="block">
-          <span className="text-sm text-gray-600">비밀번호</span>
-          <input
-            type="password"
-            className="mt-1 w-full rounded-md border px-3 py-2 outline-none focus:ring"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete="current-password"
-            required
-          />
-        </label>
+        <div className="block">
+          <label className="form-label">비밀번호</label>
+          <div className="form-input-wrap">
+            <input
+              type="password"
+              className="form-input"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+              required
+            />
+          </div>
+        </div>
 
         {err && <p className="text-sm text-red-500">{err}</p>}
+
+        <div className="flex justify-end text-sm gap-2 text-grayscale-400">
+          <a href="/" className="hover:underline hover:text-black">
+            아이디 찾기
+          </a>
+          <p>|</p>
+          <a href="/" className="hover:underline hover:text-black">
+            비밀번호 찾기
+          </a>
+        </div>
 
         <button
           type="submit"
           disabled={submitting}
-          className="w-full rounded-md bg-black text-white py-2 disabled:opacity-60"
+          className="w-full rounded-lg bg-primary-orange text-white py-2 disabled:opacity-60 font-semibold"
         >
           {submitting ? "로그인 중..." : "로그인"}
         </button>
+
+        <div className="flex gap-2 text-sm justify-center">
+          <p className="text-grayscale-400">계정이 없으신가요?</p>
+          <a href="/" className="hover:underline">
+            회원가입하러 가기
+          </a>
+        </div>
       </form>
     </div>
   );
