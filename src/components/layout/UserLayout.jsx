@@ -10,7 +10,7 @@ export default function UserLayout() {
         <Header />
       </header>
       <main className="flex flex-grow  min-h-screen w-full px-20 py-32 gap-12">
-        <div className="w-48">
+        <div className="w-52">
           <MenuBar />
         </div>
 

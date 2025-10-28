@@ -67,11 +67,11 @@ export default function LoginPage() {
         {err && <p className="text-sm text-red-500">{err}</p>}
 
         <div className="flex justify-end text-sm gap-2 text-grayscale-400">
-          <a href="/" className="hover:underline hover:text-black">
+          <a href="/find-id" className="hover:underline hover:text-black">
             아이디 찾기
           </a>
           <p>|</p>
-          <a href="/" className="hover:underline hover:text-black">
+          <a href="/find-password" className="hover:underline hover:text-black">
             비밀번호 찾기
           </a>
         </div>

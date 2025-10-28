@@ -8,7 +8,9 @@ import useUserStore from "@stores/userStore";
 import { tryRefresh } from "@utils/authFlow";
 
 const LandingPage = lazy(() => import("@pages/LandingPage"));
-const LoginPage = lazy(() => import("@pages/LoginPage"));
+const LoginPage = lazy(() => import("@pages/Auth/LoginPage"));
+const FindIdPage = lazy(() => import("@pages/Auth/FindIdPage"));
+const FindPasswordPage = lazy(() => import("@pages/Auth/FindPasswordPage"));
 const ApplicantPage = lazy(() => import("@pages/Employ/ApplicantPage"));
 const MyRecruitPage = lazy(() => import("@pages/Employ/MyRecruitPage"));
 const MyGuestHousePage = lazy(() =>
@@ -55,6 +57,8 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: S(<LandingPage />) }, // /
       { path: "login", element: S(<LoginPage />) }, // /login
+      { path: "find-id", element: S(<FindIdPage />) },
+      { path: "find-password", element: S(<FindPasswordPage />) },
     ],
   },
 

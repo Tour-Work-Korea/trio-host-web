@@ -37,10 +37,7 @@ export default function LandingPage() {
           <br />한 곳에서 시작하세요
         </h3>
         <div className="w-72">
-          <ButtonOrange
-            title="입점신청서 작성하기"
-            onPress={handleRegisterModal}
-          />
+          <ButtonOrange title="회원가입" onPress={handleRegisterModal} />
         </div>
       </div>
 

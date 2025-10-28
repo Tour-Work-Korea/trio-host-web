@@ -26,6 +26,24 @@ export async function sendCodeForPhone(phone) {
   }
 }
 
+/** 계정 찾기용 휴대폰 인증코드 발송 */
+export async function sendCodeForFindAccount(phone) {
+  const digits = onlyDigits(phone);
+  if (!isValidPhone(digits)) {
+    throw new Error("올바른 전화번호를 입력해주세요.");
+  }
+  try {
+    const res = await authApi.verifySelfByPhone(digits);
+    return res?.data ?? true;
+  } catch (e) {
+    const msg =
+      e?.response?.data?.message ||
+      e?.message ||
+      "휴대폰 인증 요청에 실패했습니다.";
+    throw new Error(msg);
+  }
+}
+
 /** 휴대폰 인증코드 확인 */
 export async function checkCodeForPhone(phone, code) {
   const digits = onlyDigits(phone);

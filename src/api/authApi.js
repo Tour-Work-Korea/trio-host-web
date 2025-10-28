@@ -46,6 +46,26 @@ const authApi = {
       params: { phoneNum, code },
       withAuth: false,
     }),
+  //계졍찾기용 휴대폰 인증번호 발송
+  verifySelfByPhone: (phoneNum) =>
+    api.post("/auth/find/send-code", null, {
+      params: { phoneNum, role: "HOST" },
+      withAuth: false,
+    }),
+
+  //아이디 찾기
+  findId: (phoneNum) =>
+    api.get("/auth/find/email", {
+      params: {
+        phoneNum,
+        role: "HOST",
+      },
+      withAuth: false,
+    }),
+
+  //비밀번호 찾기
+  findPassword: (body) =>
+    api.post("/auth/find/password", body, { withAuth: false }),
 };
 
 export default authApi;
