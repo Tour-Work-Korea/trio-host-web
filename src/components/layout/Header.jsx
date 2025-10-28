@@ -1,11 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { useCallback } from "react";
 
-import ButtonOrange from "../ButtonOrange";
+import ButtonOrange from "@components/ButtonOrange";
 import useUserStore from "@stores/userStore";
 
 import WaLogo from "@assets/images/wa_logo.svg";
-import { logout } from "../../utils/authFlow";
+import { logout } from "@utils/authFlow";
 
 export default function Header() {
   const navigate = useNavigate();
