@@ -11,6 +11,7 @@ export default function ErrorModal({
   buttonText2 = null,
   onPress,
   onPress2 = null,
+  imgUrl = null,
 }) {
   if (!visible) return null;
 
@@ -21,35 +22,32 @@ export default function ErrorModal({
       aria-modal="true"
       aria-labelledby="error-modal-title"
     >
-      <div className="w-[90%] max-w-md rounded-2xl bg-grayscale-0 p-6 text-center shadow-lg">
-        <h2
-          id="error-modal-title"
-          className="text-lg font-semibold text-grayscale-900"
-        >
-          {title}
-        </h2>
+      <div className="w-[90%] max-w-md rounded-2xl bg-grayscale-0 p-6 text-center shadow-lg flex flex-col gap-4 items-center">
+        <div>
+          <h2
+            id="error-modal-title"
+            className="text-lg font-semibold text-grayscale-900 whitespace-pre-line"
+          >
+            {title}
+          </h2>
 
-        {message ? (
-          <p className="mt-1 text-sm text-grayscale-600 whitespace-pre-line">
-            {message}
-          </p>
-        ) : null}
+          {message ? (
+            <p className="mt-1 text-sm text-grayscale-600 whitespace-pre-line">
+              {message}
+            </p>
+          ) : null}
+        </div>
+
+        {imgUrl && <img src={imgUrl} className="h-20 my-4" />}
 
         {/* 버튼 영역 */}
         {buttonText2 ? (
-          <div className="mt-4 grid grid-cols-2 gap-2">
-            {/* RN 코드 동작 그대로: 첫 버튼이 Scarlet, 두 번째가 White */}
-            <ButtonOrange title={buttonText} onPress={onPress} />
+          <div className=" grid grid-cols-2 gap-2 w-full">
             <ButtonWhite title={buttonText2} onPress={onPress2} />
+            <ButtonOrange title={buttonText} onPress={onPress} />
           </div>
         ) : (
-          <div className="mt-4">
-            <ButtonOrange
-              title={buttonText}
-              onPress={onPress}
-              className="w-full"
-            />
-          </div>
+          <ButtonOrange title={buttonText} onPress={onPress} />
         )}
       </div>
     </div>
