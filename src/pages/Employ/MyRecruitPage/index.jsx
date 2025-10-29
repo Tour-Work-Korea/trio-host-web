@@ -7,11 +7,11 @@ import ButtonWhite from "@components/ButtonWhite";
 import ButtonOrange from "@components/ButtonOrange";
 import guesthouseApi from "@api/guesthouseApi";
 import EmptyIcon from "@assets/images/wa_blue_empty.svg";
+import SelectModal from "@components/SelectModal";
+import { useNavigate } from "react-router-dom";
 
 export default function MyRecruitPage() {
-  const [guesthouses, setGuestHouses] = useState([
-    { id: -1, label: "전체 게스트하우스" },
-  ]);
+  const [guesthouses, setGuestHouses] = useState([]);
   const [selected, setSelected] = useState(-1); //선택한 게스트하우스 default:전체
   const [recruits, setRecruits] = useState([]);
   const [errorModal, setErrorModal] = useState({
@@ -24,6 +24,9 @@ export default function MyRecruitPage() {
     onPress2: null,
     imgUrl: null,
   });
+  const [selectModal, setSelectModal] = useState({ visible: false }); //게스트하우스 선택 모달
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     tryFetchGuestHouse();
@@ -50,8 +53,11 @@ export default function MyRecruitPage() {
         : [];
 
       const options = [
-        { id: -1, label: "전체 게스트하우스" },
-        ...list.map((g) => ({ id: g.id, label: g.guesthouseName })),
+        ...list.map((g) => ({
+          id: g.id,
+          title: g.guesthouseName,
+          subtitle: g.guesthouseAddress,
+        })),
       ];
 
       setGuestHouses(options);
@@ -72,7 +78,6 @@ export default function MyRecruitPage() {
         onPress2: null,
         imgUrl: null,
       });
-      setGuestHouses([{ id: -1, label: "전체 게스트하우스" }]);
     }
   };
 
@@ -147,7 +152,24 @@ export default function MyRecruitPage() {
   };
 
   //공고 등록 핸들러
-  const handleCreateRecruit = () => {};
+  const handleCreateRecruit = () => {
+    if (guesthouses.length > 0) setSelectModal({ visible: true });
+    else {
+      setErrorModal({
+        visible: true,
+        title: "입점된 게스트하우스가 없습니다",
+        message: "게스트하우스를 등록하러 가볼까요?",
+        buttonText: "게스트하우스 등록하기",
+        buttonText2: "다음에 할게요",
+        onPress: () => {
+          setErrorModal({ ...errorModal, visible: false });
+          alert("게스트하우스 등록으로 이동");
+        },
+        onPress2: () => setErrorModal({ ...errorModal, visible: false }),
+        imgUrl: EmptyIcon,
+      });
+    }
+  };
   return (
     <div className="container">
       <div className="flex justify-between items-center">
@@ -168,7 +190,7 @@ export default function MyRecruitPage() {
         >
           {guesthouses.map((opt) => (
             <option key={opt.id} value={opt.id}>
-              {opt.label}
+              {opt.title}
             </option>
           ))}
         </select>
@@ -250,6 +272,17 @@ export default function MyRecruitPage() {
         onPress={errorModal.onPress}
         onPress2={errorModal.onPress2 ?? null}
         imgUrl={errorModal.imgUrl ?? null}
+      />
+      {/* 게스트하우스 선택 모달(공고 등록 시) */}
+      <SelectModal
+        visible={selectModal.visible}
+        title={"게스트하우스를 선택해 주세요"}
+        items={guesthouses}
+        onClose={() => setSelectModal({ visible: false })}
+        onPress={(id) => {
+          setSelectModal({ visible: false });
+          navigate(`/employ/recruit-form/${id}`);
+        }}
       />
     </div>
   );

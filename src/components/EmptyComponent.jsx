@@ -3,6 +3,9 @@ import React from "react";
 import EmptyIcon from "@assets/images/wa_blue_empty.svg";
 import ButtonOrange from "@components/ButtonOrange";
 
+/**
+ * 등록한 공고, 채용 없을 경우 사용
+ */
 export default function EmptyComponent({
   title,
   subtitle,
