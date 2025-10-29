@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import ButtonOrange from "@components/ButtonOrange";
 import { checkCodeForPhone, sendCodeForFindAccount } from "@utils/confirmPhone";
+import ErrorModal from "@components/ErrorModal";
 import { useParams } from "react-router-dom";
 
 const fmt = (s) => {
@@ -168,6 +169,13 @@ export default function FindAccount({ mode, setChecked, phone, setPhone }) {
         title={`${findTitle} 찾기`}
         disabled={!phoneChecked}
         onPress={handleFind}
+      />
+      <ErrorModal
+        visible={errorModal.visible}
+        title={errorModal.title}
+        message={errorModal.message}
+        buttonText={errorModal.buttonText}
+        onPress={errorModal.onPress}
       />
     </div>
   );
