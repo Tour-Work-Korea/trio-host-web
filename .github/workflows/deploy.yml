@@ -24,7 +24,7 @@ jobs:
         run: |
           npm ci
           npm run build
-          ls -al build  # ✅ build 폴더 생성 확인용 (디버깅용)
+          ls -al dist  # ✅ build 폴더 생성 확인용 (디버깅용)
 
       # 4️⃣ EC2로 빌드 파일 업로드
       - name: Deploy build files to EC2
@@ -33,7 +33,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "build/*"
+          source: "dist/*"
           target: "/var/www/host"
           overwrite: true   # ✅ 기존 파일 덮어쓰기 허용
 
