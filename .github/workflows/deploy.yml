@@ -33,7 +33,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "dist/*"
+          source: "dist/."
           target: "/var/www/host"
           overwrite: true   # ✅ 기존 파일 덮어쓰기 허용
 
