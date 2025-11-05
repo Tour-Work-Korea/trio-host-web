@@ -2,8 +2,12 @@ import axios from "axios";
 import useUserStore from "@stores/userStore";
 import { tryRefresh } from "@utils/authFlow";
 
+const isDev = import.meta.env.DEV;
+const API_BASE = isDev
+  ? "/api/v1"
+  : `${import.meta.env.VITE_API_URL.replace(/\/$/, "")}/api/v1`;
 const api = axios.create({
-  baseURL: "/api/v1",
+  baseURL: API_BASE,
   timeout: 5000,
   withCredentials: false,
   headers: { "Content-Type": "application/json" },
