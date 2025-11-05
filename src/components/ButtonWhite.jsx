@@ -20,7 +20,7 @@ export default function ButtonWhite({
       type="button"
       onClick={handleClick}
       disabled={disabled}
-      className={`h-9 w-full inline-flex items-center justify-center rounded-lg px-4 border
+      className={`h-9 w-full inline-flex items-center justify-center rounded-full px-4 border
         ${
           disabled
             ? "bg-grayscale-200 border-grayscale-300 text-grayscale-400"
@@ -28,7 +28,7 @@ export default function ButtonWhite({
         }
         ${className}`}
     >
-      <span className="text-sm font-semibold]">{title}</span>
+      <span className="text-md font-semibold]">{title}</span>
     </button>
   );
 }

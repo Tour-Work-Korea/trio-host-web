@@ -1,11 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { useCallback } from "react";
 
-import ButtonOrange from "../ButtonOrange";
+import ButtonOrange from "@components/ButtonOrange";
 import useUserStore from "@stores/userStore";
 
 import WaLogo from "@assets/images/wa_logo.svg";
-import { logout } from "../../utils/authFlow";
+import { logout } from "@utils/authFlow";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -22,8 +22,13 @@ export default function Header() {
     }
   }, [navigate]);
   return (
-    <header className="w-full flex bg-white py-4 px-6 justify-between items-center">
-      <img src={WaLogo} alt="WorkAway" className="h-10 w-auto" />
+    <header className="w-full flex bg-white py-4 px-6 justify-between items-center cursor-pointer">
+      <img
+        src={WaLogo}
+        alt="WorkAway"
+        className="h-10 w-auto"
+        onClick={() => (isLoggedIn ? navigate("guesthouse/my") : navigate("/"))}
+      />
       <div>
         {isLoggedIn ? (
           <ButtonOrange title="로그아웃" onPress={onLogout} />

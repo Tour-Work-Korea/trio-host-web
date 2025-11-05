@@ -9,17 +9,33 @@ const api = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-//accessToken 자동 주입
-api.interceptors.request.use((config) => {
-  const state = useUserStore.getState();
-  const token = state.accessToken;
-  const isAuth = typeof state.isAuth === "boolean" ? state.isAuth : !!token;
-
-  if (isAuth) config.headers.Authorization = `Bearer ${token}`;
-  config.withCredentials = !!isAuth;
-  return config;
+export const authClient = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
+//accessToken 자동 주입
+api.interceptors.request.use((config) => {
+  const { accessToken } = useUserStore.getState();
+
+  // 1) 요청에서 withAuth 명시되면 그걸 우선
+  // 2) 없으면 토큰 유무로 기본값 결정
+  const withAuth = config.withAuth ?? !!accessToken;
+
+  // 헤더 객체 보장
+  config.headers ||= {};
+
+  if (withAuth && accessToken) {
+    config.headers.Authorization = `Bearer ${accessToken}`;
+  } else {
+    // 요청별로 auth 끄면 혹시 남아있을 Authorization 제거
+    delete config.headers.Authorization;
+  }
+
+  // withCredentials도 요청이 명시했으면 존중, 아니면 withAuth에 따름
+  config.withCredentials = config.withCredentials ?? withAuth;
+
+  return config;
+});
 //401처리: 1회 리프레시 후 재시도
 let refreshing = null;
 api.interceptors.response.use(
@@ -37,6 +53,7 @@ api.interceptors.response.use(
 
     if (!ok) {
       useUserStore.getState().clearUser();
+      localStorage.clear();
       throw err;
     }
 

@@ -57,6 +57,7 @@ export const tryRefresh = async () => {
       error?.response?.status,
       error?.message
     );
+    localStorage.clear();
     useUserStore.getState().clearUser();
 
     return false;

@@ -8,9 +8,12 @@ import useUserStore from "@stores/userStore";
 import { tryRefresh } from "@utils/authFlow";
 
 const LandingPage = lazy(() => import("@pages/LandingPage"));
-const LoginPage = lazy(() => import("@pages/LoginPage"));
+const LoginPage = lazy(() => import("@pages/Auth/LoginPage"));
+const FindIdPage = lazy(() => import("@pages/Auth/FindIdPage"));
+const FindPasswordPage = lazy(() => import("@pages/Auth/FindPasswordPage"));
 const ApplicantPage = lazy(() => import("@pages/Employ/ApplicantPage"));
 const MyRecruitPage = lazy(() => import("@pages/Employ/MyRecruitPage"));
+const RecruitFormPage = lazy(() => import("@pages/Employ/RecruitFormPage"));
 const MyGuestHousePage = lazy(() =>
   import("@pages/Guesthouse/MyGuestHousePage")
 );
@@ -55,6 +58,8 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: S(<LandingPage />) }, // /
       { path: "login", element: S(<LoginPage />) }, // /login
+      { path: "find-id", element: S(<FindIdPage />) },
+      { path: "find-password", element: S(<FindPasswordPage />) },
     ],
   },
 
@@ -65,7 +70,10 @@ export const router = createBrowserRouter([
       // Employ
       { path: "employ/applicant", element: S(<ApplicantPage />) },
       { path: "employ/my-recruit", element: S(<MyRecruitPage />) },
-
+      {
+        path: "employ/recruit-form/:guesthouse_id",
+        element: S(<RecruitFormPage />),
+      },
       // Guesthouse
       { path: "guesthouse/my", element: S(<MyGuestHousePage />) },
       { path: "guesthouse/store-register", element: S(<StoreRegisterPage />) },

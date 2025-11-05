@@ -24,7 +24,6 @@ const useUserStore = create(
       clearUser: () =>
         set({
           accessToken: null,
-          refreshToken: null,
           profile: {
             name: "",
             photoUrl: null,
