@@ -23,6 +23,7 @@ jobs:
       - name: Build React app
         run: |
           npm ci
+          export VITE_API_URL=${{ secrets.VITE_API_URL }}
           npm run build
           ls -al dist  # ✅ build 폴더 생성 확인용 (디버깅용)
 
