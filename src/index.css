@@ -23,6 +23,7 @@
   --color-stroke-gray: #c8d1e2;
   --color-gray: #747d8f;
   --color-yellow: #ffef5e;
+  --color-light-orange: #ff865b;
 
   --color-primary-orange: #fe4401;
   --color-primary-blue: #5361db;
@@ -96,6 +97,25 @@
   .body-container {
     @apply flex-col h-full w-full overflow-y-scroll border-grayscale-200 border-2 rounded-lg p-4;
   }
+
+  /* 
+    랜딩 페이지 css
+  */
+  .landing-container {
+    @apply py-[120px] max-w-[1440px] w-full sm:px-[65px] px-4;
+  }
+  .landing-divide {
+    @apply flex flex-col justify-center md:flex-row md:justify-between md:items-center gap-10;
+  }
+  .landing-blue-box {
+    @apply flex-col flex justify-center items-center p-[30px] rounded-2xl border-1 border-secondary-blue shadow-secondary-blue shadow-sm;
+  }
+  .landing-ui-box {
+    @apply w-full rounded-t-2xl border-b-4 border-primary-orange py-6 px-1.5 bg-white shadow-sm shadow-secondary-blue text-lg font-medium;
+  }
+  .landing-ui-intro-section {
+    @apply flex flex-1 flex-col justify-between items-center py-2.5 w-full text-center min-w-[363px] md:max-w-[497px];
+  }
 }
 
 @layer utilities {
@@ -118,4 +138,16 @@ html,
 body,
 #root {
   font-family: var(--font-sans);
+}
+.slick-slider {
+  position: relative;
+}
+
+.slick-list {
+  overflow: hidden;
+}
+
+.slick-slide > div {
+  display: block;
+  height: 100%;
 }
