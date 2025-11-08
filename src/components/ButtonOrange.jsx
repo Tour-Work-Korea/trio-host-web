@@ -21,7 +21,7 @@ export default function ButtonOrange({
       type="button"
       onClick={handleClick}
       disabled={disabled}
-      className={`h-9 w-full inline-flex items-center rounded-full px-4 justify-center
+      className={`py-3 w-full inline-flex items-center rounded-full px-6 justify-center
         ${disabled ? "bg-grayscale-200" : "bg-primary-orange hover:opacity-80"}
         ${className}`}
     >
