@@ -1,0 +1,65 @@
+.heroSection {
+  width: 100%;
+  position: relative;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  align-content: center;
+  padding: 120px 65px;
+  box-sizing: border-box;
+  gap: 101px 0px;
+  text-align: left;
+  font-size: 48px;
+  color: #2d2d2d;
+  font-family: Pretendard;
+}
+.header {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 40px;
+  min-width: 549px;
+}
+.parent {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+}
+.b {
+  align-self: stretch;
+  position: relative;
+}
+.heroSectionB {
+  position: relative;
+  font-size: 20px;
+  line-height: 140%;
+  font-family: Inter;
+}
+.button {
+  border-radius: 30px;
+  background-color: #fe4401;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 30px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 18px;
+  color: #fff;
+}
+.label {
+  position: relative;
+  line-height: 150%;
+}
+.visualsIcon {
+  height: 497px;
+  flex: 1;
+  position: relative;
+  max-width: 100%;
+  min-width: 496px;
+}

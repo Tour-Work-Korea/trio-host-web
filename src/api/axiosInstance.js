@@ -6,6 +6,7 @@ const isDev = import.meta.env.DEV;
 const API_BASE = isDev
   ? "/api/v1"
   : `${import.meta.env.VITE_API_URL.replace(/\/$/, "")}/api/v1`;
+
 const api = axios.create({
   baseURL: API_BASE,
   timeout: 5000,

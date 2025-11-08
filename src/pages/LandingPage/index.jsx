@@ -1,6 +1,7 @@
 import ButtonOrange from "@components/ButtonOrange";
 import { useState } from "react";
 import RegisterModal from "./RegisterModal/RegisterModal";
+import HeroSection from "./IntroduceSection/HeroSection";
 
 export default function LandingPage() {
   const [registerModalVisible, setRegisterModalVisible] = useState(false);
@@ -29,7 +30,7 @@ export default function LandingPage() {
   return (
     <div>
       {/* 배너 */}
-      <div className="from-primary-orange to-white py-20 flex flex-col justify-center items-center md:px-20 lg:px-40 bg-gradient-to-b">
+      {/* <div className="from-primary-orange to-white py-20 flex flex-col justify-center items-center md:px-20 lg:px-40 bg-gradient-to-b">
         <h3 className="text-2xl font-semibold text-white w-full mb-20">
           사장님을 위한 워커웨이
           <br />
@@ -39,8 +40,11 @@ export default function LandingPage() {
         <div className="w-72">
           <ButtonOrange title="회원가입" onPress={handleRegisterModal} />
         </div>
+      </div> */}
+      {/* 서비스 소개 */}
+      <div className="">
+        <HeroSection />
       </div>
-
       {/* 입점신청, 회원가입 모달 */}
       <RegisterModal
         visible={registerModalVisible}
