@@ -9,9 +9,14 @@ export default function Banner({ handleRegisterModal }) {
       <div className="landing-divide">
         {/* 왼쪽 요소 */}
         <div className="flex-col">
-          <h1 className="text-5xl font-bold">사장님을 위한 워커웨이</h1>
+          <h1 className="text-5xl font-bold">
+            사장님을 위한&nbsp;
+            <br className="sm:hidden" />
+            워커웨이
+          </h1>
           <h3 className="text-xl font-bold mt-[20px]">
-            게스트하우스 등록부터 일자리·파티 모집까지 한 곳에서 시작하세요
+            게스트하우스 등록부터 일자리·모임까지
+            <br className="sm:hiddne" />한 곳에서 시작하세요
           </h3>
           <div className="w-72 mt-[40px]">
             <ButtonOrange
