@@ -6,20 +6,14 @@ import WaSuccessOrange from "@assets/images/wa_success_orange.svg";
 import ImageSlider from "@components/ImageSlider";
 
 export default function IntroUI2() {
-  return (
-    <section className="landing-container relative overflow-hidden">
-      {/* 배경 */}
-      <img
-        src={BgWaA}
-        aria-hidden="true"
-        className="absolute bottom-0 right-0 w-[591px] h-auto -z-10 pointer-events-none select-none"
-      />
-
-      {/* 양쪽 박스 높이 동일 */}
-      <div className="landing-divide flex gap-8 items-stretch w-full">
-        {/* 왼쪽 */}
-        <div className="landing-ui-intro-section">
-          <h2 className="text-[40px] font-bold">모임 참여자 예약 ・ 결제</h2>
+  const introSection = () => {
+    return (
+      <div className="flex justify-end w-full sm:justify-center">
+        <div className="landing-ui-intro-section ">
+          <h2 className="text-[40px] font-bold">
+            모임 참여자&nbsp; <br className="sm:hidden" />
+            예약 ・ 결제
+          </h2>
           <div className="flex flex-col items-center w-full gap-5 mt-4">
             <div className="landing-ui-box">
               귀찮은 공고 올리기는 이제 그만.
@@ -41,10 +35,32 @@ export default function IntroUI2() {
             <img src={WaSuccessOrange} />
           </div>
         </div>
-        {/* 오른쪽 */}
-        <div className="flex justify-center">
-          <ImageSlider images={[UI1, UI2]} />
-        </div>
+      </div>
+    );
+  };
+  const uiSection = () => {
+    return (
+      <div className="flex justify-center w-full">
+        <ImageSlider images={[UI1, UI2]} />
+      </div>
+    );
+  };
+  return (
+    <section className="landing-container relative overflow-hidden">
+      {/* 배경 */}
+      <img
+        src={BgWaA}
+        aria-hidden="true"
+        className="absolute bottom-0 right-0 w-[591px] h-auto -z-10 pointer-events-none select-none"
+      />
+
+      {/* 양쪽 박스 높이 동일 */}
+      <div className="landing-divide flex gap-8 items-stretch w-full">
+        {/* introSection: 가로일 때 왼쪽, 세로일 때 아래 */}
+        <div className="order-2 lg:order-1 w-full mt-4">{introSection()}</div>
+
+        {/* uiSection: 가로일 때 오른쪽, 세로일 때 위 */}
+        <div className="order-1 lg:order-2 w-full">{uiSection()}</div>
       </div>
     </section>
   );

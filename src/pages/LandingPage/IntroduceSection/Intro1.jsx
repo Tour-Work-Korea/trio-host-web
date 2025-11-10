@@ -19,7 +19,7 @@ export default function Intro1() {
         </div>
         {/* 오른쪽 */}
         <div className="flex landing-blue-box md:min-h-[370px] ">
-          <img src={VentureLogo} className="h-[104px] min-w-[310px]" />
+          <img src={VentureLogo} className="h-[104px] md:min-w-[310px] " />
         </div>
       </div>
     </div>

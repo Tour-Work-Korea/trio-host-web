@@ -18,39 +18,41 @@ export default function IntroUI1() {
       {/* 양쪽 박스 높이 동일 */}
       <div className="landing-divide flex gap-8 items-stretch w-full">
         {/* 왼쪽 */}
-        <div className="flex justify-center">
+        <div className="flex justify-center w-full">
           <ImageSlider images={[UI1, UI2]} />
         </div>
 
         {/* 오른쪽 */}
-        <div className="landing-ui-intro-section flex-1">
-          <h2 className="text-[40px] font-bold">스탭 모집 ・ 관리</h2>
-          <div className="flex flex-col items-center w-full gap-5 mt-4">
-            <div className="landing-ui-box">
-              MBTI, 경력 등 <b>스탭의 성향과 역량</b>을
-              <br />
-              파악할 수 있는 <b>WA 전용 이력서 제공</b>
-            </div>
-            <div className="landing-ui-box">
-              쉽게 작성 가능한 <b>템플릿</b>으로
-              <br /> <b>빠르게 공고</b> 등록
-            </div>
-            <div className="w-full">
+        <div className="flex justify-end w-full sm:justify-center">
+          <div className="landing-ui-intro-section ">
+            <h2 className="text-[40px] font-bold mt-4">스탭 모집 ・ 관리</h2>
+            <div className="flex flex-col items-center w-full gap-5 mt-4">
               <div className="landing-ui-box">
-                일정 확정 시 <b>예약금을 선 결제</b>
+                MBTI, 경력 등 <b>스탭의 성향과 역량</b>을
                 <br />
-                <b>
-                  스탭의 무단 불참 방지
-                  <span className="text-primary-orange">*</span>
-                </b>
+                파악할 수 있는 <b>WA 전용 이력서 제공</b>
               </div>
-              <p className="text-primary-orange font-semibold text-sm text-right">
-                *버전2 출시 기능
-              </p>
+              <div className="landing-ui-box">
+                쉽게 작성 가능한 <b>템플릿</b>으로
+                <br /> <b>빠르게 공고</b> 등록
+              </div>
+              <div className="w-full">
+                <div className="landing-ui-box">
+                  일정 확정 시 <b>예약금을 선 결제</b>
+                  <br />
+                  <b>
+                    스탭의 무단 불참 방지
+                    <span className="text-primary-orange">*</span>
+                  </b>
+                </div>
+                <p className="text-primary-orange font-semibold text-sm text-right">
+                  *버전2 출시 기능
+                </p>
+              </div>
             </div>
-          </div>
-          <div className="flex justify-end w-full mt-4">
-            <img src={WaSuccessBlue} />
+            <div className="flex justify-end w-full mt-4">
+              <img src={WaSuccessBlue} />
+            </div>
           </div>
         </div>
       </div>

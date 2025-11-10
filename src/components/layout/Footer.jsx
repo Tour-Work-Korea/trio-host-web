@@ -2,7 +2,7 @@ import WaLogo from "@assets/images/wa_logo.svg";
 
 export default function Footer() {
   return (
-    <div className="flex justify-between bg-gray-100 py-4 px-12 items-end">
+    <div className="sm:flex sm:justify-between sm:items-end bg-gray-100  py-8 w-full sm:px-[40px] px-4">
       <div>
         <img src={WaLogo} className="h-10 w-auto mb-4" />
         <div className="flex text-sm font-semibold">
@@ -18,7 +18,7 @@ export default function Footer() {
           <p>wa_korea_official</p>
         </div>
       </div>
-      <div className="text-sm font-semibold text-gray-400">
+      <div className="text-sm font-semibold text-gray-400 pt-4">
         @copyright 2025 workaway
       </div>
     </div>
