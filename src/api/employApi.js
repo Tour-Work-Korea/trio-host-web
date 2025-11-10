@@ -8,6 +8,10 @@ const employApi = {
   //사장님 나의 채용공고 목록 조회
   getMyRecruits: () => api.get("/host/recruits"),
 
+  //사장님 게스트하우스별 채용공고 목록 조회
+  getMyRecruitsByGuesthouse: (guesthouseId) =>
+    api.get(`/host/recruits/guesthouse/${guesthouseId}`),
+
   //채용공고 상세 조회
   getRecruitDetail: (recruitId) => api.get(`/host/recruits/${recruitId}`),
 
