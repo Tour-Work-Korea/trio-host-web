@@ -71,7 +71,7 @@ export const router = createBrowserRouter([
       { path: "employ/applicant", element: S(<ApplicantPage />) },
       { path: "employ/my-recruit", element: S(<MyRecruitPage />) },
       {
-        path: "employ/recruit-form/:guesthouse_id",
+        path: "employ/recruit-form",
         element: S(<RecruitFormPage />),
       },
       // Guesthouse
