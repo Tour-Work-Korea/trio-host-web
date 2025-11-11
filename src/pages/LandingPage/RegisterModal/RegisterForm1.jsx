@@ -1,7 +1,6 @@
 /* eslint-disable react/prop-types */
 import React, { useMemo, useState } from "react";
 import ButtonOrange from "@components/ButtonOrange";
-import { uploadSensitiveImage } from "@utils/imageUpload";
 import { handleSearchAddress } from "@utils/searchAddress";
 import ErrorModal from "@components/ErrorModal";
 import authApi from "@/api/authApi";
@@ -45,8 +44,8 @@ export default function RegisterForm1({
   // 이미지 업로드
   const handleUploadImage = async () => {
     try {
-      const url = await uploadSensitiveImage({ adaptive: false });
-      if (url) handleInputChange("img", url);
+      // const url = await uploadSensitiveImage({ adaptive: false });
+      // if (url) handleInputChange("img", url);
     } catch (error) {
       setErrorModal({
         ...errorModal,

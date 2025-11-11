@@ -434,29 +434,19 @@ export default function RecruitmentForm() {
               />
             </div>
 
-            <p className="text-sm text-grayscale-500 mt-2">
+            <p className="text-sm text-primary-blue mt-2 text-right">
               모든 항목을 입력하셔야 등록이 완료됩니다
             </p>
 
             {/* 하단 등록 버튼 */}
             <div className="mt-4 flex justify-center">
-              <button
-                type="button"
-                className={`inline-flex items-center gap-2 rounded-full px-6 py-2 text-sm font-semibold border ${
-                  isAllValid
-                    ? "bg-primary-orange border-primary-orange text-white"
-                    : "bg-white border-grayscale-300 text-grayscale-500 cursor-not-allowed"
-                }`}
-                disabled={!isAllValid}
-                onClick={handleSubmit}
-              >
-                <span>등록하기</span>
-                {isAllValid ? (
-                  <img src={CheckWhite} width={24} height={24} />
-                ) : (
-                  <img src={CheckBlack} width={24} height={24} />
-                )}
-              </button>
+              <div>
+                <ButtonOrange
+                  title="등록하기"
+                  onPress={handleSubmit}
+                  disabled={!isAllValid}
+                />
+              </div>
             </div>
           </div>
         </div>

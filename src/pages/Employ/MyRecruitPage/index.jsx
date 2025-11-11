@@ -185,10 +185,6 @@ export default function MyRecruitPage() {
 
   // 공고 등록 핸들러
   const handleCreateRecruit = () => {
-    //임시
-    dummyForTest();
-    return;
-    //
     if (guesthouses.length > 0) setSelectModal({ visible: true });
     else {
       setErrorModal({
