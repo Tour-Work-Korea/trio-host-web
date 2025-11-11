@@ -185,6 +185,10 @@ export default function MyRecruitPage() {
 
   // 공고 등록 핸들러
   const handleCreateRecruit = () => {
+    //임시
+    dummyForTest();
+    return;
+    //
     if (guesthouses.length > 0) setSelectModal({ visible: true });
     else {
       setErrorModal({
@@ -210,6 +214,10 @@ export default function MyRecruitPage() {
     }
   };
 
+  //임시 - 게하 아직 등록안했지만 일단 공고 등록 테스트할때
+  const dummyForTest = () => {
+    navigate(`/employ/recruit-form/`);
+  };
   // 게스트하우스 선택 변경 핸들러
   const handleChangeGuesthouse = (e) => {
     const id = Number(e.target.value);
@@ -327,7 +335,7 @@ export default function MyRecruitPage() {
         onClose={() => setSelectModal({ visible: false })}
         onPress={(id) => {
           setSelectModal({ visible: false });
-          navigate(`/employ/recruit-form/${id}`);
+          navigate(`/employ/recruit-form/`);
         }}
       />
     </div>
