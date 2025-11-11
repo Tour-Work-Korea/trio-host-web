@@ -79,12 +79,12 @@ export default function RecruitConditionSection({
     value ? new Date(value).toLocaleDateString("ko-KR") : placeholder;
 
   return (
-    <div className="w-full bg-white rounded-t-3xl px-5 pt-5 pb-6 flex flex-col">
+    <div className="form-body-container">
       {/* 내용 */}
       <div className="flex-1 overflow-y-auto flex flex-col gap-6">
         {/* 모집 기간 */}
         <div>
-          <p className="text-md font-semibold mb-2">모집 기간</p>
+          <p className="form-body-label">모집 기간</p>
           <div className="flex gap-3">
             <button
               type="button"
@@ -151,7 +151,7 @@ export default function RecruitConditionSection({
 
         {/* 모집 인원 */}
         <div>
-          <p className="text-md font-semibold mb-2">모집 인원</p>
+          <p className="form-body-label">모집 인원</p>
           <div className="flex gap-4">
             {/* 여자 */}
             <div className="flex items-center justify-between">
@@ -241,7 +241,7 @@ export default function RecruitConditionSection({
 
         {/* 나이 */}
         <div>
-          <p className="text-md font-semibold mb-2">나이</p>
+          <p className="form-body-label">나이</p>
           <div className="flex gap-4">
             {/* 최소 */}
             <div className="flex items-center justify-between">
@@ -303,7 +303,7 @@ export default function RecruitConditionSection({
 
         {/* 우대 조건 (태그 + 기타) */}
         <div>
-          <p className="text-md font-semibold mb-2">우대 조건</p>
+          <p className="form-body-label">우대 조건</p>
           <div className="flex flex-wrap gap-2 mb-3">
             {tags.map((tag) => {
               const isSelected = selectedTags.some(
@@ -314,10 +314,8 @@ export default function RecruitConditionSection({
                   key={tag.id}
                   type="button"
                   onClick={() => handleSelectTag(tag)}
-                  className={`px-3 py-1 rounded-full text-sm border ${
-                    isSelected
-                      ? "bg-primary-orange text-white border-primary-orange"
-                      : "bg-white text-gray-700 border-gray-300"
+                  className={`form-hashtag ${
+                    isSelected && "form-hashtag-selected"
                   }`}
                 >
                   {tag.title}
@@ -334,8 +332,8 @@ export default function RecruitConditionSection({
                 className="w-7 h-7"
               />
             </button>
-            <textarea
-              className="flex-1 min-h-[48px] max-h-[80px] resize-none rounded-xl border border-gray-200 px-3 py-2 text-md outline-none disabled:bg-gray-50"
+            <input
+              className="form-input disabled:bg-gray-50"
               placeholder="기타 입력"
               maxLength={50}
               value={etcText}

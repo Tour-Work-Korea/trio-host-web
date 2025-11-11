@@ -146,7 +146,7 @@ export default function WorkConditionSection({
   };
 
   return (
-    <div className="w-full px-5 pt-5 pb-6 flex flex-col">
+    <div className="form-body-container">
       {/* 내용 스크롤 영역 */}
       <div className="flex-1 overflow-y-auto flex flex-col gap-6">
         {/* 근무 형태 (입력형) */}
@@ -162,7 +162,7 @@ export default function WorkConditionSection({
           </div>
           <input
             type="text"
-            className="w-full rounded-xl border border-gray-200 px-3 py-2 text-md outline-none focus:border-primary-orange"
+            className="form-input"
             placeholder="예: 상주 스탭, 파트타임, 단기 스탭 등"
             maxLength={50}
             value={formData.workType ?? ""}
@@ -172,7 +172,7 @@ export default function WorkConditionSection({
 
         {/* 주요 업무 (태그 + 기타) */}
         <div>
-          <p className="text-md font-semibold mb-2">주요 업무</p>
+          <p className="form-body-label">주요 업무</p>
           <div className="flex flex-wrap gap-2 mb-3">
             {workParts.map((tag) => {
               const isSelected = selectedWorkParts.some((t) => t.id === tag.id);
@@ -181,10 +181,8 @@ export default function WorkConditionSection({
                   key={tag.id}
                   type="button"
                   onClick={() => handleSelectWorkPart(tag)}
-                  className={`px-3 py-1 rounded-full text-sm border ${
-                    isSelected
-                      ? "bg-primary-orange text-white border-primary-orange"
-                      : "bg-white text-gray-700 border-gray-300"
+                  className={`form-hashtag ${
+                    isSelected && "form-hashtag-selected"
                   }`}
                 >
                   {tag.title}
@@ -205,8 +203,8 @@ export default function WorkConditionSection({
                 className="w-7 h-7"
               />
             </button>
-            <textarea
-              className="flex-1 min-h-[48px] max-h-[80px] resize-none rounded-xl border border-gray-200 px-3 py-2 text-md outline-none disabled:bg-gray-50"
+            <input
+              className="form-input disabled:bg-gray-50"
               placeholder="기타 업무를 입력해주세요."
               maxLength={50}
               value={workPartEtcText}
@@ -226,7 +224,7 @@ export default function WorkConditionSection({
 
         {/* 근무 기간 요약 (태그 + 기타) */}
         <div>
-          <p className="text-md font-semibold mb-2">근무 기간 요약</p>
+          <p className="form-body-label">근무 기간</p>
           <div className="flex flex-wrap gap-2 mb-3">
             {workDurations.map((tag) => {
               const isSelected = selectedWorkDurations.some(
@@ -237,10 +235,8 @@ export default function WorkConditionSection({
                   key={tag.id}
                   type="button"
                   onClick={() => handleSelectWorkDuration(tag)}
-                  className={`px-3 py-1 rounded-full text-sm border ${
-                    isSelected
-                      ? "bg-primary-orange text-white border-primary-orange"
-                      : "bg-white text-gray-700 border-gray-300"
+                  className={`form-hashtag ${
+                    isSelected && "form-hashtag-selected"
                   }`}
                 >
                   {tag.title}
@@ -252,7 +248,7 @@ export default function WorkConditionSection({
 
         {/* 복지 (태그 + 기타) */}
         <div>
-          <p className="text-md font-semibold mb-2">복지</p>
+          <p className="form-body-label">복지</p>
           <div className="flex flex-wrap gap-2 mb-3">
             {welfares.map((tag) => {
               const isSelected = selectedWelfares.some((t) => t.id === tag.id);
@@ -261,10 +257,8 @@ export default function WorkConditionSection({
                   key={tag.id}
                   type="button"
                   onClick={() => handleSelectWelfare(tag)}
-                  className={`px-3 py-1 rounded-full text-sm border ${
-                    isSelected
-                      ? "bg-primary-orange text-white border-primary-orange"
-                      : "bg-white text-gray-700 border-gray-300"
+                  className={`form-hashtag ${
+                    isSelected && "form-hashtag-selected"
                   }`}
                 >
                   {tag.title}
@@ -285,8 +279,8 @@ export default function WorkConditionSection({
                 className="w-7 h-7"
               />
             </button>
-            <textarea
-              className="flex-1 min-h-[48px] max-h-[80px] resize-none rounded-xl border border-gray-200 px-3 py-2 text-md outline-none disabled:bg-gray-50"
+            <input
+              className="form-input disabled:bg-gray-50"
               placeholder="기타 복지 내용을 입력해주세요."
               maxLength={50}
               value={welfareEtcText}

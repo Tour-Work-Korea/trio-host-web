@@ -1,5 +1,4 @@
 /* eslint-disable react/prop-types */
-
 import React, { useRef } from "react";
 
 export default function DetailInfoSection({
@@ -20,7 +19,7 @@ export default function DetailInfoSection({
     handleInputChange("recruitDetail", e.target.value);
   };
   return (
-    <div className="w-full px-5 pt-5 pb-6 flex flex-col">
+    <div className="form-body-container">
       {/* 내용 영역 */}
       <div className="flex flex-col gap-2">
         <div className="flex justify-between">
@@ -40,7 +39,7 @@ export default function DetailInfoSection({
         {/* 상세 내용 textarea */}
         <textarea
           ref={textareaRef}
-          className="overflow-y-scroll w-full rounded-xl border max-h-[700px] border-gray-200 p-3 text-md text-gray-800 outline-none focus:border-primary-orange overflow-hidden"
+          className=" max-h-[700px] form-input-textarea"
           placeholder={`🏡 막내네 게스트하우스에서 스탭을 모집합니다!
 
 안녕하세요 :) 막내네 게스트하우스는 여행자들이 편히 쉬고, 사람들과 자연스럽게 어울릴 수 있는 공간을 만들고자 노력하는 숙소입니다.

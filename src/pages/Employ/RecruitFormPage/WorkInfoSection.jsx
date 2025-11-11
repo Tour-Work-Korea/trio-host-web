@@ -60,7 +60,7 @@ export default function WorkInfoSection({
   if (!visible) return null;
 
   return (
-    <div className="w-full px-5 pt-5 pb-6 flex flex-col">
+    <div className="form-body-container">
       {/* 내용 */}
       <div className="flex-1 overflow-y-auto">
         {/* 상단 텍스트 + 남은 개수 */}

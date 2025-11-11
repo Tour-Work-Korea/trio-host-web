@@ -1,6 +1,6 @@
 // src/pages/RecruitmentForm/index.jsx
 import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import ErrorModal from "@components/ErrorModal";
 import ButtonOrange from "@components/ButtonOrange";
@@ -16,8 +16,6 @@ import GuesthouseModal from "./GuesthouseModal";
 import ShortDescriptionModal from "./ShortDescriptionModal";
 
 import CheckOrange from "@assets/images/check_orange.svg";
-import CheckBlack from "@assets/images/check_black.svg";
-import CheckWhite from "@assets/images/check_white.svg";
 import ChevronBlack from "@assets/images/chevron_right_black.svg";
 
 const today = new Date();
@@ -30,7 +28,6 @@ dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
 
 export default function RecruitmentForm() {
   const navigate = useNavigate();
-  const { recruitId } = useParams();
 
   const [formData, setFormData] = useState({
     recruitTitle: "",
@@ -104,75 +101,6 @@ export default function RecruitmentForm() {
     setValid(computeValidSections(formData));
   }, [formData]);
 
-  // 수정 모드라면 기존 공고 조회
-  useEffect(() => {
-    if (!recruitId) return;
-
-    const toDate = (v) => (v ? new Date(v) : null);
-    const splitTitles = (v) =>
-      Array.isArray(v)
-        ? v
-        : typeof v === "string"
-        ? v
-            .split(",")
-            .map((s) => s.trim())
-            .filter(Boolean)
-        : [];
-    const toCondObjs = (v) => {
-      const arr = Array.isArray(v) ? v : splitTitles(v);
-      return arr.map((t, i) =>
-        typeof t === "string" ? { id: -1000 - i, title: t } : t
-      );
-    };
-
-    const getPrevRecruit = async (id) => {
-      try {
-        const response = await employApi.getRecruitDetail(id);
-        const r = response.data;
-
-        setFormData((prev) => ({
-          ...prev,
-          recruitTitle: r.recruitTitle ?? "",
-          recruitShortDescription: r.recruitShortDescription ?? "",
-          recruitStart: toDate(r.recruitStart),
-          recruitEnd: toDate(r.recruitEnd),
-          entryStartDate: toDate(r.entryStartDate),
-          entryEndDate: toDate(r.entryEndDate),
-
-          recruitNumberFemale: r.recruitNumberFemale ?? 0,
-          recruitNumberMale: r.recruitNumberMale ?? 0,
-          recruitNumberNoGender: r.recruitNumberNoGender ?? 0,
-          recruitMinAge: r.recruitMinAge ?? 0,
-          recruitMaxAge: r.recruitMaxAge ?? 0,
-
-          recruitCondition: toCondObjs(r.recruitCondition),
-          workPart: splitTitles(r.workPart),
-          welfare: splitTitles(r.welfare),
-
-          workType: r.workType ?? "",
-          workDuration: r.workDuration ?? "",
-
-          recruitImage: r.recruitImages ?? [],
-          recruitDetail: r.recruitDetail ?? "",
-          hashtags: (r.hashtags ?? []).map((t) => t.id),
-          guesthouseId: r.guesthouseId ?? 0,
-        }));
-      } catch (error) {
-        const serverMessage =
-          error?.response?.data?.message ||
-          error?.message ||
-          "공고 정보를 불러오는 중 오류가 발생했습니다.";
-        setErrorModal((prev) => ({
-          ...prev,
-          visible: true,
-          title: serverMessage,
-        }));
-      }
-    };
-
-    getPrevRecruit(recruitId);
-  }, [recruitId]);
-
   // formData 업데이트
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
@@ -242,15 +170,15 @@ export default function RecruitmentForm() {
         <div className="flex-1 overflow-y-auto">
           <div className="flex flex-col gap-4">
             {/* 공고 제목 섹션 */}
-            <div className="w-full rounded-2xl border-1 border-grayscale-200 bg-white px-4 py-3 flex flex-col gap-2 shadow-sm text-left">
+            <div className="form-section-box">
               <div
-                className="flex items-center justify-between hover:cursor-pointer"
+                className="form-title-box"
                 type="button"
                 onClick={() =>
                   setModalVisible((prev) => ({ ...prev, title: !prev.title }))
                 }
               >
-                <span className="text-lg font-semibold">공고 제목</span>
+                <span className="form-title-text">공고 제목</span>
                 {valid.title ? (
                   <img src={CheckOrange} width={24} height={24} />
                 ) : (
@@ -261,7 +189,7 @@ export default function RecruitmentForm() {
               {modalVisible.title && (
                 <input
                   type="text"
-                  className="mt-2 w-full border border-grayscale-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-primary-orange"
+                  className="form-input mt-2"
                   placeholder="공고제목을 입력해주세요."
                   value={formData.recruitTitle}
                   maxLength={30}
@@ -272,9 +200,9 @@ export default function RecruitmentForm() {
               )}
             </div>
             {/* 게스트하우스 */}
-            <div className="w-full rounded-2xl border-1 border-grayscale-200 bg-white px-4 py-3 flex flex-col gap-2 shadow-sm text-left">
+            <div className="form-section-box">
               <div
-                className="flex items-center justify-between "
+                className="form-title-box"
                 type="button"
                 onClick={() =>
                   setModalVisible((prev) => ({
@@ -283,7 +211,7 @@ export default function RecruitmentForm() {
                   }))
                 }
               >
-                <span className="text-lg font-semibold">게스트하우스</span>
+                <span className="form-title-text">게스트하우스</span>
                 {valid.guesthouse ? (
                   <img src={CheckOrange} width={24} height={24} />
                 ) : (
@@ -299,9 +227,9 @@ export default function RecruitmentForm() {
               )}
             </div>
             {/* 공고요약 */}
-            <div className="w-full rounded-2xl border-1 border-grayscale-200 bg-white px-4 py-3 flex flex-col gap-2 shadow-sm text-left">
+            <div className="form-section-box">
               <div
-                className="flex items-center justify-between "
+                className="form-title-box"
                 type="button"
                 onClick={() =>
                   setModalVisible((prev) => ({
@@ -310,7 +238,7 @@ export default function RecruitmentForm() {
                   }))
                 }
               >
-                <span className="text-lg font-semibold">공고요약</span>
+                <span className="form-title-text">공고요약</span>
                 {valid.shortDescription ? (
                   <img src={CheckOrange} width={24} height={24} />
                 ) : (
@@ -332,9 +260,9 @@ export default function RecruitmentForm() {
               )}
             </div>
             {/* 모집조건 */}
-            <div className="w-full rounded-2xl border-1 border-grayscale-200 bg-white px-4 py-3 flex flex-col gap-2 shadow-sm text-left">
+            <div className="form-section-box">
               <div
-                className="flex items-center justify-between "
+                className="form-title-box"
                 type="button"
                 onClick={() =>
                   setModalVisible((prev) => ({
@@ -343,7 +271,7 @@ export default function RecruitmentForm() {
                   }))
                 }
               >
-                <span className="text-lg font-semibold">모집조건</span>
+                <span className="form-title-text">모집조건</span>
                 {valid.recruitCondition ? (
                   <img src={CheckOrange} width={24} height={24} />
                 ) : (
@@ -359,9 +287,9 @@ export default function RecruitmentForm() {
               )}
             </div>
             {/* 근무 조건 */}
-            <div className="w-full rounded-2xl border-1 border-grayscale-200 bg-white px-4 py-3 flex flex-col gap-2 shadow-sm text-left">
+            <div className="form-section-box">
               <div
-                className="flex items-center justify-between "
+                className="form-title-box"
                 type="button"
                 onClick={() =>
                   setModalVisible((prev) => ({
@@ -370,7 +298,7 @@ export default function RecruitmentForm() {
                   }))
                 }
               >
-                <span className="text-lg font-semibold">근무조건</span>
+                <span className="form-title-text">근무조건</span>
                 {valid.workCondition ? (
                   <img src={CheckOrange} width={24} height={24} />
                 ) : (
@@ -384,9 +312,9 @@ export default function RecruitmentForm() {
               />
             </div>
             {/* 근무지 정보 */}
-            <div className="w-full rounded-2xl border-1 border-grayscale-200 bg-white px-4 py-3 flex flex-col gap-2 shadow-sm text-left">
+            <div className="form-section-box">
               <div
-                className="flex items-center justify-between "
+                className="form-title-box"
                 type="button"
                 onClick={() =>
                   setModalVisible((prev) => ({
@@ -395,7 +323,7 @@ export default function RecruitmentForm() {
                   }))
                 }
               >
-                <span className="text-lg font-semibold">근무지 정보</span>
+                <span className="form-title-text">근무지 정보</span>
                 {valid.workInfo ? (
                   <img src={CheckOrange} width={24} height={24} />
                 ) : (
@@ -409,9 +337,9 @@ export default function RecruitmentForm() {
               />
             </div>
             {/* 상세 정보 */}
-            <div className="w-full rounded-2xl border-1 border-grayscale-200 bg-white px-4 py-3 flex flex-col gap-2 shadow-sm text-left">
+            <div className="form-section-box">
               <div
-                className="flex items-center justify-between "
+                className="form-title-box"
                 type="button"
                 onClick={() =>
                   setModalVisible((prev) => ({
@@ -420,7 +348,7 @@ export default function RecruitmentForm() {
                   }))
                 }
               >
-                <span className="text-lg font-semibold">상세 정보</span>
+                <span className="form-title-text">상세 정보</span>
                 {valid.detailInfo ? (
                   <img src={CheckOrange} width={24} height={24} />
                 ) : (

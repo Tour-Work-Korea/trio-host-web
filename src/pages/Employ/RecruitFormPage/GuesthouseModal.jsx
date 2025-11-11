@@ -6,7 +6,6 @@ import guesthouseApi from "@api/guesthouseApi";
 import ButtonOrange from "@components/ButtonOrange";
 import ErrorModal from "@components/ErrorModal";
 
-import XBtn from "@assets/images/x_gray.svg";
 import DisabledRadioButton from "@assets/images/radio_button_disabled.svg";
 import EnabledRadioButton from "@assets/images/radio_button_enabled.svg";
 import EmployLogo from "@assets/images/wa_blue_empty.svg";
@@ -70,7 +69,7 @@ export default function GuesthouseModal({
   // 게스트하우스가 하나도 없을 때: 안내 모달 형태로 노출
   if (guesthouses.length === 0) {
     return (
-      <div className="w-full rounded-3xl bg-white px-6 py-6 text-center flex flex-col items-center gap-4">
+      <div className="form-body-container">
         <img src={EmployLogo} alt="게스트하우스" className="w-16 h-16 mb-2" />
         <h2 className="text-lg font-semibold">게스트하우스</h2>
         <p className="text-md text-grayscale-500">
