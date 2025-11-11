@@ -1,7 +1,6 @@
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState } from "react";
 import DatePicker from "@components/DatePicker";
-import ButtonOrange from "@components/ButtonOrange";
 
 import Plus from "@assets/images/plus_gray.svg";
 import Minus from "@assets/images/minus_gray.svg";
@@ -30,7 +29,10 @@ export default function RecruitConditionSection({
   const [selectedTags, setSelectedTags] = useState(
     formData.recruitCondition ?? []
   );
-  const [etcText, setEtcText] = useState("");
+  const [etcText, setEtcText] = useState(() => {
+    const etc = formData?.recruitCondition?.find((item) => item.id === 7);
+    return etc ? etc.title : "";
+  });
 
   const isSelectedEtc = selectedTags?.some((t) => t.id === 7);
 
@@ -38,6 +40,10 @@ export default function RecruitConditionSection({
   useEffect(() => {
     setSelectedTags(formData.recruitCondition ?? []);
   }, [visible, formData.recruitCondition]);
+
+  useEffect(() => {
+    handleInputChange("recruitCondition", selectedTags);
+  }, [selectedTags]);
 
   if (!visible) return null;
 
@@ -69,24 +75,20 @@ export default function RecruitConditionSection({
     }
   };
 
-  const handleApply = () => {
-    handleInputChange("recruitCondition", selectedTags);
-  };
-
   const renderDateLabel = (value, placeholder) =>
     value ? new Date(value).toLocaleDateString("ko-KR") : placeholder;
 
   return (
-    <div className="w-full max-h-[90vh] bg-white rounded-t-3xl px-5 pt-5 pb-6 flex flex-col">
+    <div className="w-full bg-white rounded-t-3xl px-5 pt-5 pb-6 flex flex-col">
       {/* 내용 */}
       <div className="flex-1 overflow-y-auto flex flex-col gap-6">
         {/* 모집 기간 */}
         <div>
-          <p className="text-sm font-semibold mb-2">모집 기간</p>
+          <p className="text-md font-semibold mb-2">모집 기간</p>
           <div className="flex gap-3">
             <button
               type="button"
-              className="flex-1 flex items-center justify-between rounded-xl border border-gray-200 px-3 py-2 text-sm"
+              className="flex-1 flex items-center justify-between rounded-xl border border-gray-200 px-3 py-2 text-md"
               onClick={() => {
                 if (
                   selectedRecruitField == "recruitStart" &&
@@ -111,7 +113,7 @@ export default function RecruitConditionSection({
 
             <button
               type="button"
-              className="flex-1 flex items-center justify-between rounded-xl border border-gray-200 px-3 py-2 text-sm"
+              className="flex-1 flex items-center justify-between rounded-xl border border-gray-200 px-3 py-2 text-md"
               onClick={() => {
                 if (selectedRecruitField == "recruitEnd" && showRecruitCalendar)
                   setShowRecruitCalendar(false);
@@ -149,11 +151,11 @@ export default function RecruitConditionSection({
 
         {/* 모집 인원 */}
         <div>
-          <p className="text-sm font-semibold mb-2">모집 인원</p>
+          <p className="text-md font-semibold mb-2">모집 인원</p>
           <div className="flex gap-4">
             {/* 여자 */}
             <div className="flex items-center justify-between">
-              <span className="w-16 text-sm text-gray-600">여자</span>
+              <span className="w-16 text-md text-gray-600">여자</span>
               <div className="flex items-center gap-2">
                 <button
                   type="button"
@@ -163,7 +165,7 @@ export default function RecruitConditionSection({
                   <img src={Minus} alt="-" className="w-5 h-5" />
                 </button>
                 <input
-                  className="w-16 h-11 rounded-xl border border-gray-200 text-center text-sm outline-none"
+                  className="w-16 h-11 rounded-xl border border-gray-200 text-center text-md outline-none"
                   value={String(formData.recruitNumberFemale ?? 0)}
                   onChange={(e) =>
                     handleNumberChange("recruitNumberFemale", e.target.value)
@@ -181,7 +183,7 @@ export default function RecruitConditionSection({
 
             {/* 남자 */}
             <div className="flex items-center justify-between">
-              <span className="w-16 text-sm text-gray-600">남자</span>
+              <span className="w-16 text-md text-gray-600">남자</span>
               <div className="flex items-center gap-2">
                 <button
                   type="button"
@@ -191,7 +193,7 @@ export default function RecruitConditionSection({
                   <img src={Minus} alt="-" className="w-5 h-5" />
                 </button>
                 <input
-                  className="w-16 h-11 rounded-xl border border-gray-200 text-center text-sm outline-none"
+                  className="w-16 h-11 rounded-xl border border-gray-200 text-center text-md outline-none"
                   value={String(formData.recruitNumberMale ?? 0)}
                   onChange={(e) =>
                     handleNumberChange("recruitNumberMale", e.target.value)
@@ -209,7 +211,7 @@ export default function RecruitConditionSection({
 
             {/* 성별무관 */}
             <div className="flex items-center justify-between">
-              <span className="w-16 text-sm text-gray-600">성별무관</span>
+              <span className="w-16 text-md text-gray-600">성별무관</span>
               <div className="flex items-center gap-2">
                 <button
                   type="button"
@@ -219,7 +221,7 @@ export default function RecruitConditionSection({
                   <img src={Minus} alt="-" className="w-5 h-5" />
                 </button>
                 <input
-                  className="w-16 h-11 rounded-xl border border-gray-200 text-center text-sm outline-none"
+                  className="w-16 h-11 rounded-xl border border-gray-200 text-center text-md outline-none"
                   value={String(formData.recruitNumberNoGender ?? 0)}
                   onChange={(e) =>
                     handleNumberChange("recruitNumberNoGender", e.target.value)
@@ -239,11 +241,11 @@ export default function RecruitConditionSection({
 
         {/* 나이 */}
         <div>
-          <p className="text-sm font-semibold mb-2">나이</p>
+          <p className="text-md font-semibold mb-2">나이</p>
           <div className="flex gap-4">
             {/* 최소 */}
             <div className="flex items-center justify-between">
-              <span className="w-16 text-sm text-gray-600">최소</span>
+              <span className="w-16 text-md text-gray-600">최소</span>
               <div className="flex items-center gap-2">
                 <button
                   type="button"
@@ -253,7 +255,7 @@ export default function RecruitConditionSection({
                   <img src={Minus} alt="-" className="w-5 h-5" />
                 </button>
                 <input
-                  className="w-16 h-11 rounded-xl border border-gray-200 text-center text-sm outline-none"
+                  className="w-16 h-11 rounded-xl border border-gray-200 text-center text-md outline-none"
                   value={String(formData.recruitMinAge ?? 0)}
                   onChange={(e) =>
                     handleNumberChange("recruitMinAge", e.target.value)
@@ -271,7 +273,7 @@ export default function RecruitConditionSection({
 
             {/* 최대 */}
             <div className="flex items-center justify-between">
-              <span className="w-16 text-sm text-gray-600">최대</span>
+              <span className="w-16 text-md text-gray-600">최대</span>
               <div className="flex items-center gap-2">
                 <button
                   type="button"
@@ -281,7 +283,7 @@ export default function RecruitConditionSection({
                   <img src={Minus} alt="-" className="w-5 h-5" />
                 </button>
                 <input
-                  className="w-16 h-11 rounded-xl border border-gray-200 text-center text-sm outline-none"
+                  className="w-16 h-11 rounded-xl border border-gray-200 text-center text-md outline-none"
                   value={String(formData.recruitMaxAge ?? 0)}
                   onChange={(e) =>
                     handleNumberChange("recruitMaxAge", e.target.value)
@@ -301,7 +303,7 @@ export default function RecruitConditionSection({
 
         {/* 우대 조건 (태그 + 기타) */}
         <div>
-          <p className="text-sm font-semibold mb-2">우대 조건</p>
+          <p className="text-md font-semibold mb-2">우대 조건</p>
           <div className="flex flex-wrap gap-2 mb-3">
             {tags.map((tag) => {
               const isSelected = selectedTags.some(
@@ -312,7 +314,7 @@ export default function RecruitConditionSection({
                   key={tag.id}
                   type="button"
                   onClick={() => handleSelectTag(tag)}
-                  className={`px-3 py-1 rounded-full text-xs border ${
+                  className={`px-3 py-1 rounded-full text-sm border ${
                     isSelected
                       ? "bg-primary-orange text-white border-primary-orange"
                       : "bg-white text-gray-700 border-gray-300"
@@ -333,7 +335,7 @@ export default function RecruitConditionSection({
               />
             </button>
             <textarea
-              className="flex-1 min-h-[48px] max-h-[80px] resize-none rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none disabled:bg-gray-50"
+              className="flex-1 min-h-[48px] max-h-[80px] resize-none rounded-xl border border-gray-200 px-3 py-2 text-md outline-none disabled:bg-gray-50"
               placeholder="기타 입력"
               maxLength={50}
               value={etcText}
@@ -348,11 +350,6 @@ export default function RecruitConditionSection({
             />
           </div>
         </div>
-      </div>
-
-      {/* 하단 적용하기 버튼 */}
-      <div className="mt-5">
-        <ButtonOrange title="적용하기" onPress={handleApply} />
       </div>
     </div>
   );

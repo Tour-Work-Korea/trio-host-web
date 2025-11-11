@@ -1,4 +1,4 @@
-// KoreanDatePicker.jsx (웹용 React)
+/* eslint-disable react/prop-types */
 import React, { useEffect, useMemo, useState } from "react";
 import LeftChevron from "@assets/images/chevron_left_gray.svg";
 import RightChevron from "@assets/images/chevron_right_gray.svg";
@@ -143,8 +143,8 @@ export default function KoreanDatePicker({
     >
       {/* 상단 라벨/선택일 */}
       <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-gray-900">{label}</span>
-        <span className="text-xs font-semibold text-primary-blue">
+        <span className="text-md font-medium text-gray-900">{label}</span>
+        <span className="text-md font-semibold text-primary-blue">
           {selected ? formatSelected(selected) : "선택"}
         </span>
       </div>
@@ -161,7 +161,7 @@ export default function KoreanDatePicker({
         >
           <img src={LeftChevron} width={20} height={20} />
         </button>
-        <span className="text-sm font-semibold text-gray-900">
+        <span className="text-md font-semibold text-gray-900">
           {year}년 {month + 1}월
         </span>
         <button

@@ -20,27 +20,25 @@ import CheckBlack from "@assets/images/check_black.svg";
 import CheckWhite from "@assets/images/check_white.svg";
 import ChevronBlack from "@assets/images/chevron_right_black.svg";
 
-const sections = [
-  { id: "guesthouse", title: "게스트하우스" },
-  { id: "shortDescription", title: "공고 요약" },
-  { id: "recruitCondition", title: "모집 조건" },
-  { id: "workCondition", title: "근무 조건" },
-  { id: "workInfo", title: "근무지 정보" },
-  { id: "detailInfo", title: "상세 정보" },
-];
+const today = new Date();
+
+const tomorrow = new Date(today);
+tomorrow.setDate(tomorrow.getDate() + 1);
+
+const dayAfterTomorrow = new Date(today);
+dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
 
 export default function RecruitmentForm() {
   const navigate = useNavigate();
-  const { recruitId } = useParams(); // /employ/recruit-form/:recruitId 같은 형태 가정
+  const { recruitId } = useParams();
 
-  // RN formData 그대로
   const [formData, setFormData] = useState({
     recruitTitle: "",
     recruitShortDescription: "",
     recruitStart: null,
     recruitEnd: null,
-    entryStartDate: null,
-    entryEndDate: null,
+    entryStartDate: tomorrow,
+    entryEndDate: dayAfterTomorrow,
     recruitNumberMale: 0,
     recruitNumberFemale: 0,
     recruitNumberNoGender: 0,
@@ -48,7 +46,7 @@ export default function RecruitmentForm() {
     recruitMinAge: 0,
     recruitMaxAge: 0,
     workType: "",
-    workDuration: "",
+    workDuration: [],
     workPart: [],
     welfare: [],
     recruitDetail: "",
@@ -195,8 +193,6 @@ export default function RecruitmentForm() {
         buttonText2: null,
         onPress: () => {
           setErrorModal((prev) => ({ ...prev, visible: false }));
-          // RN에서는 MainTabs -> MyRecruitmentList로 reset
-          // 웹에서는 공고 목록 페이지로 이동한다고 가정
           navigate("/employ/my-recruit");
         },
         onPress2: null,
@@ -225,11 +221,14 @@ export default function RecruitmentForm() {
       recruitEnd: formData.recruitEnd.toISOString(),
       entryStartDate: formData.entryStartDate.toISOString(),
       entryEndDate: formData.entryEndDate.toISOString(),
-      recruitCondition: formData.recruitCondition
+      recruitCondition: (formData.recruitCondition || [])
         .map((c) => c.title)
         .join(", "),
-      workPart: formData.workPart.join(", "),
-      welfare: formData.welfare.join(", "),
+      workDuration: (formData.workDuration || [])
+        .map((d) => d.title)
+        .join(", "),
+      workPart: (formData.workPart || []).map((p) => p.title).join(", "),
+      welfare: (formData.welfare || []).map((w) => w.title).join(", "),
     };
 
     fetchNewRecruit(payload);
@@ -245,13 +244,13 @@ export default function RecruitmentForm() {
             {/* 공고 제목 섹션 */}
             <div className="w-full rounded-2xl border-1 border-grayscale-200 bg-white px-4 py-3 flex flex-col gap-2 shadow-sm text-left">
               <div
-                className="flex items-center justify-between"
+                className="flex items-center justify-between hover:cursor-pointer"
                 type="button"
                 onClick={() =>
                   setModalVisible((prev) => ({ ...prev, title: !prev.title }))
                 }
               >
-                <span className="text-base font-semibold">공고 제목</span>
+                <span className="text-lg font-semibold">공고 제목</span>
                 {valid.title ? (
                   <img src={CheckOrange} width={24} height={24} />
                 ) : (
@@ -284,7 +283,7 @@ export default function RecruitmentForm() {
                   }))
                 }
               >
-                <span className="text-base font-semibold">게스트하우스</span>
+                <span className="text-lg font-semibold">게스트하우스</span>
                 {valid.guesthouse ? (
                   <img src={CheckOrange} width={24} height={24} />
                 ) : (
@@ -311,7 +310,7 @@ export default function RecruitmentForm() {
                   }))
                 }
               >
-                <span className="text-base font-semibold">공고요약</span>
+                <span className="text-lg font-semibold">공고요약</span>
                 {valid.shortDescription ? (
                   <img src={CheckOrange} width={24} height={24} />
                 ) : (
@@ -344,7 +343,7 @@ export default function RecruitmentForm() {
                   }))
                 }
               >
-                <span className="text-base font-semibold">모집조건</span>
+                <span className="text-lg font-semibold">모집조건</span>
                 {valid.recruitCondition ? (
                   <img src={CheckOrange} width={24} height={24} />
                 ) : (
@@ -356,34 +355,84 @@ export default function RecruitmentForm() {
                   handleInputChange={handleInputChange}
                   formData={formData}
                   visible={modalVisible.recruitCondition}
-                  onClose={() =>
-                    setModalVisible((prev) => ({
-                      ...prev,
-                      recruitCondition: false,
-                    }))
-                  }
                 />
               )}
             </div>
-
-            {/* 나머지 섹션 카드들 */}
-            {sections.map((item) => (
-              <button
-                key={item.id}
+            {/* 근무 조건 */}
+            <div className="w-full rounded-2xl border-1 border-grayscale-200 bg-white px-4 py-3 flex flex-col gap-2 shadow-sm text-left">
+              <div
+                className="flex items-center justify-between "
                 type="button"
-                className="w-full rounded-2xl bg-white px-4 py-3 flex items-center justify-between shadow-sm text-left"
                 onClick={() =>
-                  setModalVisible((prev) => ({ ...prev, [item.id]: true }))
+                  setModalVisible((prev) => ({
+                    ...prev,
+                    workCondition: !prev.workCondition,
+                  }))
                 }
               >
-                <span className="text-base font-semibold">{item.title}</span>
-                {valid[item.id] ? (
+                <span className="text-lg font-semibold">근무조건</span>
+                {valid.workCondition ? (
                   <img src={CheckOrange} width={24} height={24} />
                 ) : (
                   <img src={ChevronBlack} width={24} height={24} />
                 )}
-              </button>
-            ))}
+              </div>
+              <WorkConditionSection
+                handleInputChange={handleInputChange}
+                formData={formData}
+                visible={modalVisible.workCondition}
+              />
+            </div>
+            {/* 근무지 정보 */}
+            <div className="w-full rounded-2xl border-1 border-grayscale-200 bg-white px-4 py-3 flex flex-col gap-2 shadow-sm text-left">
+              <div
+                className="flex items-center justify-between "
+                type="button"
+                onClick={() =>
+                  setModalVisible((prev) => ({
+                    ...prev,
+                    workInfo: !prev.workInfo,
+                  }))
+                }
+              >
+                <span className="text-lg font-semibold">근무지 정보</span>
+                {valid.workInfo ? (
+                  <img src={CheckOrange} width={24} height={24} />
+                ) : (
+                  <img src={ChevronBlack} width={24} height={24} />
+                )}
+              </div>
+              <WorkInfoSection
+                handleInputChange={handleInputChange}
+                formData={formData}
+                visible={modalVisible.workInfo}
+              />
+            </div>
+            {/* 상세 정보 */}
+            <div className="w-full rounded-2xl border-1 border-grayscale-200 bg-white px-4 py-3 flex flex-col gap-2 shadow-sm text-left">
+              <div
+                className="flex items-center justify-between "
+                type="button"
+                onClick={() =>
+                  setModalVisible((prev) => ({
+                    ...prev,
+                    detailInfo: !prev.detailInfo,
+                  }))
+                }
+              >
+                <span className="text-lg font-semibold">상세 정보</span>
+                {valid.detailInfo ? (
+                  <img src={CheckOrange} width={24} height={24} />
+                ) : (
+                  <img src={ChevronBlack} width={24} height={24} />
+                )}
+              </div>
+              <DetailInfoSection
+                handleInputChange={handleInputChange}
+                formData={formData}
+                visible={modalVisible.detailInfo}
+              />
+            </div>
 
             <p className="text-sm text-grayscale-500 mt-2">
               모든 항목을 입력하셔야 등록이 완료됩니다
@@ -422,36 +471,6 @@ export default function RecruitmentForm() {
           onPress={errorModal.onPress}
           onPress2={errorModal.onPress2 ?? null}
           imgUrl={errorModal.imgUrl ?? null}
-        />
-
-        {/* 모집 조건 모달 */}
-        <RecruitConditionSection
-          handleInputChange={handleInputChange}
-          formData={formData}
-          visible={modalVisible.recruitCondition}
-          onClose={() =>
-            setModalVisible((prev) => ({ ...prev, recruitCondition: false }))
-          }
-        />
-
-        {/* 근무 조건 모달 */}
-        <WorkConditionSection
-          handleInputChange={handleInputChange}
-          formData={formData}
-          visible={modalVisible.workCondition}
-          onClose={() =>
-            setModalVisible((prev) => ({ ...prev, workCondition: false }))
-          }
-        />
-
-        {/* 상세 정보 모달 */}
-        <DetailInfoSection
-          handleInputChange={handleInputChange}
-          formData={formData}
-          visible={modalVisible.detailInfo}
-          onClose={() =>
-            setModalVisible((prev) => ({ ...prev, detailInfo: false }))
-          }
         />
       </div>
     </div>

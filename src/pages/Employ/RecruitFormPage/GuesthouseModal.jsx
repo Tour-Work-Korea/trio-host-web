@@ -23,12 +23,13 @@ export default function GuesthouseModal({
     title: "",
     message: null,
   });
+  const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
 
-  // 최초 한 번: 나의 게스트하우스 목록 조회
   useEffect(() => {
     const fetchMyGuestHouse = async () => {
+      setLoading(true);
       try {
         const res = await guesthouseApi.getMyGuesthouses();
         const list = Array.isArray(res?.data)
@@ -45,6 +46,8 @@ export default function GuesthouseModal({
             "나의 게스트하우스 조회에 실패했습니다.",
           message: null,
         });
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -62,6 +65,7 @@ export default function GuesthouseModal({
   }, [visible, formData?.guesthouseId]);
 
   if (!visible) return null;
+  if (loading) return null;
 
   // 게스트하우스가 하나도 없을 때: 안내 모달 형태로 노출
   if (guesthouses.length === 0) {
@@ -69,10 +73,10 @@ export default function GuesthouseModal({
       <div className="w-full rounded-3xl bg-white px-6 py-6 text-center flex flex-col items-center gap-4">
         <img src={EmployLogo} alt="게스트하우스" className="w-16 h-16 mb-2" />
         <h2 className="text-lg font-semibold">게스트하우스</h2>
-        <p className="text-sm text-grayscale-500">
+        <p className="text-md text-grayscale-500">
           입점된 게스트하우스가 없어요
         </p>
-        <p className="text-xs text-grayscale-400">
+        <p className="text-sm text-grayscale-400">
           게스트하우스를 등록하러 가볼까요?
         </p>
 
@@ -107,7 +111,7 @@ export default function GuesthouseModal({
       <button
         key={gh.id}
         type="button"
-        className="w-full flex items-center gap-3 rounded-2xl bg-grayscale-50 px-3 py-3 hover:bg-grayscale-100 transition"
+        className="w-full flex items-center gap-3 rounded-2xl bg-grayscale-50 px-3 py-3 hover:bg-grayscale-100 transition duration-300"
         onClick={() => setSelectedId(gh.id)}
       >
         <div className="flex items-center justify-center">
@@ -128,11 +132,11 @@ export default function GuesthouseModal({
           )}
         </div>
 
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-grayscale-900 truncate">
+        <div className="flex-1 min-w-0 text-left">
+          <p className="text-md font-semibold text-grayscale-900 truncate">
             {gh.guesthouseName}
           </p>
-          <p className="mt-1 text-xs text-grayscale-500">
+          <p className="mt-1 text-sm text-grayscale-500">
             {gh.guesthouseAddress}
           </p>
         </div>
@@ -141,8 +145,8 @@ export default function GuesthouseModal({
   };
 
   return (
-    <div className="w-full max-w-xl max-h-[90vh] bg-white rounded-t-3xl px-5 pt-5 pb-6 flex flex-col">
-      <p className="text-sm text-grayscale-400 text-center mb-4">
+    <div className="w-full max-h-[90vh] px-5 pt-5 pb-6 flex flex-col">
+      <p className="text-md text-grayscale-400 text-center mb-4">
         알바 공고에 등록할 게스트하우스를 선택해주세요
       </p>
 

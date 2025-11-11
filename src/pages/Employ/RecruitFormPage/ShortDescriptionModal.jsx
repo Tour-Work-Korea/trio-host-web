@@ -75,21 +75,22 @@ export default function ShortDescriptionModal({
         <div className="flex-1 flex flex-col gap-6">
           {/* 한 줄 요약 */}
           <div className="flex flex-col gap-2">
-            <p className="text-sm font-semibold text-gray-900">한 줄 요약</p>
-            <p className="text-xs text-gray-500">
-              공고를 대표할 한 줄 설명을 작성해 주세요.
-            </p>
+            <p className="text-md font-semibold text-gray-900">한 줄 요약</p>
+            <div className="flex justify-between">
+              <p className="text-sm text-gray-500">
+                공고를 대표할 한 줄 설명을 작성해 주세요.
+              </p>
 
-            <p className="text-right text-xs text-gray-400">
-              <span className="text-primary-orange">
-                {formData.recruitShortDescription.length.toLocaleString()}
-              </span>
-              /1,000
-            </p>
-
+              <p className="text-right text-sm text-gray-400">
+                <span className="text-primary-orange">
+                  {formData.recruitShortDescription.length.toLocaleString()}
+                </span>
+                /1,000
+              </p>
+            </div>
             <textarea
               ref={textareaRef}
-              className="w-full rounded-xl border max-h-72 border-gray-200 p-3 text-sm text-gray-800 outline-none focus:border-primary-orange overflow-hidden"
+              className="overflow-y-scroll w-full rounded-xl border max-h-72 border-gray-200 p-3 text-md text-gray-800 outline-none focus:border-primary-orange overflow-hidden"
               placeholder="성실함과 책임감을 가지고 모든 일에 임하는 사람을 구해요."
               maxLength={1000}
               value={formData.recruitShortDescription}
@@ -98,7 +99,7 @@ export default function ShortDescriptionModal({
 
             <button
               type="button"
-              className="self-end text-xs text-gray-500 underline"
+              className="self-end text-sm text-gray-500 underline"
               onClick={() => handleInputChange("recruitShortDescription", "")}
             >
               다시쓰기
@@ -107,8 +108,8 @@ export default function ShortDescriptionModal({
 
           {/* 태그 선택 */}
           <div className="flex flex-col gap-2">
-            <p className="text-sm font-semibold text-gray-900">태그</p>
-            <p className="text-xs text-primary-blue">
+            <p className="text-md font-semibold text-gray-900">태그</p>
+            <p className="text-sm text-primary-blue">
               태그로 공고를 눈에 띄게 나타내보세요! (최대 3개)
             </p>
 
@@ -120,7 +121,7 @@ export default function ShortDescriptionModal({
                     key={tag.id}
                     type="button"
                     onClick={() => handleTagToggle(tag.id, isSelected)}
-                    className={`px-3 py-1 rounded-full text-xs border transition ${
+                    className={`px-3 py-1 rounded-full text-sm border transition ${
                       isSelected
                         ? "bg-primary-orange text-white border-primary-orange"
                         : "bg-white text-gray-700 border-gray-300"

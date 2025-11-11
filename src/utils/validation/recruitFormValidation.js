@@ -77,9 +77,6 @@ export const computeValidSections = (data) => {
     isValidDate(recruitStart) &&
     isValidDate(recruitEnd) &&
     isDateOrder(recruitStart, recruitEnd) &&
-    isValidDate(entryStartDate) &&
-    isValidDate(entryEndDate) &&
-    isDateOrder(entryStartDate, entryEndDate) &&
     headcountOk &&
     ageOk &&
     conditionTagsOk;
@@ -88,7 +85,7 @@ export const computeValidSections = (data) => {
   const workConditionValid =
     isNonEmpty(workType) &&
     hasItems(workPart) &&
-    isNonEmpty(workDuration) &&
+    hasItems(workDuration) &&
     hasItems(welfare);
 
   // "근무지 정보" (썸네일 필수면 some(img => img?.isThumbnail) 추가)
