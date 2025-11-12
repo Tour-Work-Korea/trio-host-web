@@ -5,11 +5,13 @@ import { uploadSingleImageToS3Web } from "@utils/s3ImageWeb";
 export default function ImageDropzone({
   label = "이미지 업로드",
   accept = "image/*",
+  sensitive = false, // ← 민감 모드면 1장만
   disabled = false,
-  maxCount = Infinity, // 최대 업로드 개수
-  currentCount = 0, // 이미 업로드된 개수 (부모에서 내려줌)
-  onUploaded, // (urls: string[]) => void  업로드 완료 후 호출
-  onError, // (message: string) => void  에러 시 부모에 알림(선택)
+  maxCount = Infinity, // 일반 모드에서만 의미 있음
+  currentCount = 0, // 일반 모드에서만 의미 있음
+  onUploaded, // 일반 모드: (urls: string[]) => void
+  onUploadedFile, // 민감 모드: (file: File) => void
+  onError, // (message: string) => void
 }) {
   const inputRef = useRef(null);
   const [dragOver, setDragOver] = useState(false);
@@ -26,11 +28,36 @@ export default function ImageDropzone({
     const list = Array.from(files || []);
     if (!list.length) return;
 
+    // ── 민감 모드: 단일 파일만 허용 ─────────────────
+    if (sensitive) {
+      if (list.length > 1) {
+        const msg = "민감 이미지는 1장만 업로드할 수 있습니다.";
+        setError(msg);
+        onError?.(msg);
+      }
+      const file = list[0];
+      try {
+        setUploading(true);
+        setProgress(100); // 업로드 안 하므로 즉시 완료
+        onUploadedFile?.(file);
+      } catch (e) {
+        console.error(e);
+        const msg = "이미지 처리 중 오류가 발생했습니다.";
+        setError(msg);
+        onError?.(msg);
+      } finally {
+        setUploading(false);
+        setTimeout(() => setProgress(0), 300);
+      }
+      return;
+    }
+
+    // ── 일반 모드: 여러 장 + S3 업로드 ───────────────
     const remaining = maxCount - currentCount;
     if (remaining <= 0) {
       const msg = `최대 ${maxCount}장까지 등록 가능합니다.`;
       setError(msg);
-      onError && onError(msg);
+      onError?.(msg);
       return;
     }
 
@@ -43,34 +70,26 @@ export default function ImageDropzone({
       setError("");
 
       const total = targetFiles.length;
-
       for (let i = 0; i < total; i += 1) {
         const file = targetFiles[i];
-
         const url = await uploadSingleImageToS3Web(file, (p) => {
-          // 여러 장 기준 전체 진행률 계산
           const overall = Math.round(((i + p / 100) / total) * 100);
           setProgress(overall);
         });
-
         if (url) uploadedUrls.push(url);
       }
 
-      if (uploadedUrls.length) {
-        onUploaded && onUploaded(uploadedUrls);
-      }
-
-      // 더 많이 선택했다가 잘린 경우
+      if (uploadedUrls.length) onUploaded?.(uploadedUrls);
       if (list.length > remaining) {
         const msg = `최대 ${maxCount}장까지라서, 앞에서 ${remaining}장만 업로드되었습니다.`;
         setError(msg);
-        onError && onError(msg);
+        onError?.(msg);
       }
     } catch (e) {
       console.error(e);
       const msg = "이미지 업로드 중 오류가 발생했습니다.";
       setError(msg);
-      onError && onError(msg);
+      onError?.(msg);
     } finally {
       setUploading(false);
       setTimeout(() => setProgress(0), 300);
@@ -91,7 +110,7 @@ export default function ImageDropzone({
   };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 w-full">
       <div
         className={[
           "border-2 border-dashed rounded-2xl p-4 text-center cursor-pointer",
@@ -116,7 +135,7 @@ export default function ImageDropzone({
           <div>
             클릭 또는 드래그하여 선택
             <span className="ml-1 text-xs text-gray-400">
-              (여러 장 선택 가능)
+              {sensitive ? "(1장만 선택 가능)" : "(여러 장 선택 가능)"}
             </span>
           </div>
           <div className="text-xs mt-1">
@@ -131,7 +150,7 @@ export default function ImageDropzone({
           className="hidden"
           onChange={handleInputChange}
           disabled={disabled || uploading}
-          multiple
+          multiple={!sensitive} // ← 민감 모드에서는 다중 선택 금지
         />
       </div>
 

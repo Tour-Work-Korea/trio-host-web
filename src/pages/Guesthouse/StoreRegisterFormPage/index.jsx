@@ -8,12 +8,11 @@ import { onlyDigits, isValidBizNo } from "@utils/validation/validationUtils";
 import { computeStoreRegister } from "@utils/validation/storeRegisterValidation";
 import ImageDropzone from "@components/ImageDropzone";
 import { BizCertPreview } from "@components/BizCertPreview";
+import guesthouseApi from "../../../api/guesthouseApi";
+import { useNavigate } from "react-router-dom";
 
-export default function RegisterForm1({
-  formData,
-  handleInputChange,
-  setPage,
-}) {
+export default function RegisterFormPage() {
+  const navigate = useNavigate();
   const [bizChecking, setBizChecking] = useState(false);
   const [bizChecked, setBizChecked] = useState(null); // null | true | false
   const [errorModal, setErrorModal] = useState({
@@ -22,6 +21,18 @@ export default function RegisterForm1({
     message: "",
     buttonText: "확인",
     onPress: () => setErrorModal((p) => ({ ...p, visible: false })),
+  });
+  const [formData, setFormData] = useState({
+    businessName: "", //상호명
+    businessType: "", //사업장 유형
+    employeeCount: "", //직원 수
+    managerName: "", //담당자 이름
+    managerEmail: "", //담당자 이메일
+    businessPhone: "", //사업장 전화번호
+    address: "", //사업자 주소
+    detailAddress: "", //사업자 상세 주소
+    businessRegistrationNumber: "", //사업자 등록번호
+    img: null, //사업자 등록증 이미지
   });
 
   const bizNo = formData.businessRegistrationNumber ?? "";
@@ -52,7 +63,9 @@ export default function RegisterForm1({
       setBizChecking(false);
     }
   };
-
+  const handleInputChange = (field, value) => {
+    setFormData({ ...formData, [field]: value });
+  };
   const handleNext = () => {
     const result = computeStoreRegister(formData, { bizChecked });
     if (!result.allValid) {
@@ -66,12 +79,31 @@ export default function RegisterForm1({
       setErrorModal((p) => ({ ...p, visible: true, title, message: "" }));
       return;
     }
-    setPage(2);
+    tryFetchApplications();
+  };
+
+  const tryFetchApplications = async () => {
+    try {
+      await guesthouseApi.postApplication(formData);
+      navigate("/guesthouse/store-register");
+    } catch (error) {
+      setErrorModal({
+        ...errorModal,
+        visible: true,
+        title: "입점신청서 등록 실패",
+        message:
+          error?.response?.data?.message ||
+          "입점신청서 등록 중 오류가 발생했습니다.",
+        buttonText: "확인",
+      });
+    }
   };
 
   return (
-    <div>
-      <div className="flex flex-col items-start mt-12 w-full gap-3">
+    <div className="container">
+      <div className="page-title">입점신청서 등록</div>
+
+      <div className="flex flex-col items-start mt-4 rounded-lg w-full gap-3 border-2 border-grayscale-200 p-8">
         {/* 1) 상호명 */}
         <div className="form-group">
           <label htmlFor="businessName" className="form-label">
@@ -304,9 +336,9 @@ export default function RegisterForm1({
         </div>
       </div>
 
-      <div className="flex mt-8 w-full justify-end">
+      <div className="flex mt-8 w-full justify-center">
         <div>
-          <ButtonOrange title="→" onPress={handleNext} />
+          <ButtonOrange title="입점신청하기" onPress={handleNext} />
         </div>
       </div>
 

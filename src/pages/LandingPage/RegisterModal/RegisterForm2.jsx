@@ -10,19 +10,7 @@ import { checkCodeForPhone, sendCodeForPhone } from "@utils/confirmPhone";
 import { checkCodeForEmail, sendCodeForEmail } from "@utils/confirmEmail";
 import ErrorModal from "@components/ErrorModal";
 
-// 간단한 이메일 검증
-const isEmail = (v) =>
-  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v || "").trim());
-
-//비밀번호 검증
-const isStrongPassword = (pw = "") => {
-  if (pw.length < 8) return false;
-  const hasUpper = /[A-Z]/.test(pw);
-  const hasLower = /[a-z]/.test(pw);
-  const hasNumber = /\d/.test(pw);
-  const hasSpecial = /[^A-Za-z0-9]/.test(pw); // 특수문자 1개 이상
-  return hasUpper && hasLower && hasNumber && hasSpecial;
-};
+import { registerValidation } from "@utils/validation/registerValidation";
 
 // mm:ss 포맷
 const fmt = (s) => {
@@ -32,6 +20,12 @@ const fmt = (s) => {
   const ss = (s % 60).toString().padStart(2, "0");
   return `${m}:${ss}`;
 };
+
+// 간단한 로컬 체크(버튼 활성화 UX용)
+// - 최종 판정은 registerValidation에서 수행
+const isLikelyEmail = (v) =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v || "").trim());
+const isLikelyPhone = (v) => /^0\d{8,}$/.test(String(v || "")); // 0 시작, 9자리+
 
 export default function RegisterForm2({
   formData,
@@ -57,7 +51,11 @@ export default function RegisterForm2({
     title: "",
     message: "",
     buttonText: "확인",
-    onPress: () => setErrorModal({ ...errorModal, visible: false }),
+    onPress: () =>
+      setErrorModal((prev) => ({
+        ...prev,
+        visible: false,
+      })),
   });
 
   // 타이머 틱
@@ -66,30 +64,33 @@ export default function RegisterForm2({
     const id = setInterval(() => setPhoneTimer((t) => t - 1), 1000);
     return () => clearInterval(id);
   }, [phoneTimer]);
+
   useEffect(() => {
     if (emailTimer <= 0) return;
     const id = setInterval(() => setEmailTimer((t) => t - 1), 1000);
     return () => clearInterval(id);
   }, [emailTimer]);
 
-  // 버튼 활성 조건
-  const canSendPhone = useMemo(() => {
-    return (
-      (formData.phone || "").length >= 8 && phoneTimer === 0 && !phoneSending
-    );
-  }, [formData.phone, phoneTimer, phoneSending]);
+  // 버튼 활성 조건(UX)
+  const canSendPhone = useMemo(
+    () => isLikelyPhone(formData?.phone) && phoneTimer === 0 && !phoneSending,
+    [formData?.phone, phoneTimer, phoneSending]
+  );
 
-  const canSendEmail = useMemo(() => {
-    return isEmail(formData.email) && emailTimer === 0 && !emailSending;
-  }, [formData.email, emailTimer, emailSending]);
+  const canSendEmail = useMemo(
+    () => isLikelyEmail(formData?.email) && emailTimer === 0 && !emailSending,
+    [formData?.email, emailTimer, emailSending]
+  );
 
-  const canCheckPhone = useMemo(() => {
-    return phoneCode.trim().length > 0 && phoneTimer > 0;
-  }, [phoneCode, phoneTimer]);
+  const canCheckPhone = useMemo(
+    () => phoneCode.trim().length > 0 && phoneTimer > 0,
+    [phoneCode, phoneTimer]
+  );
 
-  const canCheckEmail = useMemo(() => {
-    return emailCode.trim().length > 0 && emailTimer > 0;
-  }, [emailCode, emailTimer]);
+  const canCheckEmail = useMemo(
+    () => emailCode.trim().length > 0 && emailTimer > 0,
+    [emailCode, emailTimer]
+  );
 
   // 전화 인증 요청
   const handleSendPhone = async () => {
@@ -105,7 +106,7 @@ export default function RegisterForm2({
         ...prev,
         visible: true,
         title: "전화 인증 요청 실패",
-        message: e.message || "전화 인증 요청에 실패했습니다.",
+        message: e?.message || "전화 인증 요청에 실패했습니다.",
       }));
     } finally {
       setPhoneSending(false);
@@ -118,9 +119,7 @@ export default function RegisterForm2({
     try {
       const ok = await checkCodeForPhone(formData.phone, phoneCode);
       setPhoneChecked(!!ok);
-      if (ok) {
-        setPhoneTimer(0); // 성공 시 타이머 종료
-      }
+      if (ok) setPhoneTimer(0); // 성공 시 타이머 종료
     } catch (e) {
       setPhoneChecked(false);
       console.error("전화 인증 확인 실패:", e);
@@ -128,7 +127,7 @@ export default function RegisterForm2({
         ...prev,
         visible: true,
         title: "전화 인증 확인 실패",
-        message: e.message || "인증번호가 올바르지 않습니다.",
+        message: e?.message || "인증번호가 올바르지 않습니다.",
       }));
     }
   };
@@ -142,12 +141,12 @@ export default function RegisterForm2({
       setEmailTimer(300);
       setEmailChecked(null);
     } catch (e) {
-      console.error("이메일 인증 요청 실패:", e.message);
+      console.error("이메일 인증 요청 실패:", e);
       setErrorModal((prev) => ({
         ...prev,
         visible: true,
         title: "이메일 인증 요청 실패",
-        message: e.message || "이메일 인증 요청에 실패했습니다.",
+        message: e?.message || "이메일 인증 요청에 실패했습니다.",
       }));
     } finally {
       setEmailSending(false);
@@ -160,9 +159,7 @@ export default function RegisterForm2({
     try {
       const ok = await checkCodeForEmail(formData.email, emailCode);
       setEmailChecked(!!ok);
-      if (ok) {
-        setEmailTimer(0);
-      }
+      if (ok) setEmailTimer(0);
     } catch (e) {
       setEmailChecked(false);
       console.error("이메일 인증 확인 실패:", e);
@@ -170,44 +167,32 @@ export default function RegisterForm2({
         ...prev,
         visible: true,
         title: "이메일 인증 확인 실패",
-        message: e.message || "인증번호가 올바르지 않습니다.",
+        message: e?.message || "인증번호가 올바르지 않습니다.",
       }));
     }
   };
 
-  // 제출 전 간단 체크
+  // 제출 전 단일 검증 호출
   const handleNext = () => {
-    let title = null;
-    if (!formData.name?.trim()) title = "이름을 입력해주세요.";
-    else if (!formData.phone || formData.phone.length < 8)
-      title = "전화번호를 정확히 입력해주세요.";
-    else if (!isEmail(formData.email)) title = "올바른 이메일을 입력해주세요.";
-    else if (!formData.password || !isStrongPassword(formData.password))
-      title =
-        "비밀번호는 8자 이상, 대소문자, 숫자, 특수문자를 포함해야 합니다.";
-    else if (formData.password !== formData.passwordConfirm)
-      title = "비밀번호가 일치하지 않습니다.";
-    // (선택) 인증 필수화 시:
-    else if (phoneChecked !== true) title = "전화번호 인증을 완료해주세요.";
-    else if (emailChecked !== true) title = "이메일 인증을 완료해주세요.";
+    const { allValid, firstError } = registerValidation(formData, {
+      requirePhoneVerify: true,
+      phoneChecked,
+      requireEmailVerify: true,
+      emailChecked,
+    });
 
-    if (title) {
-      setErrorModal({
-        ...errorModal,
+    if (!allValid) {
+      setErrorModal((prev) => ({
+        ...prev,
         visible: true,
-        title: title,
-        message: null,
-      });
-      //return;
+        title: firstError || "입력값을 확인해주세요.",
+        message: "",
+      }));
+      return;
     }
-    console.log(formData);
-  };
 
-  const handleSubmit = async () => {
-    //1. 데이터를 제출 형태로 가공
-    //2. api 호출
-    //3. 성공 시 로그인 페이지로 이동
-    //4. 실패 시 에러 메시지 표시
+    // TODO: 제출 or 다음 단계
+    console.log("validated:", formData);
   };
 
   return (
@@ -383,7 +368,7 @@ export default function RegisterForm2({
             </button>
           </div>
           <div className="mt-1 text-xs text-grayscale-500">
-            8~20자, 영문 대소문자/숫자/특수문자 조합으로 작성해주세요
+            8자 이상, 대소문자/숫자/특수문자 포함
           </div>
         </div>
 

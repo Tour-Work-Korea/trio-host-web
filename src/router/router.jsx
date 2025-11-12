@@ -20,6 +20,9 @@ const MyGuestHousePage = lazy(() =>
 const StoreRegisterPage = lazy(() =>
   import("@pages/Guesthouse/StoreRegisterPage")
 );
+const StoreRegisterFormPage = lazy(() =>
+  import("@pages/Guesthouse/StoreRegisterFormPage")
+);
 const ReviewPage = lazy(() => import("@pages/Guesthouse/ReviewPage"));
 const ReservationPage = lazy(() => import("@pages/Guesthouse/ReservationPage"));
 const ProfilePage = lazy(() => import("@pages/ProfilePage"));
@@ -77,6 +80,10 @@ export const router = createBrowserRouter([
       // Guesthouse
       { path: "guesthouse/my", element: S(<MyGuestHousePage />) },
       { path: "guesthouse/store-register", element: S(<StoreRegisterPage />) },
+      {
+        path: "guesthouse/store-register-form",
+        element: S(<StoreRegisterFormPage />),
+      },
       { path: "guesthouse/review", element: S(<ReviewPage />) },
       { path: "reservation", element: S(<ReservationPage />) },
 

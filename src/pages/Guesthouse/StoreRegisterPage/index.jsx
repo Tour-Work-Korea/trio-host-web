@@ -48,7 +48,9 @@ export default function StoreRegisterPage() {
     }
   };
 
-  const handleCreateApplication = () => {};
+  const handleCreateApplication = () => {
+    navigate("/guesthouse/store-register-form");
+  };
 
   return (
     <div className="container">
@@ -57,7 +59,7 @@ export default function StoreRegisterPage() {
         <div>
           <ButtonOrange
             title="입점신청하기"
-            onPress={() => handleCreateApplication}
+            onPress={() => handleCreateApplication()}
           />
         </div>
       </div>
