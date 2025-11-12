@@ -2,11 +2,15 @@
 import React, { useEffect, useState } from "react";
 import employApi from "@api/employApi";
 import ErrorModal from "@components/ErrorModal";
+import ResumeModal from "./ResumeModal";
 import { formatDateToDot } from "@utils/formatDate";
+import { formatPhoneKR } from "@utils/formatPhone";
 
 export default function ApplicantList({ recruitId }) {
   const [loading, setLoading] = useState(true);
   const [applicants, setApplicants] = useState([]);
+  const [resumeVisible, setResumeVisible] = useState(false);
+  const [selectedResume, setSelectedResume] = useState(-1);
   const [errorModal, setErrorModal] = useState({
     visible: false,
     title: "",
@@ -65,6 +69,10 @@ export default function ApplicantList({ recruitId }) {
           <div
             key={el.id}
             className="bg-gray-50 flex-col p-4 rounded-lg gap-2 flex hover:shadow-md hover:cursor-pointer duration-300"
+            onClick={() => {
+              setResumeVisible(true);
+              setSelectedResume(el.id);
+            }}
           >
             <p className="text-grayscale-500">
               지원날짜 <span>{formatDateToDot(el.applyDate)}</span>
@@ -81,7 +89,7 @@ export default function ApplicantList({ recruitId }) {
                 <div>
                   <div className="flex gap-2">
                     <div className="w-16 text-grayscale-500">연락처</div>
-                    <div>{el.phone}</div>
+                    <div>{formatPhoneKR(el.phone)}</div>
                   </div>
                   <div className="flex gap-2">
                     <div className="w-16 text-grayscale-500">MBTI</div>
@@ -135,6 +143,12 @@ export default function ApplicantList({ recruitId }) {
         onPress={errorModal.onPress}
         onPress2={errorModal.onPress2 ?? null}
         imgUrl={errorModal.imgUrl ?? null}
+      />
+
+      <ResumeModal
+        visible={resumeVisible}
+        onClose={() => setResumeVisible(false)}
+        resumeId={selectedResume}
       />
     </div>
   );
