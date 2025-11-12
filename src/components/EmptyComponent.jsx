@@ -10,7 +10,7 @@ export default function EmptyComponent({
   title,
   subtitle,
   buttonText,
-  onPress,
+  onPress = null,
 }) {
   return (
     <div className="flex-col flex h-full items-center justify-center bg-white w-full">
@@ -18,7 +18,7 @@ export default function EmptyComponent({
       <div className="font-semibold text-lg mt-4">{title}</div>
       <div className="text-grayscale-500 mt-1">{subtitle}</div>
       <div className="mt-4">
-        <ButtonOrange title={buttonText} onPress={onPress} />
+        {onPress && <ButtonOrange title={buttonText} onPress={onPress} />}
       </div>
     </div>
   );
