@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 import ApplicantList from "./ApplicantList";
 
 export default function ApplicantPage() {
-  const [guesthouses, setGuestHouses] = useState([]);
+  const [guesthouses, setGuesthouses] = useState([]);
   const [selectedGuesthouse, setSelectedGuesthouse] = useState(-1); // -1 = 전체
   const [selectedRecruit, setSelectedRecruit] = useState();
   const [applicants, setApplicants] = useState([]);
@@ -35,12 +35,12 @@ export default function ApplicantPage() {
 
   useEffect(() => {
     // 마운트 시: 게스트하우스 목록 + 전체 공고 조회
-    tryFetchGuestHouse();
+    tryFetchGuesthouse();
     tryFetchMyRecruit(-1);
   }, []);
 
   // 게스트하우스 목록 조회
-  const tryFetchGuestHouse = async () => {
+  const tryFetchGuesthouse = async () => {
     try {
       const res = await guesthouseApi.getMyGuesthouses();
 
@@ -56,7 +56,7 @@ export default function ApplicantPage() {
         subtitle: g.guesthouseAddress,
       }));
 
-      setGuestHouses(options);
+      setGuesthouses(options);
     } catch (error) {
       console.warn(
         "나의 게스트하우스 조회 실패:",

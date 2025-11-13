@@ -4,7 +4,6 @@ import {
   isValidEmail,
   isValidPhone,
   isValidBizNo,
-  isValidImageUrl,
   onlyDigits,
 } from "@utils/validation/validationUtils";
 

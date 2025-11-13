@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import guesthouseApi from "@api/guesthouseApi";
 import ButtonOrange from "@components/ButtonOrange";
 import ErrorModal from "@components/ErrorModal";
+import EmptyComponent from "@components/EmptyComponent";
 
 import DisabledRadioButton from "@assets/images/radio_button_disabled.svg";
 import EnabledRadioButton from "@assets/images/radio_button_enabled.svg";
@@ -27,7 +28,7 @@ export default function GuesthouseModal({
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchMyGuestHouse = async () => {
+    const fetchMyGuesthouse = async () => {
       setLoading(true);
       try {
         const res = await guesthouseApi.getMyGuesthouses();
@@ -50,7 +51,7 @@ export default function GuesthouseModal({
       }
     };
 
-    fetchMyGuestHouse();
+    fetchMyGuesthouse();
   }, []);
 
   useEffect(() => {
@@ -69,37 +70,12 @@ export default function GuesthouseModal({
   // 게스트하우스가 하나도 없을 때: 안내 모달 형태로 노출
   if (guesthouses.length === 0) {
     return (
-      <div className="form-body-container">
-        <img src={EmployLogo} alt="게스트하우스" className="w-16 h-16 mb-2" />
-        <h2 className="text-lg font-semibold">게스트하우스</h2>
-        <p className="text-md text-grayscale-500">
-          입점된 게스트하우스가 없어요
-        </p>
-        <p className="text-sm text-grayscale-400">
-          게스트하우스를 등록하러 가볼까요?
-        </p>
-
-        <div className="mt-2 w-full">
-          <ButtonOrange
-            title="게스트하우스 등록하기"
-            onPress={() => {
-              // 실제 등록 페이지 경로에 맞게 수정
-              navigate("/host/guesthouse/register");
-            }}
-          />
-        </div>
-
-        <ErrorModal
-          visible={errorModal.visible}
-          title={errorModal.title}
-          message={errorModal.message}
-          buttonText="확인"
-          buttonText2={null}
-          onPress={() => setErrorModal((prev) => ({ ...prev, visible: false }))}
-          onPress2={null}
-          imgUrl={null}
-        />
-      </div>
+      <EmptyComponent
+        title="등록한 게스트하우스가 없어요"
+        subtitle="게스트하우스를 등록하러 갈까요?"
+        buttonText="게스트하우스 등록하러 가기"
+        onPress={navigate("/guesthouse/form")}
+      />
     );
   }
 

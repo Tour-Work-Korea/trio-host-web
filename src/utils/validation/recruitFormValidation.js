@@ -17,8 +17,6 @@ export const computeValidSections = (data) => {
     recruitShortDescription,
     recruitStart,
     recruitEnd,
-    entryStartDate, // 필요 시 사용
-    entryEndDate, // 필요 시 사용
     recruitNumberMale,
     recruitNumberFemale,
     recruitNumberNoGender,

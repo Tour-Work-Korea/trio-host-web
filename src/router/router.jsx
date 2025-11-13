@@ -14,8 +14,11 @@ const FindPasswordPage = lazy(() => import("@pages/Auth/FindPasswordPage"));
 const ApplicantPage = lazy(() => import("@pages/Employ/ApplicantPage"));
 const MyRecruitPage = lazy(() => import("@pages/Employ/MyRecruitPage"));
 const RecruitFormPage = lazy(() => import("@pages/Employ/RecruitFormPage"));
-const MyGuestHousePage = lazy(() =>
-  import("@pages/Guesthouse/MyGuestHousePage")
+const MyGuesthousePage = lazy(() =>
+  import("@pages/Guesthouse/MyGuesthousePage")
+);
+const GuesthouseFormPage = lazy(() =>
+  import("@pages/Guesthouse/GuesthouseFormPage")
 );
 const StoreRegisterPage = lazy(() =>
   import("@pages/Guesthouse/StoreRegisterPage")
@@ -78,7 +81,8 @@ export const router = createBrowserRouter([
         element: S(<RecruitFormPage />),
       },
       // Guesthouse
-      { path: "guesthouse/my", element: S(<MyGuestHousePage />) },
+      { path: "guesthouse/my", element: S(<MyGuesthousePage />) },
+      { path: "guesthouse/form", element: S(<GuesthouseFormPage />) },
       { path: "guesthouse/store-register", element: S(<StoreRegisterPage />) },
       {
         path: "guesthouse/store-register-form",

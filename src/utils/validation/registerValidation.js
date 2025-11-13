@@ -1,7 +1,7 @@
 // validators/registerValidation.js
 import {
   isNonEmpty,
-  isEmail,
+  isValidEmail,
   isValidPhone,
   isStrongPassword,
 } from "./validationUtils";
@@ -26,7 +26,7 @@ export function registerValidation(
 ) {
   const nameOk = isNonEmpty(data?.name);
   const phoneOk = isValidPhone(data?.phone);
-  const emailOk = isEmail(data?.email);
+  const emailOk = isValidEmail(data?.email);
   const pwOk = isStrongPassword(data?.password);
   const pwConfirmOk = data?.password === data?.passwordConfirm;
 

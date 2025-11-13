@@ -11,7 +11,7 @@ import SelectModal from "@components/SelectModal";
 import { useNavigate } from "react-router-dom";
 
 export default function MyRecruitPage() {
-  const [guesthouses, setGuestHouses] = useState([]);
+  const [guesthouses, setGuesthouses] = useState([]);
   const [selected, setSelected] = useState(-1); // -1 = 전체
   const [recruits, setRecruits] = useState([]);
   const [errorModal, setErrorModal] = useState({
@@ -34,12 +34,12 @@ export default function MyRecruitPage() {
 
   useEffect(() => {
     // 마운트 시: 게스트하우스 목록 + 전체 공고 조회
-    tryFetchGuestHouse();
+    tryFetchGuesthouse();
     tryFetchMyRecruit(-1);
   }, []);
 
   // 게스트하우스 목록 조회
-  const tryFetchGuestHouse = async () => {
+  const tryFetchGuesthouse = async () => {
     try {
       const res = await guesthouseApi.getMyGuesthouses();
 
@@ -55,7 +55,7 @@ export default function MyRecruitPage() {
         subtitle: g.guesthouseAddress,
       }));
 
-      setGuestHouses(options);
+      setGuesthouses(options);
     } catch (error) {
       console.warn(
         "나의 게스트하우스 조회 실패:",
@@ -198,7 +198,7 @@ export default function MyRecruitPage() {
             ...prev,
             visible: false,
           }));
-          alert("게스트하우스 등록으로 이동");
+          navigate("/guesthouse/form");
         },
         onPress2: () =>
           setErrorModal((prev) => ({
