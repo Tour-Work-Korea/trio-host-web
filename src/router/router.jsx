@@ -7,28 +7,38 @@ import UserLayout from "@components/layout/UserLayout";
 import useUserStore from "@stores/userStore";
 import { tryRefresh } from "@utils/authFlow";
 
-const LandingPage = lazy(() => import("@pages/LandingPage"));
-const LoginPage = lazy(() => import("@pages/Auth/LoginPage"));
-const FindIdPage = lazy(() => import("@pages/Auth/FindIdPage"));
-const FindPasswordPage = lazy(() => import("@pages/Auth/FindPasswordPage"));
-const ApplicantPage = lazy(() => import("@pages/Employ/ApplicantPage"));
-const MyRecruitPage = lazy(() => import("@pages/Employ/MyRecruitPage"));
-const RecruitFormPage = lazy(() => import("@pages/Employ/RecruitFormPage"));
+const LandingPage = lazy(() => import("@pages/LandingPage/index.jsx"));
+const LoginPage = lazy(() => import("@pages/Auth/LoginPage/index.jsx"));
+const FindIdPage = lazy(() => import("@pages/Auth/FindIdPage/index.jsx"));
+const FindPasswordPage = lazy(() =>
+  import("@pages/Auth/FindPasswordPage/index.jsx")
+);
+const ApplicantPage = lazy(() =>
+  import("@pages/Employ/ApplicantPage/index.jsx")
+);
+const MyRecruitPage = lazy(() =>
+  import("@pages/Employ/MyRecruitPage/index.jsx")
+);
+const RecruitFormPage = lazy(() =>
+  import("@pages/Employ/RecruitFormPage/index.jsx")
+);
 const MyGuesthousePage = lazy(() =>
-  import("@pages/Guesthouse/MyGuesthousePage")
+  import("@pages/Guesthouse/MyGuesthousePage/index.jsx")
 );
 const GuesthouseFormPage = lazy(() =>
-  import("@pages/Guesthouse/GuesthouseFormPage")
+  import("@pages/Guesthouse/GuesthouseFormPage/index.jsx")
 );
 const StoreRegisterPage = lazy(() =>
-  import("@pages/Guesthouse/StoreRegisterPage")
+  import("@pages/Guesthouse/StoreRegisterPage/index.jsx")
 );
 const StoreRegisterFormPage = lazy(() =>
-  import("@pages/Guesthouse/StoreRegisterFormPage")
+  import("@pages/Guesthouse/StoreRegisterFormPage/index.jsx")
 );
-const ReviewPage = lazy(() => import("@pages/Guesthouse/ReviewPage"));
-const ReservationPage = lazy(() => import("@pages/Guesthouse/ReservationPage"));
-const ProfilePage = lazy(() => import("@pages/ProfilePage"));
+const ReviewPage = lazy(() => import("@pages/Guesthouse/ReviewPage/index.jsx"));
+const ReservationPage = lazy(() =>
+  import("@pages/Guesthouse/ReservationPage/index.jsx")
+);
+const ProfilePage = lazy(() => import("@pages/ProfilePage/index.jsx"));
 
 // 공통 Suspense 래퍼
 const S = (el) => <Suspense fallback={<div>로딩중…</div>}>{el}</Suspense>;
