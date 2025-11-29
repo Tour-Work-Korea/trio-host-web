@@ -95,7 +95,7 @@
   }
   /* 바디 컨테이너 */
   .body-container {
-    @apply flex-col h-full w-full overflow-y-scroll border-grayscale-200 border-2 rounded-lg p-4;
+    @apply flex-col h-full w-full overflow-y-scroll overflow-x-hidden border-grayscale-200 border-2 rounded-lg p-4;
   }
 
   /**
@@ -117,7 +117,7 @@
     @apply font-semibold mb-2;
   }
   .form-hashtag {
-    @apply px-3 py-1 rounded-full text-sm border transition bg-white text-gray-700 border-gray-300;
+    @apply px-3 py-1 rounded-full border transition bg-white text-gray-700 border-gray-300;
   }
   .form-hashtag-selected {
     @apply bg-primary-orange text-white border-primary-orange;

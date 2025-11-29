@@ -1,7 +1,7 @@
 import api from "./axiosInstance";
 
 const commonApi = {
-  // 비민감 이미지 presigned url 발급 (RN에서 사용)
+  // 비민감 이미지 presigned url 발급
   getPresignedUrl: (filename) =>
     api.get("/common/S3/presigned-url", {
       params: { filename },
