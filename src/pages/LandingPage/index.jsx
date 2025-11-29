@@ -10,6 +10,7 @@ import ImageSlider from "../../components/ImageSlider";
 import IntroUI2 from "./IntroduceSection/IntroUI2";
 import IntroUI3 from "./IntroduceSection/IntroUI3";
 import InstallBox from "./IntroduceSection/InstallBox";
+import StoreGuesthouses from "./IntroduceSection/StoreGuesthouses";
 
 export default function LandingPage() {
   const [registerModalVisible, setRegisterModalVisible] = useState(false);
@@ -37,21 +38,8 @@ export default function LandingPage() {
   };
   return (
     <div className="flex-col flex items-center">
-      {/* 배너 */}
-      {/* <div className="from-primary-orange to-white py-20 flex flex-col justify-center items-center md:px-20 lg:px-40 bg-gradient-to-b">
-        <h3 className="text-2xl font-semibold text-white w-full mb-20">
-          사장님을 위한 워커웨이
-          <br />
-          게스트하우스 등록부터 일자리·파티 모집까지
-          <br />한 곳에서 시작하세요
-        </h3>
-        <div className="w-72">
-          <ButtonOrange title="회원가입" onPress={handleRegisterModal} />
-        </div>
-      </div> */}
-      {/* 서비스 소개 */}
-
       <Banner handleRegisterModal={handleRegisterModal} />
+      <StoreGuesthouses />
       <Intro1 />
       <Intro2 />
       <VisionMission />
