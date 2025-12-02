@@ -10,11 +10,12 @@ export default function UserLayout() {
         <Header />
       </header>
       <main className="flex flex-grow min-h-screen w-full px-12 xl:px-40 py-32 gap-12 lg:gap-20">
-        <div className="">
+        <div className="w-64 flex-shrink-0">
           <MenuBar />
         </div>
-
-        <Outlet />
+        <div className="flex-1 min-w-0 overflow-x-hidden">
+          <Outlet />
+        </div>
       </main>
       <footer className="w-full">
         <Footer />

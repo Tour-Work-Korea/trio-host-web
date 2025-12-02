@@ -8,15 +8,15 @@ import ButtonOrange from "@components/ButtonOrange";
  */
 export default function EmptyComponent({
   title,
-  subtitle,
-  buttonText,
+  subtitle = null,
+  buttonText = null,
   onPress = null,
 }) {
   return (
-    <div className="flex-col flex h-full items-center justify-center bg-white w-full">
+    <div className="flex-col flex h-full items-center justify-center w-full">
       <img src={EmptyIcon} className="w-48" />
       <div className="font-semibold text-lg mt-4">{title}</div>
-      <div className="text-grayscale-500 mt-1">{subtitle}</div>
+      {subtitle && <div className="text-grayscale-500 mt-1">{subtitle}</div>}
       <div className="mt-4">
         {onPress && <ButtonOrange title={buttonText} onPress={onPress} />}
       </div>

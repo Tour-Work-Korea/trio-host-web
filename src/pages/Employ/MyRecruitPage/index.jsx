@@ -7,7 +7,6 @@ import ButtonWhite from "@components/ButtonWhite";
 import ButtonOrange from "@components/ButtonOrange";
 import guesthouseApi from "@api/guesthouseApi";
 import EmptyIcon from "@assets/images/wa_blue_empty.svg";
-import SelectModal from "@components/SelectModal";
 import { useNavigate } from "react-router-dom";
 
 export default function MyRecruitPage() {
@@ -28,7 +27,6 @@ export default function MyRecruitPage() {
     onPress2: null,
     imgUrl: null,
   });
-  const [selectModal, setSelectModal] = useState({ visible: false }); //게스트하우스 선택 모달
 
   const navigate = useNavigate();
 
@@ -185,8 +183,7 @@ export default function MyRecruitPage() {
 
   // 공고 등록 핸들러
   const handleCreateRecruit = () => {
-    if (guesthouses.length > 0) setSelectModal({ visible: true });
-    else {
+    if (guesthouses.length == 0) {
       setErrorModal({
         visible: true,
         title: "입점된 게스트하우스가 없습니다",
@@ -207,6 +204,8 @@ export default function MyRecruitPage() {
           })),
         imgUrl: EmptyIcon,
       });
+    } else {
+      navigate(`/employ/recruit-form/`);
     }
   };
 
@@ -249,12 +248,14 @@ export default function MyRecruitPage() {
       <div className="body-container scrollbar-hide">
         {/* 공고가 없는 경우 empty page 띄움 */}
         {recruits.length === 0 && (
-          <EmptyComponent
-            title="등록한 알바 공고가 없어요"
-            subtitle="알바 공고를 등록하러 갈까요?"
-            buttonText="알바공고 등록하러 가기"
-            onPress={handleCreateRecruit}
-          />
+          <div className="h-[500px]">
+            <EmptyComponent
+              title="등록한 알바 공고가 없어요"
+              subtitle="알바 공고를 등록하러 갈까요?"
+              buttonText="알바공고 등록하러 가기"
+              onPress={handleCreateRecruit}
+            />
+          </div>
         )}
 
         {/* 공고가 존재하는 경우 */}
@@ -317,18 +318,6 @@ export default function MyRecruitPage() {
         onPress={errorModal.onPress}
         onPress2={errorModal.onPress2 ?? null}
         imgUrl={errorModal.imgUrl ?? null}
-      />
-
-      {/* 게스트하우스 선택 모달(공고 등록 시) */}
-      <SelectModal
-        visible={selectModal.visible}
-        title={"게스트하우스를 선택해 주세요"}
-        items={guesthouses} // 여기에는 '전체' 안 들어감
-        onClose={() => setSelectModal({ visible: false })}
-        onPress={() => {
-          setSelectModal({ visible: false });
-          navigate(`/employ/recruit-form/`);
-        }}
       />
     </div>
   );
