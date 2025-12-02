@@ -2,14 +2,13 @@ import React, { useEffect, useState } from "react";
 
 import EmptyComponent from "@components/EmptyComponent";
 import ErrorModal from "@components/ErrorModal";
-import ButtonWhite from "@components/ButtonWhite";
-import ButtonOrange from "@components/ButtonOrange";
 import guesthouseApi from "@api/guesthouseApi";
 import SelectModal from "@components/SelectModal";
 import { useNavigate } from "react-router-dom";
 import { getDummyReviews } from "./dummyReviews";
 import StarIcon from "@assets/images/star_filled.svg";
 import SendIcon from "@assets/images/send_filled.svg";
+import ReviewDeleteModal from "./ReviewDeleteModal";
 
 export default function ReviewPage() {
   const [guesthouses, setGuesthouses] = useState([]);
@@ -38,6 +37,7 @@ export default function ReviewPage() {
     last: true,
   });
   const [replyState, setReplyState] = useState({});
+  const [deleteModal, setDeleteModal] = useState({ visible: false, id: null });
 
   const navigate = useNavigate();
 
@@ -135,29 +135,20 @@ export default function ReviewPage() {
     }
   };
 
-  // 마감 요청 핸들러
-  const handleEndRecruit = (id) => {
+  // 삭제 요청 핸들러
+  const handleDeleteReview = (id) => {
     setErrorModal({
       visible: true,
-      title: `마감 요청은 되돌릴 수 없는 작업이에요\n계속 진행하시겠어요?`,
+      title: `삭제 요청은 관리자의 검토 후 처리돼요\n계속 진행하시겠어요?`,
       message: null,
-      buttonText: "마감할게요",
+      buttonText: "네, 요청할래요",
       buttonText2: "보류할게요",
       onPress: () => {
-        setErrorModal({
-          visible: true,
-          title: null,
-          message:
-            "삭제 요청은 관리자의 검토 후 처리돼요.\n계속 진행하시겠어요?",
-          buttonText: "네, 요청할래요",
-          buttonText2: "보류할게요",
-          onPress: () => {},
-          onPress2: setErrorModal((prev) => ({
-            ...prev,
-            visible: false,
-          })),
-          imgUrl: null,
-        });
+        setDeleteModal({ visible: true, id });
+        setErrorModal((prev) => ({
+          ...prev,
+          visible: false,
+        }));
       },
       onPress2: () =>
         setErrorModal((prev) => ({
@@ -215,7 +206,7 @@ export default function ReviewPage() {
     try {
       await guesthouseApi.postReviewReply(id, content);
 
-      // ⭐ 더미/프론트에서만: 로컬 상태에 답글 추가
+      // 더미/프론트에서만: 로컬 상태에 답글 추가
       setReviews((prev) =>
         prev.map((review) =>
           review.id === id
@@ -323,7 +314,10 @@ export default function ReviewPage() {
                         />
                         <div className="font-medium">{review.nickname}</div>
                       </div>
-                      <button className="bg-grayscale-200 px-3 py-1 rounded-lg text-sm">
+                      <button
+                        onClick={() => handleDeleteReview(review.id)}
+                        className="bg-grayscale-200 px-4 h-8 text-sm rounded-lg font-medium"
+                      >
                         삭제 요청
                       </button>
                     </div>
@@ -454,6 +448,14 @@ export default function ReviewPage() {
           setSelectModal({ visible: false });
           navigate(`/employ/recruit-form/`);
         }}
+      />
+
+      {/* 삭제 요청 모달 */}
+      <ReviewDeleteModal
+        id={deleteModal.id}
+        visible={deleteModal.visible}
+        onClose={() => setDeleteModal({ visible: false, id: null })}
+        setErrorModal={setErrorModal}
       />
     </div>
   );

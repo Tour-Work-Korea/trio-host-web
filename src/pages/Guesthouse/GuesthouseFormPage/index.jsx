@@ -621,7 +621,6 @@ export default function GuesthouseForm() {
                       사진을 선택할 수 있어요.
                     </p>
 
-                    {/* ⬇⬇ 여기부터 ImageDropzone 사용 */}
                     <div className="flex flex-wrap gap-3 mt-2">
                       <div className="w-40">
                         <ImageDropzone
