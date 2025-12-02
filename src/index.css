@@ -95,7 +95,7 @@
   }
   /* 바디 컨테이너 */
   .body-container {
-    @apply flex-col h-full w-full overflow-y-scroll overflow-x-hidden border-grayscale-200 border-2 rounded-lg p-4;
+    @apply flex flex-col h-full w-full min-h-[500px] overflow-y-scroll overflow-x-hidden border-grayscale-200 border-2 rounded-lg p-4;
   }
 
   /**

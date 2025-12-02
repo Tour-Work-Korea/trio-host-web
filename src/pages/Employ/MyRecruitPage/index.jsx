@@ -248,12 +248,14 @@ export default function MyRecruitPage() {
       <div className="body-container scrollbar-hide">
         {/* 공고가 없는 경우 empty page 띄움 */}
         {recruits.length === 0 && (
-          <EmptyComponent
-            title="등록한 알바 공고가 없어요"
-            subtitle="알바 공고를 등록하러 갈까요?"
-            buttonText="알바공고 등록하러 가기"
-            onPress={handleCreateRecruit}
-          />
+          <div className="h-[500px]">
+            <EmptyComponent
+              title="등록한 알바 공고가 없어요"
+              subtitle="알바 공고를 등록하러 갈까요?"
+              buttonText="알바공고 등록하러 가기"
+              onPress={handleCreateRecruit}
+            />
+          </div>
         )}
 
         {/* 공고가 존재하는 경우 */}

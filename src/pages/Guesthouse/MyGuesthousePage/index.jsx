@@ -228,12 +228,14 @@ export default function MyGuesthousePage() {
 
       <div className="body-container scrollbar-hide">
         {guesthouses.length === 0 && (
-          <EmptyComponent
-            title="등록한 게스트하우스가 없어요"
-            subtitle="게스트하우스를 등록하러 갈까요?"
-            buttonText="게스트하우스 등록하러 가기"
-            onPress={handleCreateGuesthouse}
-          />
+          <div className="h-[500px]">
+            <EmptyComponent
+              title="등록한 게스트하우스가 없어요"
+              subtitle="게스트하우스를 등록하러 갈까요?"
+              buttonText="게스트하우스 등록하러 가기"
+              onPress={handleCreateGuesthouse}
+            />
+          </div>
         )}
 
         {/* 게스트하우스가 존재하는 경우 */}

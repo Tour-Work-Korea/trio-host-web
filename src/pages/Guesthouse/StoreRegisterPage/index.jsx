@@ -66,13 +66,16 @@ export default function StoreRegisterPage() {
 
       <div className="body-container scrollbar-hide">
         {/* 공고가 없는 경우 empty page 띄움 */}
+
         {applications.length === 0 && (
-          <EmptyComponent
-            title="등록한 입점신청서가 없어요"
-            subtitle="입점신청서를 등록하러 갈까요?"
-            buttonText="입점신청하러 가기"
-            onPress={handleCreateApplication}
-          />
+          <div className="h-[500x]">
+            <EmptyComponent
+              title="등록한 입점신청서가 없어요"
+              subtitle="입점신청서를 등록하러 갈까요?"
+              buttonText="입점신청하러 가기"
+              onPress={handleCreateApplication}
+            />
+          </div>
         )}
 
         {/* 공고가 존재하는 경우 */}
