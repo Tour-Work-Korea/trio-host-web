@@ -8,7 +8,8 @@ import StarEmpty from "@assets/images/star_white.svg";
 import XBtn from "@assets/images/x_gray.svg";
 import ImageDropzone from "@components/ImageDropzone";
 
-const EMPTY_ROOM = {
+const createEmptyRoom = () => ({
+  id: null, // 기존 방이면 서버 id, 새 방이면 null 유지
   roomName: "",
   roomDesc: "",
   roomImages: [], // { roomImageUrl, isThumbnail }
@@ -16,7 +17,7 @@ const EMPTY_ROOM = {
   roomMaxCapacity: "",
   roomType: "",
   roomPrice: "",
-};
+});
 
 const translateRoomType = (type) => {
   switch (type) {
@@ -35,17 +36,17 @@ export default function RoomsSection({
   open,
   onToggle,
   valid,
-  rooms,
-  onChangeRooms,
+  rooms, // [{ id?, roomName, roomDesc, roomImages, roomCapacity, roomMaxCapacity, roomType, roomPrice }]
+  onChangeRooms, // rooms 배열 변경 시 호출
   onImageUploadError,
 }) {
-  const [draft, setDraft] = useState(EMPTY_ROOM);
+  const [draft, setDraft] = useState(createEmptyRoom());
   const [editingIndex, setEditingIndex] = useState(-1); // -1이면 새로 추가
 
   const isEditing = editingIndex >= 0;
 
   const resetDraft = () => {
-    setDraft(EMPTY_ROOM);
+    setDraft(createEmptyRoom());
     setEditingIndex(-1);
   };
 
@@ -89,8 +90,10 @@ export default function RoomsSection({
   const handleClickEdit = (index) => {
     const target = rooms[index];
     if (!target) return;
+
     setEditingIndex(index);
     setDraft({
+      id: target.id ?? null, // ✅ id 유지해서 나중에 submit 시 update/새로생성 구분
       roomName: target.roomName ?? "",
       roomDesc: target.roomDesc ?? "",
       roomImages: target.roomImages ?? [],
@@ -107,9 +110,12 @@ export default function RoomsSection({
   const handleDeleteRoom = (index) => {
     const next = rooms.filter((_, i) => i !== index);
     onChangeRooms(next);
-    // 편집 중인 걸 지웠으면 초기화
+
     if (editingIndex === index) {
       resetDraft();
+    } else if (editingIndex > index) {
+      // 삭제한 index보다 뒤를 수정 중이었으면 index 하나 당겨줌
+      setEditingIndex((prev) => prev - 1);
     }
   };
 
@@ -128,13 +134,13 @@ export default function RoomsSection({
       Number.isNaN(capacityNum) ||
       capacityNum <= 0 ||
       Number.isNaN(priceNum) ||
-      priceNum <= 0
+      priceNum < 10000 // 최소 금액
     ) {
-      // 간단한 validation만. 필요하면 섹션 위에 에러 문구를 추가해도 됨
       return;
     }
 
     const normalized = {
+      id: draft.id ?? null, // 기존 방이면 서버에서 받은 id 그 상태로 유지
       roomName: trimmedName,
       roomDesc: trimmedDesc,
       roomImages: draft.roomImages,
@@ -166,7 +172,7 @@ export default function RoomsSection({
       Number.isNaN(capacityNum) ||
       capacityNum <= 0 ||
       Number.isNaN(priceNum) ||
-      priceNum <= 0
+      priceNum < 10000
     );
   })();
 
@@ -201,7 +207,7 @@ export default function RoomsSection({
 
                 return (
                   <div
-                    key={index}
+                    key={room.id ?? index}
                     className="flex items-center justify-between rounded-xl border border-gray-200 px-3 py-2"
                   >
                     <div className="flex items-center gap-3">

@@ -8,13 +8,11 @@ import guesthouseApi from "@api/guesthouseApi";
 import EmptyIcon from "@assets/images/wa_blue_empty.svg";
 import SelectModal from "@components/SelectModal";
 import { useNavigate } from "react-router-dom";
-import { dummyGHs } from "./dummyData";
-
 import EditIcon from "@assets/images/edit_gray.svg";
 import DeleteIcon from "@assets/images/delete_gray.svg";
 
 export default function MyGuesthousePage() {
-  const [guesthouses, setGuesthouses] = useState(dummyGHs); // 실제 연동 시 []로 시작해도 ok
+  const [guesthouses, setGuesthouses] = useState([]); // 실제 연동 시 []로 시작해도 ok
   const [applications, setApplications] = useState([]); // 입점신청서
   const [errorModal, setErrorModal] = useState({
     visible: false,
@@ -411,7 +409,7 @@ export default function MyGuesthousePage() {
         onClose={() => setSelectModal({ visible: false })}
         onPress={(storeRegisterId) => {
           setSelectModal({ visible: false });
-          navigate(`/guesthouse/form/${storeRegisterId}`);
+          navigate(`/guesthouse/form`);
         }}
       />
     </div>

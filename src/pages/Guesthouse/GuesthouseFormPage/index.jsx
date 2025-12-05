@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 import ErrorModal from "@components/ErrorModal";
 import ButtonOrange from "@components/ButtonOrange";
@@ -12,6 +12,7 @@ import {
   services,
 } from "@data/guesthouseOptions";
 import { guesthouseTags } from "@data/guesthouseTags";
+import { AMENITY_NAME_TO_ID, HASHTAG_TEXT_TO_ID } from "@data/guesthouseMaps";
 
 // 섹션 컴포넌트
 import PostRegisterSection from "./PostRegisterSection";
@@ -41,7 +42,8 @@ const displayTimeHHMM = (value) => {
   return value.slice(0, 5);
 };
 
-const computeValidSections = (formData) => {
+// 수정: isEditMode에 따라 postRegister validation 다르게
+const computeValidSections = (formData, { isEditMode = false } = {}) => {
   const {
     applicationId,
     guesthouseName,
@@ -58,7 +60,8 @@ const computeValidSections = (formData) => {
     roomInfos,
   } = formData;
 
-  const postRegister = Boolean(applicationId);
+  const postRegister = isEditMode ? true : Boolean(applicationId);
+
   const info =
     isNonEmpty(guesthouseName) &&
     isNonEmpty(guesthouseAddress) &&
@@ -92,6 +95,9 @@ const computeValidSections = (formData) => {
 
 export default function GuesthouseForm() {
   const navigate = useNavigate();
+  const { guesthouseId } = useParams();
+  const numericGuesthouseId = guesthouseId ? Number(guesthouseId) : null;
+  const isEditMode = !!numericGuesthouseId;
 
   const [formData, setFormData] = useState({
     applicationId: null,
@@ -107,8 +113,11 @@ export default function GuesthouseForm() {
     hashtagIds: [],
     rules: "",
     amenities: [], // [{ amenityId, count }]
-    roomInfos: [], // ✅ 객실 정보
+    roomInfos: [], //
   });
+
+  // 🔹 수정 모드에서 "초기 객실 목록" 저장용
+  const originalRoomsRef = useRef([]);
 
   // 입점 신청서
   const [applications, setApplications] = useState([]);
@@ -117,7 +126,7 @@ export default function GuesthouseForm() {
   // 섹션 토글
   const [visible, setVisible] = useState({
     postRegister: false,
-    info: false,
+    info: true,
     introSummary: false,
     rooms: false,
     detailInfo: false,
@@ -161,13 +170,138 @@ export default function GuesthouseForm() {
     setVisible((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  // formData 변경 시 섹션 유효성 갱신
+  // formData 변경 시 섹션 유효성 갱신 (모드에 따라 다르게)
   useEffect(() => {
-    setValid(computeValidSections(formData));
-  }, [formData]);
+    setValid(computeValidSections(formData, { isEditMode }));
+  }, [formData, isEditMode]);
 
-  // 입점 신청서 목록 조회
+  // 수정 모드일 때: 기존 게스트하우스 상세 조회해서 formData 초기화
   useEffect(() => {
+    if (!isEditMode) return;
+
+    const fetchDetail = async () => {
+      try {
+        const res = await guesthouseApi.getGuesthouseDetail(
+          numericGuesthouseId
+        );
+        const data = res.data;
+
+        const mappedAmenities =
+          data.amenities
+            ?.map((a) => {
+              const baseId =
+                AMENITY_NAME_TO_ID[a.amenityType] ||
+                AMENITY_NAME_TO_ID[a.amenityName];
+
+              if (!baseId) {
+                console.warn("알 수 없는 편의시설 매핑 실패:", a);
+                return null;
+              }
+
+              return {
+                amenityId: baseId,
+                count: a.count ?? 1,
+              };
+            })
+            .filter(Boolean) ?? [];
+
+        const mappedHashtagIds =
+          data.hashtags
+            ?.map((h) => {
+              const baseId = HASHTAG_TEXT_TO_ID[h.hashtag];
+              if (!baseId) {
+                console.warn("알 수 없는 해시태그 매핑 실패:", h);
+              }
+              return baseId;
+            })
+            .filter(Boolean) ?? [];
+
+        const mappedRooms =
+          data.roomInfos?.map((room) => ({
+            id: room.id ?? room.roomId,
+            roomName: room.roomName,
+            roomDesc: room.roomDesc ?? room.roomDescription ?? "",
+            roomCapacity: room.roomCapacity,
+            roomMaxCapacity: room.roomMaxCapacity ?? room.roomCapacity,
+            roomType: room.roomType,
+            roomPrice: room.roomPrice,
+            roomExtraFees: room.roomExtraFees ?? [],
+            roomImages:
+              room.roomImages?.map((img) => ({
+                roomImageUrl: img.roomImageUrl,
+                isThumbnail: img.isThumbnail,
+              })) ?? [],
+          })) ??
+          data.rooms?.map((room) => ({
+            id: room.roomId,
+            roomName: room.roomName,
+            roomDesc: "",
+            roomCapacity: room.roomCapacity ?? room.roomMaxCapacity,
+            roomMaxCapacity: room.roomMaxCapacity ?? room.roomCapacity,
+            roomType: room.roomType,
+            roomPrice: room.roomPrice ?? 0,
+            roomExtraFees: [],
+            roomImages:
+              room.roomImages?.map((img) => ({
+                roomImageUrl: img.roomImageUrl,
+                isThumbnail: img.isThumbnail,
+              })) ??
+              (room.thumbnailImg
+                ? [
+                    {
+                      roomImageUrl: room.thumbnailImg,
+                      isThumbnail: true,
+                    },
+                  ]
+                : []),
+          })) ??
+          [];
+
+        const mapped = {
+          applicationId: data.applicationId ?? null,
+          guesthouseName: data.guesthouseName ?? "",
+          guesthouseAddress: data.guesthouseAddress ?? "",
+          guesthouseDetailAddress: data.guesthouseDetailAddress ?? "",
+          guesthousePhone: data.guesthousePhone ?? "",
+          checkIn: data.checkIn ?? "15:00:00",
+          checkOut: data.checkOut ?? "11:00:00",
+          guesthouseShortIntro: data.guesthouseShortIntro ?? "",
+          guesthouseLongDesc:
+            data.guesthouseLongDesc ?? data.guesthouseLongDescription ?? "",
+          guesthouseImages:
+            data.guesthouseImages?.map((img) => ({
+              serverUrl: img.guesthouseImageUrl,
+              previewUrl: img.guesthouseImageUrl,
+              isThumbnail: img.isThumbnail,
+            })) ?? [],
+          hashtagIds: mappedHashtagIds,
+          rules: data.rules ?? "",
+          amenities: mappedAmenities,
+          roomInfos: mappedRooms,
+        };
+
+        setFormData(mapped);
+        originalRoomsRef.current = mappedRooms; // 🔹 초기 객실 목록 저장
+      } catch (error) {
+        const serverMessage =
+          error?.response?.data?.message ||
+          error?.message ||
+          "게스트하우스 정보를 불러오지 못했어요.";
+        setErrorModal((prev) => ({
+          ...prev,
+          visible: true,
+          title: serverMessage,
+        }));
+      }
+    };
+
+    fetchDetail();
+  }, [isEditMode, numericGuesthouseId]);
+
+  // 입점 신청서 목록 조회 (등록 모드에서만 의미 있음)
+  useEffect(() => {
+    if (isEditMode) return;
+
     const fetchApplications = async () => {
       try {
         const res = await guesthouseApi.getHostApplications();
@@ -201,7 +335,7 @@ export default function GuesthouseForm() {
     };
 
     fetchApplications();
-  }, []);
+  }, [isEditMode]);
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
@@ -218,7 +352,7 @@ export default function GuesthouseForm() {
     }));
   };
 
-  // 입점 신청서 선택
+  // 입점 신청서 선택 (등록 모드 전용)
   const handleSelectApplication = (app) => {
     setSelectedApplication(app);
     setFormData((prev) => ({
@@ -239,7 +373,7 @@ export default function GuesthouseForm() {
       const mapped = urls.map((url, index) => ({
         serverUrl: url,
         previewUrl: url,
-        isThumbnail: existing.length === 0 && index === 0, // 첫 장만 대표
+        isThumbnail: existing.length === 0 && index === 0,
       }));
       const merged = [...existing, ...mapped];
 
@@ -328,69 +462,181 @@ export default function GuesthouseForm() {
     }));
   };
 
-  // 등록
+  // 🔹 등록 / 수정 공통 처리
   const handleSubmit = async () => {
     if (!isAllValid) return;
 
     try {
-      const guesthouseImagesPayload = (formData.guesthouseImages || []).map(
-        (img) => ({
-          guesthouseImageUrl: img.previewUrl,
+      // 공통 payload들
+      const guesthouseImagesPayload =
+        formData.guesthouseImages?.map((img) => ({
+          guesthouseImageUrl: img.serverUrl || img.previewUrl,
           isThumbnail: !!img.isThumbnail,
-        })
-      );
+        })) ?? [];
 
-      const roomInfosPayload = (formData.roomInfos || []).map((room) => ({
-        roomName: room.roomName,
-        roomDesc: room.roomDesc,
-        roomCapacity: Number(room.roomCapacity),
-        roomMaxCapacity: Number(room.roomMaxCapacity ?? room.roomCapacity),
-        roomType: room.roomType,
-        roomPrice: Number(room.roomPrice),
-        roomImages:
-          room.roomImages?.map((img) => ({
-            roomImageUrl: img.roomImageUrl,
-            isThumbnail: !!img.isThumbnail,
-          })) ?? [],
-      }));
+      const amenitiesPayload = formData.amenities ?? [];
+      const hashtagIdsPayload = formData.hashtagIds ?? [];
 
-      const payload = {
-        applicationId: formData.applicationId,
-        guesthouseName: formData.guesthouseName,
-        guesthouseAddress: formData.guesthouseAddress,
-        guesthouseDetailAddress: formData.guesthouseDetailAddress,
-        guesthousePhone: formData.guesthousePhone,
-        checkIn: formData.checkIn,
-        checkOut: formData.checkOut,
-        guesthouseShortIntro: formData.guesthouseShortIntro,
-        guesthouseLongDesc: formData.guesthouseLongDesc,
-        rules: formData.rules,
-        hashtagIds: formData.hashtagIds,
-        amenities: formData.amenities,
-        guesthouseImages: guesthouseImagesPayload,
-        roomInfos: roomInfosPayload,
-      };
+      if (!isEditMode) {
+        // =========================
+        // 🚩 등록 모드
+        // =========================
+        const roomInfosPayload =
+          formData.roomInfos?.map((room) => ({
+            roomName: room.roomName,
+            roomType: room.roomType,
+            roomCapacity: Number(room.roomCapacity),
+            roomMaxCapacity: Number(room.roomMaxCapacity ?? room.roomCapacity),
+            roomDesc: room.roomDesc,
+            roomPrice: Number(room.roomPrice),
+            roomExtraFees: room.roomExtraFees ?? [],
+            roomImages:
+              room.roomImages?.map((img) => ({
+                roomImageUrl: img.roomImageUrl,
+                isThumbnail: !!img.isThumbnail,
+              })) ?? [],
+          })) ?? [];
 
-      await guesthouseApi.registerGuesthouse(payload);
+        const payload = {
+          applicationId: formData.applicationId,
+          guesthouseName: formData.guesthouseName,
+          guesthouseAddress: formData.guesthouseAddress,
+          guesthouseDetailAddress: formData.guesthouseDetailAddress,
+          guesthousePhone: formData.guesthousePhone,
+          checkIn: formData.checkIn,
+          checkOut: formData.checkOut,
+          guesthouseShortIntro: formData.guesthouseShortIntro,
+          guesthouseLongDesc: formData.guesthouseLongDesc,
+          rules: formData.rules,
+          hashtagIds: hashtagIdsPayload,
+          amenities: amenitiesPayload,
+          guesthouseImages: guesthouseImagesPayload,
+          roomInfos: roomInfosPayload,
+        };
 
-      setErrorModal({
-        visible: true,
-        title: "게스트하우스를 등록했어요",
-        message: null,
-        buttonText: "확인",
-        buttonText2: null,
-        onPress: () => {
-          setErrorModal((prev) => ({ ...prev, visible: false }));
-          navigate("/guesthouse/my");
-        },
-        onPress2: null,
-        imgUrl: null,
-      });
+        await guesthouseApi.registerGuesthouse(payload);
+
+        setErrorModal({
+          visible: true,
+          title: "게스트하우스를 등록했어요",
+          message: null,
+          buttonText: "확인",
+          buttonText2: null,
+          onPress: () => {
+            setErrorModal((prev) => ({ ...prev, visible: false }));
+            navigate("/guesthouse/my");
+          },
+          onPress2: null,
+          imgUrl: null,
+        });
+      } else {
+        // =========================
+        // ✏️ 수정 모드
+        // =========================
+        const basicPayload = {
+          guesthouseName: formData.guesthouseName,
+          guesthouseAddress: formData.guesthouseAddress,
+          guesthouseDetailAddress: formData.guesthouseDetailAddress,
+          guesthousePhone: formData.guesthousePhone,
+          guesthouseShortIntro: formData.guesthouseShortIntro,
+          guesthouseLongDescription: formData.guesthouseLongDesc,
+          checkIn: formData.checkIn,
+          checkOut: formData.checkOut,
+          rules: formData.rules,
+        };
+
+        await guesthouseApi.updateGuesthouseBasic(
+          numericGuesthouseId,
+          basicPayload
+        );
+        await guesthouseApi.updateGuesthouseImages(
+          numericGuesthouseId,
+          guesthouseImagesPayload
+        );
+        await guesthouseApi.updateGuesthouseHashtags(
+          numericGuesthouseId,
+          hashtagIdsPayload
+        );
+        await guesthouseApi.updateGuesthouseAmenities(
+          numericGuesthouseId,
+          amenitiesPayload
+        );
+
+        // 🔹 객실 처리
+        const currentRooms = formData.roomInfos || [];
+        const originalRooms = originalRoomsRef.current || [];
+
+        // 1) upsert (create / update)
+        for (const room of currentRooms) {
+          const basic = {
+            roomName: room.roomName,
+            roomType: room.roomType,
+            roomCapacity: Number(room.roomCapacity),
+            roomMaxCapacity: Number(room.roomMaxCapacity ?? room.roomCapacity),
+            roomDescription: room.roomDesc,
+            roomPrice: Number(room.roomPrice),
+          };
+
+          const images =
+            room.roomImages?.map((img) => ({
+              roomImageUrl: img.roomImageUrl,
+              isThumbnail: !!img.isThumbnail,
+            })) ?? [];
+
+          if (room.id) {
+            // 기존 방 → update
+            await guesthouseApi.updateRoomBasic(
+              numericGuesthouseId,
+              room.id,
+              basic
+            );
+            await guesthouseApi.updateRoomImages(
+              numericGuesthouseId,
+              room.id,
+              images
+            );
+          } else {
+            // 새 방 → create
+            const createPayload = {
+              ...basic,
+              roomExtraFees: room.roomExtraFees ?? [],
+              roomImages: images,
+            };
+            await guesthouseApi.createRoom(numericGuesthouseId, createPayload);
+          }
+        }
+
+        // 2) 삭제된 방 처리
+        const currentIds = new Set(
+          currentRooms.filter((r) => r.id).map((r) => r.id)
+        );
+        for (const r of originalRooms) {
+          if (r.id && !currentIds.has(r.id)) {
+            await guesthouseApi.deleteRoom(numericGuesthouseId, r.id);
+          }
+        }
+
+        setErrorModal({
+          visible: true,
+          title: "게스트하우스를 수정했어요",
+          message: null,
+          buttonText: "확인",
+          buttonText2: null,
+          onPress: () => {
+            setErrorModal((prev) => ({ ...prev, visible: false }));
+            navigate("/guesthouse/my");
+          },
+          onPress2: null,
+          imgUrl: null,
+        });
+      }
     } catch (error) {
       const serverMessage =
         error?.response?.data?.message ||
         error?.message ||
-        "게스트하우스 등록 중 오류가 발생했습니다.";
+        (isEditMode
+          ? "게스트하우스 수정 중 오류가 발생했습니다."
+          : "게스트하우스 등록 중 오류가 발생했습니다.");
       setErrorModal((prev) => ({
         ...prev,
         visible: true,
@@ -401,18 +647,22 @@ export default function GuesthouseForm() {
 
   return (
     <div className="container">
-      <div className="page-title">나의 게스트하우스</div>
+      <div className="page-title">
+        {isEditMode ? "게스트하우스 수정" : "나의 게스트하우스"}
+      </div>
       <div className="flex flex-col">
         <div className="flex-1 overflow-y-auto">
           <div className="flex flex-col gap-4">
-            <PostRegisterSection
-              open={visible.postRegister}
-              onToggle={() => toggleSection("postRegister")}
-              valid={valid.postRegister}
-              applications={applications}
-              selectedApplication={selectedApplication}
-              onSelectApplication={handleSelectApplication}
-            />
+            {!isEditMode && (
+              <PostRegisterSection
+                open={visible.postRegister}
+                onToggle={() => toggleSection("postRegister")}
+                valid={valid.postRegister}
+                applications={applications}
+                selectedApplication={selectedApplication}
+                onSelectApplication={handleSelectApplication}
+              />
+            )}
 
             <InfoSection
               open={visible.info}
@@ -475,12 +725,13 @@ export default function GuesthouseForm() {
             />
 
             <p className="text-sm text-primary-blue mt-2 text-right">
-              모든 항목을 입력하셔야 등록이 완료됩니다
+              모든 항목을 입력하셔야{" "}
+              {isEditMode ? "수정이 완료됩니다" : "등록이 완료됩니다"}
             </p>
 
             <div className="mt-4 flex justify-center">
               <ButtonOrange
-                title="등록하기"
+                title={isEditMode ? "수정하기" : "등록하기"}
                 onPress={handleSubmit}
                 disabled={!isAllValid}
               />
