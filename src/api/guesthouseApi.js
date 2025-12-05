@@ -150,6 +150,10 @@ const guesthouseApi = {
   getGuesthouseReservations: (guesthouseId) =>
     api.get(`/order/host/reservation/${guesthouseId}`),
 
+  // 게하 예약 검색
+  searchGuesthouseReservations: (params) =>
+    api.get("/order/host/reservation/search", { params }),
+
   // 게하 예약 취소
   cancelGuesthouseReservation: (reservationId) =>
     api.delete(`/order/reservation/${reservationId}`, {
