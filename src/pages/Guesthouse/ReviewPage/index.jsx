@@ -5,7 +5,6 @@ import ErrorModal from "@components/ErrorModal";
 import guesthouseApi from "@api/guesthouseApi";
 import SelectModal from "@components/SelectModal";
 import { useNavigate } from "react-router-dom";
-import { getDummyReviews } from "./dummyReviews";
 import StarIcon from "@assets/images/star_filled.svg";
 import SendIcon from "@assets/images/send_filled.svg";
 import ReviewDeleteModal from "./ReviewDeleteModal";

@@ -83,7 +83,11 @@ export const router = createBrowserRouter([
       // Guesthouse
       { path: "guesthouse/my", element: S(<MyGuesthousePage />) },
       {
-        path: "guesthouse/form/:storeRegisterId",
+        path: "guesthouse/form/:guesthouseId",
+        element: S(<GuesthouseFormPage />),
+      },
+      {
+        path: "guesthouse/form/",
         element: S(<GuesthouseFormPage />),
       },
       { path: "guesthouse/store-register", element: S(<StoreRegisterPage />) },

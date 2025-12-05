@@ -1,26 +1,28 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 import ErrorModal from "@components/ErrorModal";
 import ButtonOrange from "@components/ButtonOrange";
 
-import guesthouseApi from "@api/guesthouseApi"; // 경로는 프로젝트에 맞게 수정
+import guesthouseApi from "@api/guesthouseApi";
 import {
   publicFacilities,
   roomFacilities,
   services,
 } from "@data/guesthouseOptions";
 import { guesthouseTags } from "@data/guesthouseTags";
+import { AMENITY_NAME_TO_ID, HASHTAG_TEXT_TO_ID } from "@data/guesthouseMaps";
 
-import CheckOrange from "@assets/images/check_orange.svg";
-import ChevronBlack from "@assets/images/chevron_right_black.svg";
-import DisabledRadioButton from "@assets/images/radio_button_disabled.svg";
-import EnabledRadioButton from "@assets/images/radio_button_enabled.svg";
-import StarFilled from "@assets/images/star_filled.svg";
-import StarEmpty from "@assets/images/star_white.svg";
-import XBtn from "@assets/images/x_gray.svg";
-import ImageDropzone from "../../../components/ImageDropzone";
+// 섹션 컴포넌트
+import PostRegisterSection from "./PostRegisterSection";
+import InfoSection from "./InfoSection";
+import IntroSummarySection from "./IntroSummarySection";
+import DetailInfoSection from "./DetailInfoSection";
+import RulesSection from "./RulesSection";
+import AmenitiesSection from "./AmenitiesSection";
+import RoomsSection from "./RoomsSection";
+
 // ===== 유틸 =====
 const isNonEmpty = (v) =>
   (typeof v === "string" && v.trim().length > 0) ||
@@ -40,7 +42,8 @@ const displayTimeHHMM = (value) => {
   return value.slice(0, 5);
 };
 
-const computeValidSections = (formData) => {
+// 수정: isEditMode에 따라 postRegister validation 다르게
+const computeValidSections = (formData, { isEditMode = false } = {}) => {
   const {
     applicationId,
     guesthouseName,
@@ -54,9 +57,11 @@ const computeValidSections = (formData) => {
     guesthouseLongDesc,
     rules,
     amenities,
+    roomInfos,
   } = formData;
 
-  const postRegister = Boolean(applicationId);
+  const postRegister = isEditMode ? true : Boolean(applicationId);
+
   const info =
     isNonEmpty(guesthouseName) &&
     isNonEmpty(guesthouseAddress) &&
@@ -75,6 +80,7 @@ const computeValidSections = (formData) => {
   const detailInfo = isNonEmpty(guesthouseLongDesc);
   const rulesValid = isNonEmpty(rules);
   const amenitiesValid = Array.isArray(amenities) && amenities.length > 0;
+  const roomsValid = Array.isArray(roomInfos) && roomInfos.length > 0;
 
   return {
     postRegister,
@@ -83,11 +89,15 @@ const computeValidSections = (formData) => {
     detailInfo,
     rules: rulesValid,
     amenities: amenitiesValid,
+    rooms: roomsValid,
   };
 };
 
 export default function GuesthouseForm() {
   const navigate = useNavigate();
+  const { guesthouseId } = useParams();
+  const numericGuesthouseId = guesthouseId ? Number(guesthouseId) : null;
+  const isEditMode = !!numericGuesthouseId;
 
   const [formData, setFormData] = useState({
     applicationId: null,
@@ -99,11 +109,15 @@ export default function GuesthouseForm() {
     checkOut: "11:00:00",
     guesthouseShortIntro: "",
     guesthouseLongDesc: "",
-    guesthouseImages: [], // { file, previewUrl, isThumbnail }
+    guesthouseImages: [], // { serverUrl, previewUrl, isThumbnail }
     hashtagIds: [],
     rules: "",
     amenities: [], // [{ amenityId, count }]
+    roomInfos: [], //
   });
+
+  // 🔹 수정 모드에서 "초기 객실 목록" 저장용
+  const originalRoomsRef = useRef([]);
 
   // 입점 신청서
   const [applications, setApplications] = useState([]);
@@ -114,6 +128,7 @@ export default function GuesthouseForm() {
     postRegister: false,
     info: false,
     introSummary: false,
+    rooms: false,
     detailInfo: false,
     rules: false,
     amenities: false,
@@ -124,6 +139,7 @@ export default function GuesthouseForm() {
     postRegister: false,
     info: false,
     introSummary: false,
+    rooms: false,
     detailInfo: false,
     rules: false,
     amenities: false,
@@ -150,13 +166,142 @@ export default function GuesthouseForm() {
     imgUrl: null,
   });
 
-  // formData 변경 시 섹션 유효성 갱신
-  useEffect(() => {
-    setValid(computeValidSections(formData));
-  }, [formData]);
+  const toggleSection = (key) => {
+    setVisible((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
 
-  // 입점 신청서 목록 조회
+  // formData 변경 시 섹션 유효성 갱신 (모드에 따라 다르게)
   useEffect(() => {
+    setValid(computeValidSections(formData, { isEditMode }));
+  }, [formData, isEditMode]);
+
+  // 수정 모드일 때: 기존 게스트하우스 상세 조회해서 formData 초기화
+  useEffect(() => {
+    if (!isEditMode) return;
+
+    const fetchDetail = async () => {
+      try {
+        const res = await guesthouseApi.getGuesthouseDetail(
+          numericGuesthouseId
+        );
+        const data = res.data;
+
+        const mappedAmenities =
+          data.amenities
+            ?.map((a) => {
+              const baseId =
+                AMENITY_NAME_TO_ID[a.amenityType] ||
+                AMENITY_NAME_TO_ID[a.amenityName];
+
+              if (!baseId) {
+                console.warn("알 수 없는 편의시설 매핑 실패:", a);
+                return null;
+              }
+
+              return {
+                amenityId: baseId,
+                count: a.count ?? 1,
+              };
+            })
+            .filter(Boolean) ?? [];
+
+        const mappedHashtagIds =
+          data.hashtags
+            ?.map((h) => {
+              const baseId = HASHTAG_TEXT_TO_ID[h.hashtag];
+              if (!baseId) {
+                console.warn("알 수 없는 해시태그 매핑 실패:", h);
+              }
+              return baseId;
+            })
+            .filter(Boolean) ?? [];
+
+        const mappedRooms =
+          data.roomInfos?.map((room) => ({
+            id: room.id ?? room.roomId,
+            roomName: room.roomName,
+            roomDesc: room.roomDesc ?? room.roomDescription ?? "",
+            roomCapacity: room.roomCapacity,
+            roomMaxCapacity: room.roomMaxCapacity ?? room.roomCapacity,
+            roomType: room.roomType,
+            roomPrice: room.roomPrice,
+            roomExtraFees: room.roomExtraFees ?? [],
+            roomImages:
+              room.roomImages?.map((img) => ({
+                roomImageUrl: img.roomImageUrl,
+                isThumbnail: img.isThumbnail,
+              })) ?? [],
+          })) ??
+          data.rooms?.map((room) => ({
+            id: room.roomId,
+            roomName: room.roomName,
+            roomDesc: "",
+            roomCapacity: room.roomCapacity ?? room.roomMaxCapacity,
+            roomMaxCapacity: room.roomMaxCapacity ?? room.roomCapacity,
+            roomType: room.roomType,
+            roomPrice: room.roomPrice ?? 0,
+            roomExtraFees: [],
+            roomImages:
+              room.roomImages?.map((img) => ({
+                roomImageUrl: img.roomImageUrl,
+                isThumbnail: img.isThumbnail,
+              })) ??
+              (room.thumbnailImg
+                ? [
+                    {
+                      roomImageUrl: room.thumbnailImg,
+                      isThumbnail: true,
+                    },
+                  ]
+                : []),
+          })) ??
+          [];
+
+        const mapped = {
+          applicationId: data.applicationId ?? null,
+          guesthouseName: data.guesthouseName ?? "",
+          guesthouseAddress: data.guesthouseAddress ?? "",
+          guesthouseDetailAddress: data.guesthouseDetailAddress ?? "",
+          guesthousePhone: data.guesthousePhone ?? "",
+          checkIn: data.checkIn ?? "15:00:00",
+          checkOut: data.checkOut ?? "11:00:00",
+          guesthouseShortIntro: data.guesthouseShortIntro ?? "",
+          guesthouseLongDesc:
+            data.guesthouseLongDesc ?? data.guesthouseLongDescription ?? "",
+          guesthouseImages:
+            data.guesthouseImages?.map((img) => ({
+              serverUrl: img.guesthouseImageUrl,
+              previewUrl: img.guesthouseImageUrl,
+              isThumbnail: img.isThumbnail,
+            })) ?? [],
+          hashtagIds: mappedHashtagIds,
+          rules: data.rules ?? "",
+          amenities: mappedAmenities,
+          roomInfos: mappedRooms,
+        };
+
+        setFormData(mapped);
+        originalRoomsRef.current = mappedRooms; // 🔹 초기 객실 목록 저장
+      } catch (error) {
+        const serverMessage =
+          error?.response?.data?.message ||
+          error?.message ||
+          "게스트하우스 정보를 불러오지 못했어요.";
+        setErrorModal((prev) => ({
+          ...prev,
+          visible: true,
+          title: serverMessage,
+        }));
+      }
+    };
+
+    fetchDetail();
+  }, [isEditMode, numericGuesthouseId]);
+
+  // 입점 신청서 목록 조회 (등록 모드에서만 의미 있음)
+  useEffect(() => {
+    if (isEditMode) return;
+
     const fetchApplications = async () => {
       try {
         const res = await guesthouseApi.getHostApplications();
@@ -190,7 +335,7 @@ export default function GuesthouseForm() {
     };
 
     fetchApplications();
-  }, []);
+  }, [isEditMode]);
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
@@ -207,7 +352,7 @@ export default function GuesthouseForm() {
     }));
   };
 
-  // 입점 신청서 선택
+  // 입점 신청서 선택 (등록 모드 전용)
   const handleSelectApplication = (app) => {
     setSelectedApplication(app);
     setFormData((prev) => ({
@@ -221,14 +366,14 @@ export default function GuesthouseForm() {
     }));
   };
 
-  // 이미지 업로드
+  // 배너 이미지 업로드
   const handleImagesUploaded = (urls) => {
     setFormData((prev) => {
       const existing = prev.guesthouseImages || [];
       const mapped = urls.map((url, index) => ({
         serverUrl: url,
         previewUrl: url,
-        isThumbnail: existing.length === 0 && index === 0, // 첫 장만 대표
+        isThumbnail: existing.length === 0 && index === 0,
       }));
       const merged = [...existing, ...mapped];
 
@@ -264,7 +409,6 @@ export default function GuesthouseForm() {
   };
 
   const handleImageUploadError = (message) => {
-    // 필요 없으면 그냥 빈 함수로 둬도 됨
     if (!message) return;
     setErrorModal((prev) => ({
       ...prev,
@@ -310,57 +454,189 @@ export default function GuesthouseForm() {
     });
   };
 
-  // 등록
+  // 객실 리스트 변경 (RoomsSection에서 내려줌)
+  const handleRoomsChange = (rooms) => {
+    setFormData((prev) => ({
+      ...prev,
+      roomInfos: rooms,
+    }));
+  };
+
+  // 🔹 등록 / 수정 공통 처리
   const handleSubmit = async () => {
     if (!isAllValid) return;
 
     try {
-      // TODO: 실제 이미지 업로드 후 URL로 교체 필요
-      const guesthouseImagesPayload = (formData.guesthouseImages || []).map(
-        (img) => ({
-          guesthouseImageUrl: img.previewUrl,
+      // 공통 payload들
+      const guesthouseImagesPayload =
+        formData.guesthouseImages?.map((img) => ({
+          guesthouseImageUrl: img.serverUrl || img.previewUrl,
           isThumbnail: !!img.isThumbnail,
-        })
-      );
+        })) ?? [];
 
-      const payload = {
-        applicationId: formData.applicationId,
-        guesthouseName: formData.guesthouseName,
-        guesthouseAddress: formData.guesthouseAddress,
-        guesthouseDetailAddress: formData.guesthouseDetailAddress,
-        guesthousePhone: formData.guesthousePhone,
-        checkIn: formData.checkIn,
-        checkOut: formData.checkOut,
-        guesthouseShortIntro: formData.guesthouseShortIntro,
-        guesthouseLongDesc: formData.guesthouseLongDesc,
-        rules: formData.rules,
-        hashtagIds: formData.hashtagIds,
-        amenities: formData.amenities,
-        guesthouseImages: guesthouseImagesPayload,
-        roomInfos: [], // 방 등록은 제외
-      };
+      const amenitiesPayload = formData.amenities ?? [];
+      const hashtagIdsPayload = formData.hashtagIds ?? [];
 
-      // 👇 실제 API 메서드 이름에 맞춰 수정해서 사용
-      await guesthouseApi.registerGuesthouse(payload);
+      if (!isEditMode) {
+        // =========================
+        // 🚩 등록 모드
+        // =========================
+        const roomInfosPayload =
+          formData.roomInfos?.map((room) => ({
+            roomName: room.roomName,
+            roomType: room.roomType,
+            roomCapacity: Number(room.roomCapacity),
+            roomMaxCapacity: Number(room.roomMaxCapacity ?? room.roomCapacity),
+            roomDesc: room.roomDesc,
+            roomPrice: Number(room.roomPrice),
+            roomExtraFees: room.roomExtraFees ?? [],
+            roomImages:
+              room.roomImages?.map((img) => ({
+                roomImageUrl: img.roomImageUrl,
+                isThumbnail: !!img.isThumbnail,
+              })) ?? [],
+          })) ?? [];
 
-      setErrorModal({
-        visible: true,
-        title: "게스트하우스를 등록했어요",
-        message: null,
-        buttonText: "확인",
-        buttonText2: null,
-        onPress: () => {
-          setErrorModal((prev) => ({ ...prev, visible: false }));
-          navigate("/guesthouse/my");
-        },
-        onPress2: null,
-        imgUrl: null,
-      });
+        const payload = {
+          applicationId: formData.applicationId,
+          guesthouseName: formData.guesthouseName,
+          guesthouseAddress: formData.guesthouseAddress,
+          guesthouseDetailAddress: formData.guesthouseDetailAddress,
+          guesthousePhone: formData.guesthousePhone,
+          checkIn: formData.checkIn,
+          checkOut: formData.checkOut,
+          guesthouseShortIntro: formData.guesthouseShortIntro,
+          guesthouseLongDesc: formData.guesthouseLongDesc,
+          rules: formData.rules,
+          hashtagIds: hashtagIdsPayload,
+          amenities: amenitiesPayload,
+          guesthouseImages: guesthouseImagesPayload,
+          roomInfos: roomInfosPayload,
+        };
+
+        await guesthouseApi.registerGuesthouse(payload);
+
+        setErrorModal({
+          visible: true,
+          title: "게스트하우스를 등록했어요",
+          message: null,
+          buttonText: "확인",
+          buttonText2: null,
+          onPress: () => {
+            setErrorModal((prev) => ({ ...prev, visible: false }));
+            navigate("/guesthouse/my");
+          },
+          onPress2: null,
+          imgUrl: null,
+        });
+      } else {
+        // =========================
+        // ✏️ 수정 모드
+        // =========================
+        const basicPayload = {
+          guesthouseName: formData.guesthouseName,
+          guesthouseAddress: formData.guesthouseAddress,
+          guesthouseDetailAddress: formData.guesthouseDetailAddress,
+          guesthousePhone: formData.guesthousePhone,
+          guesthouseShortIntro: formData.guesthouseShortIntro,
+          guesthouseLongDescription: formData.guesthouseLongDesc,
+          checkIn: formData.checkIn,
+          checkOut: formData.checkOut,
+          rules: formData.rules,
+        };
+
+        await guesthouseApi.updateGuesthouseBasic(
+          numericGuesthouseId,
+          basicPayload
+        );
+        await guesthouseApi.updateGuesthouseImages(
+          numericGuesthouseId,
+          guesthouseImagesPayload
+        );
+        await guesthouseApi.updateGuesthouseHashtags(
+          numericGuesthouseId,
+          hashtagIdsPayload
+        );
+        await guesthouseApi.updateGuesthouseAmenities(
+          numericGuesthouseId,
+          amenitiesPayload
+        );
+
+        // 🔹 객실 처리
+        const currentRooms = formData.roomInfos || [];
+        const originalRooms = originalRoomsRef.current || [];
+
+        // 1) upsert (create / update)
+        for (const room of currentRooms) {
+          const basic = {
+            roomName: room.roomName,
+            roomType: room.roomType,
+            roomCapacity: Number(room.roomCapacity),
+            roomMaxCapacity: Number(room.roomMaxCapacity ?? room.roomCapacity),
+            roomDescription: room.roomDesc,
+            roomPrice: Number(room.roomPrice),
+          };
+
+          const images =
+            room.roomImages?.map((img) => ({
+              roomImageUrl: img.roomImageUrl,
+              isThumbnail: !!img.isThumbnail,
+            })) ?? [];
+
+          if (room.id) {
+            // 기존 방 → update
+            await guesthouseApi.updateRoomBasic(
+              numericGuesthouseId,
+              room.id,
+              basic
+            );
+            await guesthouseApi.updateRoomImages(
+              numericGuesthouseId,
+              room.id,
+              images
+            );
+          } else {
+            // 새 방 → create
+            const createPayload = {
+              ...basic,
+              roomExtraFees: room.roomExtraFees ?? [],
+              roomImages: images,
+            };
+            await guesthouseApi.createRoom(numericGuesthouseId, createPayload);
+          }
+        }
+
+        // 2) 삭제된 방 처리
+        const currentIds = new Set(
+          currentRooms.filter((r) => r.id).map((r) => r.id)
+        );
+        for (const r of originalRooms) {
+          if (r.id && !currentIds.has(r.id)) {
+            await guesthouseApi.deleteRoom(numericGuesthouseId, r.id);
+          }
+        }
+
+        setErrorModal({
+          visible: true,
+          title: "게스트하우스를 수정했어요",
+          message: null,
+          buttonText: "확인",
+          buttonText2: null,
+          onPress: () => {
+            setErrorModal((prev) => ({ ...prev, visible: false }));
+            navigate("/guesthouse/my");
+          },
+          onPress2: null,
+          imgUrl: null,
+        });
+      }
     } catch (error) {
       const serverMessage =
         error?.response?.data?.message ||
         error?.message ||
-        "게스트하우스 등록 중 오류가 발생했습니다.";
+        (isEditMode
+          ? "게스트하우스 수정 중 오류가 발생했습니다."
+          : "게스트하우스 등록 중 오류가 발생했습니다.");
       setErrorModal((prev) => ({
         ...prev,
         visible: true,
@@ -371,513 +647,91 @@ export default function GuesthouseForm() {
 
   return (
     <div className="container">
-      <div className="page-title">나의 게스트하우스</div>
+      <div className="page-title">
+        {isEditMode ? "게스트하우스 수정" : "나의 게스트하우스"}
+      </div>
       <div className="flex flex-col">
-        {/* 내용 영역 */}
         <div className="flex-1 overflow-y-auto">
           <div className="flex flex-col gap-4">
-            {/* 1. 게시물 등록 (입점 신청서 선택) */}
-            <div className="form-section-box">
-              <button
-                type="button"
-                className="form-title-box"
-                onClick={() =>
-                  setVisible((prev) => ({
-                    ...prev,
-                    postRegister: !prev.postRegister,
-                  }))
-                }
-              >
-                <span className="form-title-text">입점신청서 선택</span>
-                {valid.postRegister ? (
-                  <img src={CheckOrange} width={24} height={24} alt="완료" />
-                ) : (
-                  <img src={ChevronBlack} width={24} height={24} alt="펼치기" />
-                )}
-              </button>
+            {!isEditMode && (
+              <PostRegisterSection
+                open={visible.postRegister}
+                onToggle={() => toggleSection("postRegister")}
+                valid={valid.postRegister}
+                applications={applications}
+                selectedApplication={selectedApplication}
+                onSelectApplication={handleSelectApplication}
+              />
+            )}
 
-              {visible.postRegister && (
-                <div className="form-body-container">
-                  {applications.length === 0 && (
-                    <p className="text-sm text-gray-400">
-                      등록 가능한 입점 신청서가 없습니다.
-                    </p>
-                  )}
-                  <div className="flex flex-col gap-3 max-h-[300px] overflow-scroll scrollbar-hide">
-                    {applications.map((app) => {
-                      const selected = selectedApplication?.id === app.id;
-                      return (
-                        <button
-                          key={app.id}
-                          type="button"
-                          className={`flex items-center gap-3 rounded-xl border px-3 py-2 text-left text-sm ${
-                            selected
-                              ? "border-primary-orange bg-orange-50"
-                              : "border-gray-200"
-                          }`}
-                          onClick={() => handleSelectApplication(app)}
-                        >
-                          <img
-                            src={
-                              selected
-                                ? EnabledRadioButton
-                                : DisabledRadioButton
-                            }
-                            className="w-7 h-7"
-                          />
-                          <div>
-                            <p className="font-medium text-gray-900">
-                              {app.businessName}
-                            </p>
-                            <p className="text-sm text-gray-500">
-                              {app.address} {app.detailAddress}
-                            </p>
-                            <p className="mt-1 text-sm text-gray-500">
-                              {app.businessPhone}
-                            </p>
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
+            <InfoSection
+              open={visible.info}
+              onToggle={() => toggleSection("info")}
+              valid={valid.info}
+              formData={formData}
+              handleInputChange={handleInputChange}
+              handleTimeChange={handleTimeChange}
+              displayTimeHHMM={displayTimeHHMM}
+              guesthouseTags={guesthouseTags}
+              toggleTag={toggleTag}
+            />
 
-            {/* 2. 기본 정보 */}
-            <div className="form-section-box">
-              <button
-                type="button"
-                className="form-title-box"
-                onClick={() =>
-                  setVisible((prev) => ({
-                    ...prev,
-                    info: !prev.info,
-                  }))
-                }
-              >
-                <span className="form-title-text">기본 정보</span>
-                {valid.info ? (
-                  <img src={CheckOrange} width={24} height={24} alt="완료" />
-                ) : (
-                  <img src={ChevronBlack} width={24} height={24} alt="펼치기" />
-                )}
-              </button>
+            <IntroSummarySection
+              open={visible.introSummary}
+              onToggle={() => toggleSection("introSummary")}
+              valid={valid.introSummary}
+              formData={formData}
+              handleImagesUploaded={handleImagesUploaded}
+              handleImageUploadError={handleImageUploadError}
+              setThumbnail={setThumbnail}
+              deleteImage={deleteImage}
+              handleInputChange={handleInputChange}
+            />
 
-              {visible.info && (
-                <div className="form-body-container">
-                  <div className="flex flex-col gap-4">
-                    {/* 이름 */}
-                    <div>
-                      <p className="form-body-label">게스트하우스 이름</p>
-                      <input
-                        type="text"
-                        className="form-input"
-                        placeholder="게스트하우스 이름을 입력해 주세요"
-                        value={formData.guesthouseName}
-                        maxLength={50}
-                        onChange={(e) =>
-                          handleInputChange("guesthouseName", e.target.value)
-                        }
-                      />
-                    </div>
+            <RoomsSection
+              open={visible.rooms}
+              onToggle={() => toggleSection("rooms")}
+              valid={valid.rooms}
+              rooms={formData.roomInfos}
+              onChangeRooms={handleRoomsChange}
+              onImageUploadError={handleImageUploadError}
+            />
 
-                    {/* 전화번호 */}
-                    <div>
-                      <p className="form-body-label">전화번호</p>
-                      <input
-                        type="tel"
-                        className="form-input"
-                        placeholder="전화번호를 입력해 주세요"
-                        value={formData.guesthousePhone}
-                        maxLength={20}
-                        onChange={(e) =>
-                          handleInputChange("guesthousePhone", e.target.value)
-                        }
-                      />
-                    </div>
+            <DetailInfoSection
+              open={visible.detailInfo}
+              onToggle={() => toggleSection("detailInfo")}
+              valid={valid.detailInfo}
+              formData={formData}
+              handleInputChange={handleInputChange}
+            />
 
-                    {/* 주소 */}
-                    <div>
-                      <p className="form-body-label">주소</p>
-                      <input
-                        type="text"
-                        className="form-input mb-2"
-                        placeholder="도로명 또는 지번 주소를 입력해 주세요"
-                        value={formData.guesthouseAddress}
-                        onChange={(e) =>
-                          handleInputChange("guesthouseAddress", e.target.value)
-                        }
-                      />
-                      <input
-                        type="text"
-                        className="form-input"
-                        placeholder="상세 주소를 입력해 주세요"
-                        value={formData.guesthouseDetailAddress}
-                        onChange={(e) =>
-                          handleInputChange(
-                            "guesthouseDetailAddress",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </div>
+            <RulesSection
+              open={visible.rules}
+              onToggle={() => toggleSection("rules")}
+              valid={valid.rules}
+              formData={formData}
+              handleInputChange={handleInputChange}
+            />
 
-                    {/* 체크인/체크아웃 */}
-                    <div>
-                      <p className="form-body-label">체크인 / 체크아웃</p>
-                      <div className="flex gap-3">
-                        <div className="flex-1">
-                          <p className="text-sm text-gray-500 mb-1">체크인</p>
-                          <input
-                            type="time"
-                            className="form-input"
-                            value={displayTimeHHMM(formData.checkIn)}
-                            onChange={(e) =>
-                              handleTimeChange("checkIn", e.target.value)
-                            }
-                          />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-sm text-gray-500 mb-1">체크아웃</p>
-                          <input
-                            type="time"
-                            className="form-input"
-                            value={displayTimeHHMM(formData.checkOut)}
-                            onChange={(e) =>
-                              handleTimeChange("checkOut", e.target.value)
-                            }
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* 태그 */}
-                    <div>
-                      <p className="form-body-label">
-                        태그로 게스트하우스 특징을 알려주세요
-                      </p>
-                      <p className="text-sm text-gray-400 mb-2">
-                        최대 3개까지 선택할 수 있어요
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {guesthouseTags.map((tag) => {
-                          const selected = formData.hashtagIds.includes(tag.id);
-                          return (
-                            <button
-                              key={tag.id}
-                              type="button"
-                              onClick={() => toggleTag(tag.id)}
-                              className={`form-hashtag ${
-                                selected ? "form-hashtag-selected" : ""
-                              }`}
-                            >
-                              {tag.title ?? tag.hashtag}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* 3. 소개 요약 */}
-            <div className="form-section-box">
-              <button
-                type="button"
-                className="form-title-box"
-                onClick={() =>
-                  setVisible((prev) => ({
-                    ...prev,
-                    introSummary: !prev.introSummary,
-                  }))
-                }
-              >
-                <span className="form-title-text">소개 요약</span>
-                {valid.introSummary ? (
-                  <img src={CheckOrange} width={24} height={24} alt="완료" />
-                ) : (
-                  <img src={ChevronBlack} width={24} height={24} alt="펼치기" />
-                )}
-              </button>
-
-              {visible.introSummary && (
-                <div className="form-body-container">
-                  {/* 배너 이미지 */}
-                  <div className="mb-4">
-                    <div className="flex items-center justify-between">
-                      <p className="form-body-label mb-0">배너 사진</p>
-                      <span className="text-sm text-gray-400">
-                        <span className="text-primary-orange">
-                          {formData.guesthouseImages.length}
-                        </span>
-                        /10
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-400 mt-1">
-                      대표로 보여줄 사진을 선택해 주세요. 별모양을 클릭해 대표
-                      사진을 선택할 수 있어요.
-                    </p>
-
-                    <div className="flex flex-wrap gap-3 mt-2">
-                      <div className="w-40">
-                        <ImageDropzone
-                          label="배너 사진 업로드"
-                          accept="image/*"
-                          sensitive={false} // 여러 장 허용
-                          maxCount={10}
-                          currentCount={formData.guesthouseImages.length}
-                          disabled={formData.guesthouseImages.length >= 10}
-                          onUploaded={handleImagesUploaded} // S3 업로드 성공 시 URL 배열
-                          onError={handleImageUploadError} // 에러 시 모달로 띄우기
-                        />
-                      </div>
-
-                      {formData.guesthouseImages.map((img, index) => (
-                        <div
-                          key={index}
-                          className="relative h-40 w-40 overflow-hidden rounded-xl border border-gray-200"
-                        >
-                          <img
-                            src={img.previewUrl || img.serverUrl}
-                            alt=""
-                            className="h-full w-full object-cover"
-                          />
-                          {img.isThumbnail && (
-                            <div className="absolute left-2 top-2 rounded-full bg-white px-1">
-                              <img src={StarFilled} width={20} height={20} />
-                            </div>
-                          )}
-                          {!img.isThumbnail && (
-                            <button
-                              type="button"
-                              className="absolute left-2 top-2 rounded-full px-1 bg-white"
-                              onClick={() => setThumbnail(index)}
-                            >
-                              <img src={StarEmpty} width={20} height={20} />
-                            </button>
-                          )}
-                          <button
-                            type="button"
-                            className="absolute right-2 top-2 rounded-full bg-white px-1"
-                            onClick={() => deleteImage(index)}
-                          >
-                            <img src={XBtn} width={20} height={20} />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* 짧은 소개 */}
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <p className="form-body-label mb-0">
-                        게스트하우스를 간략하게 소개해 주세요
-                      </p>
-                      <span className="text-sm text-gray-400">
-                        <span className="text-primary-orange">
-                          {formData.guesthouseShortIntro.length}
-                        </span>
-                        /1000
-                      </span>
-                    </div>
-                    <textarea
-                      className="form-input mt-2 min-h-[350px]"
-                      placeholder="게스트하우스 소개를 입력해 주세요"
-                      maxLength={1000}
-                      value={formData.guesthouseShortIntro}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "guesthouseShortIntro",
-                          e.target.value
-                        )
-                      }
-                    />
-                    <button
-                      type="button"
-                      className="mt-1 text-sm text-gray-400 underline"
-                      onClick={() =>
-                        handleInputChange("guesthouseShortIntro", "")
-                      }
-                    >
-                      다시쓰기
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* 4. 상세 정보 */}
-            <div className="form-section-box">
-              <button
-                type="button"
-                className="form-title-box"
-                onClick={() =>
-                  setVisible((prev) => ({
-                    ...prev,
-                    detailInfo: !prev.detailInfo,
-                  }))
-                }
-              >
-                <span className="form-title-text">상세 정보</span>
-                {valid.detailInfo ? (
-                  <img src={CheckOrange} width={24} height={24} alt="완료" />
-                ) : (
-                  <img src={ChevronBlack} width={24} height={24} alt="펼치기" />
-                )}
-              </button>
-
-              {visible.detailInfo && (
-                <div className="form-body-container">
-                  <div className="flex items-center justify-between">
-                    <p className="form-body-label mb-0">
-                      게스트하우스에 대해 자유롭게 적어주세요
-                    </p>
-                    <span className="text-sm text-gray-400">
-                      <span className="text-primary-orange">
-                        {formData.guesthouseLongDesc.length}
-                      </span>
-                      /5000
-                    </span>
-                  </div>
-                  <div>
-                    <textarea
-                      className="form-input mt-2 min-h-[350px]"
-                      placeholder="게스트하우스에 대해 자세히 적어주세요"
-                      maxLength={5000}
-                      value={formData.guesthouseLongDesc}
-                      onChange={(e) =>
-                        handleInputChange("guesthouseLongDesc", e.target.value)
-                      }
-                    />
-                    <button
-                      type="button"
-                      className="mt-1 text-sm text-gray-400 underline"
-                      onClick={() =>
-                        handleInputChange("guesthouseLongDesc", "")
-                      }
-                    >
-                      다시쓰기
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* 5. 이용 규칙 */}
-            <div className="form-section-box">
-              <button
-                type="button"
-                className="form-title-box"
-                onClick={() =>
-                  setVisible((prev) => ({
-                    ...prev,
-                    rules: !prev.rules,
-                  }))
-                }
-              >
-                <span className="form-title-text">이용 규칙 및 환불 규정</span>
-                {valid.rules ? (
-                  <img src={CheckOrange} width={24} height={24} alt="완료" />
-                ) : (
-                  <img src={ChevronBlack} width={24} height={24} alt="펼치기" />
-                )}
-              </button>
-
-              {visible.rules && (
-                <div className="form-body-container">
-                  <div className="flex items-center justify-between">
-                    <p className="form-body-label mb-0">
-                      이용 규칙 및 환불 규정을 작성해 주세요
-                    </p>
-                    <span className="text-sm text-gray-400">
-                      <span className="text-primary-orange">
-                        {formData.rules.length}
-                      </span>
-                      /5000
-                    </span>
-                  </div>
-                  <div>
-                    <textarea
-                      className="form-input mt-2 min-h-[350px]"
-                      placeholder="게스트하우스 이용규칙에 대해 자세히 적어주세요"
-                      maxLength={5000}
-                      value={formData.rules}
-                      onChange={(e) =>
-                        handleInputChange("rules", e.target.value)
-                      }
-                    />
-                    <button
-                      type="button"
-                      className="mt-1 text-sm text-gray-400 underline"
-                      onClick={() => handleInputChange("rules", "")}
-                    >
-                      다시쓰기
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* 6. 편의시설 */}
-            <div className="form-section-box">
-              <button
-                type="button"
-                className="form-title-box"
-                onClick={() =>
-                  setVisible((prev) => ({
-                    ...prev,
-                    amenities: !prev.amenities,
-                  }))
-                }
-              >
-                <span className="form-title-text">편의시설 및 서비스</span>
-                {valid.amenities ? (
-                  <img src={CheckOrange} width={24} height={24} alt="완료" />
-                ) : (
-                  <img src={ChevronBlack} width={24} height={24} alt="펼치기" />
-                )}
-              </button>
-
-              {visible.amenities && (
-                <div className="form-body-container">
-                  <p className="text-sm text-primary-orange mb-3">
-                    제공하는 편의시설과 서비스를 모두 선택해 주세요
-                  </p>
-
-                  <AmenityGroup
-                    title="숙소 공용시설"
-                    options={publicFacilities}
-                    selectedIds={formData.amenities.map((a) => a.amenityId)}
-                    toggleAmenity={toggleAmenity}
-                  />
-                  <AmenityGroup
-                    title="객실 내 시설"
-                    options={roomFacilities}
-                    selectedIds={formData.amenities.map((a) => a.amenityId)}
-                    toggleAmenity={toggleAmenity}
-                  />
-                  <AmenityGroup
-                    title="기타시설 및 서비스"
-                    options={services}
-                    selectedIds={formData.amenities.map((a) => a.amenityId)}
-                    toggleAmenity={toggleAmenity}
-                  />
-                </div>
-              )}
-            </div>
+            <AmenitiesSection
+              open={visible.amenities}
+              onToggle={() => toggleSection("amenities")}
+              valid={valid.amenities}
+              selectedAmenityIds={formData.amenities.map((a) => a.amenityId)}
+              toggleAmenity={toggleAmenity}
+              publicFacilities={publicFacilities}
+              roomFacilities={roomFacilities}
+              services={services}
+            />
 
             <p className="text-sm text-primary-blue mt-2 text-right">
-              모든 항목을 입력하셔야 등록이 완료됩니다
+              모든 항목을 입력하셔야{" "}
+              {isEditMode ? "수정이 완료됩니다" : "등록이 완료됩니다"}
             </p>
 
-            {/* 하단 등록 버튼 */}
             <div className="mt-4 flex justify-center">
               <ButtonOrange
-                title="등록하기"
+                title={isEditMode ? "수정하기" : "등록하기"}
                 onPress={handleSubmit}
                 disabled={!isAllValid}
               />
@@ -885,7 +739,6 @@ export default function GuesthouseForm() {
           </div>
         </div>
 
-        {/* 에러/알림 모달 */}
         <ErrorModal
           visible={errorModal.visible}
           title={errorModal.title}
@@ -896,33 +749,6 @@ export default function GuesthouseForm() {
           onPress2={errorModal.onPress2 ?? null}
           imgUrl={errorModal.imgUrl ?? null}
         />
-      </div>
-    </div>
-  );
-}
-
-function AmenityGroup({ title, options, selectedIds, toggleAmenity }) {
-  return (
-    <div className="mb-3">
-      <p className="form-body-label mb-1">{title}</p>
-      <div className="flex flex-wrap rounded-xl bg-gray-50 p-2">
-        {options?.map((opt) => {
-          const active = selectedIds.includes(opt.id);
-          return (
-            <button
-              key={opt.id}
-              type="button"
-              onClick={() => toggleAmenity(opt.id)}
-              className={`m-1  truncate rounded-lg px-4 py-2 text-md font-medium ${
-                active
-                  ? "bg-primary-orange text-white"
-                  : "bg-white text-gray-500 border border-gray-200"
-              }`}
-            >
-              {opt.name}
-            </button>
-          );
-        })}
       </div>
     </div>
   );
