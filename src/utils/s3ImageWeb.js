@@ -99,42 +99,42 @@ const uploadBlobToS3Web = (presignedUrl, blob, onProgress) => {
 };
 
 // 실제 코드 - CORS 오류 해결 후 사용 가능
-// export const uploadSingleImageToS3Web = async (file, onProgress) => {
-//   if (!file) return null;
+export const uploadSingleImageToS3Web = async (file, onProgress) => {
+  if (!file) return null;
 
-//   const jpegBlob = await compressToJPEGWeb(file, {
-//     maxWidth: 1280,
-//     maxHeight: 1280,
-//     quality: 0.8,
-//   });
-
-//   const filename = generateUniqueFilename("jpg");
-//   const presignedUrl = await getPresignedUrl(filename);
-
-//   const uploadedUrl = await uploadBlobToS3Web(
-//     presignedUrl,
-//     jpegBlob,
-//     onProgress
-//   );
-
-//   return uploadedUrl;
-// };
-
-export const uploadSingleImageToS3Web = (file, onProgress) => {
-  if (!file) return Promise.resolve(null);
-
-  return new Promise((resolve) => {
-    const objectUrl = URL.createObjectURL(file); // 브라우저 로컬 URL (새로고침 시 사라짐)
-    let p = 0;
-
-    const timer = setInterval(() => {
-      p += 10;
-      if (onProgress) onProgress(p);
-
-      if (p >= 100) {
-        clearInterval(timer);
-        resolve(objectUrl);
-      }
-    }, 80); // 0.8초 정도에 100% 도달
+  const jpegBlob = await compressToJPEGWeb(file, {
+    maxWidth: 1280,
+    maxHeight: 1280,
+    quality: 0.8,
   });
+
+  const filename = generateUniqueFilename("jpg");
+  const presignedUrl = await getPresignedUrl(filename);
+
+  const uploadedUrl = await uploadBlobToS3Web(
+    presignedUrl,
+    jpegBlob,
+    onProgress
+  );
+
+  return uploadedUrl;
 };
+
+// export const uploadSingleImageToS3Web = (file, onProgress) => {
+//   if (!file) return Promise.resolve(null);
+
+//   return new Promise((resolve) => {
+//     const objectUrl = URL.createObjectURL(file); // 브라우저 로컬 URL (새로고침 시 사라짐)
+//     let p = 0;
+
+//     const timer = setInterval(() => {
+//       p += 10;
+//       if (onProgress) onProgress(p);
+
+//       if (p >= 100) {
+//         clearInterval(timer);
+//         resolve(objectUrl);
+//       }
+//     }, 80); // 0.8초 정도에 100% 도달
+//   });
+// };
