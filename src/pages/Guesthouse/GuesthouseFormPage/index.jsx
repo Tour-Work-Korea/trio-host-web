@@ -126,7 +126,7 @@ export default function GuesthouseForm() {
   // 섹션 토글
   const [visible, setVisible] = useState({
     postRegister: false,
-    info: true,
+    info: false,
     introSummary: false,
     rooms: false,
     detailInfo: false,

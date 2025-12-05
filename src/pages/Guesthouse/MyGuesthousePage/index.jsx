@@ -226,7 +226,9 @@ export default function MyGuesthousePage() {
   // 게스트하우스 등록 핸들러
   const handleCreateGuesthouse = () => {
     if (applications.length > 0) {
-      setSelectModal({ visible: true });
+      // 입점신청서 고르지 않고 바로 폼으로 이동
+      // setSelectModal({ visible: true });
+      navigate(`/guesthouse/form/`);
     } else {
       setErrorModal({
         visible: true,
