@@ -68,7 +68,7 @@
   /* 인풋 기본형 */
   .form-input {
     @apply w-full rounded-xl border border-grayscale-300 px-3 py-2
-           outline-none focus:border-primary-orange;
+           outline-none focus:border-primary-orange bg-grayscale-0;
   }
 
   /* 인풋+버튼 컨테이너 (absolute 버튼 배치용) */

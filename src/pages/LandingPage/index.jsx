@@ -1,4 +1,3 @@
-import ButtonOrange from "@components/ButtonOrange";
 import { useState } from "react";
 import RegisterModal from "./RegisterModal/RegisterModal";
 import Banner from "./IntroduceSection/Banner";
@@ -6,7 +5,6 @@ import Intro1 from "./IntroduceSection/Intro1";
 import Intro2 from "./IntroduceSection/Intro2";
 import VisionMission from "./IntroduceSection/VisionMission";
 import IntroUI1 from "./IntroduceSection/IntroUI1";
-import ImageSlider from "../../components/ImageSlider";
 import IntroUI2 from "./IntroduceSection/IntroUI2";
 import IntroUI3 from "./IntroduceSection/IntroUI3";
 import InstallBox from "./IntroduceSection/InstallBox";
