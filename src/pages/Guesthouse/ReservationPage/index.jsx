@@ -8,7 +8,6 @@ import SelectModal from "@components/SelectModal";
 import { useNavigate } from "react-router-dom";
 import ReservationDeleteModal from "./ReservationDeleteModal";
 import { dummyReservationsResponse } from "./dummyData";
-import ButtonOrange from "@components/ButtonOrange";
 import ButtonWhite from "@components/ButtonWhite";
 
 const STATUS_LABELS = {
@@ -37,7 +36,10 @@ export default function ReservationPage() {
     imgUrl: null,
   });
   const [selectModal, setSelectModal] = useState({ visible: false });
-  const [deleteModal, setDeleteModal] = useState({ visible: false, id: null });
+  const [deleteModal, setDeleteModal] = useState({
+    visible: false,
+    reservation: null,
+  });
 
   const [page, setPage] = useState(0);
   const [pageInfo, setPageInfo] = useState({
@@ -127,7 +129,7 @@ export default function ReservationPage() {
   };
 
   // 삭제 요청 핸들러
-  const handleDeleteReservation = (id) => {
+  const handleDeleteReservation = (reservation) => {
     setErrorModal({
       visible: true,
       title: `삭제 요청은 관리자의 검토 후 처리돼요\n계속 진행하시겠어요?`,
@@ -135,7 +137,10 @@ export default function ReservationPage() {
       buttonText: "네, 요청할래요",
       buttonText2: "보류할게요",
       onPress: () => {
-        setDeleteModal({ visible: true, id });
+        setDeleteModal({
+          visible: true,
+          reservation,
+        });
         setErrorModal((prev) => ({
           ...prev,
           visible: false,
@@ -455,9 +460,7 @@ export default function ReservationPage() {
                         <button
                           type="button"
                           className="rounded-full bg-primary-orange px-4 py-1 text-sm font-semibold text-white hover:opacity-90"
-                          onClick={() =>
-                            handleDeleteReservation(item.reservationId)
-                          }
+                          onClick={() => handleDeleteReservation(item)}
                         >
                           취소하기
                         </button>
@@ -525,10 +528,10 @@ export default function ReservationPage() {
       />
 
       <ReservationDeleteModal
-        id={deleteModal.id}
         visible={deleteModal.visible}
         onClose={() => setDeleteModal({ visible: false, id: null })}
         setErrorModal={setErrorModal}
+        reservation={deleteModal.reservation}
       />
     </div>
   );
