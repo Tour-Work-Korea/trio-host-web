@@ -67,10 +67,8 @@ export default function WorkInfoSection({
         <div className="flex items-center justify-between mb-4 gap-2">
           <p className="text-sm font-semibold">근무지 사진을 추가해주세요</p>
           <p className="text-xs text-gray-400 text-right">
-            <span className="text-primary-orange">
-              {limitImage - images.length}
-            </span>
-            /{limitImage}
+            <span className="text-primary-orange">{images.length}</span>/
+            {limitImage}
           </p>
         </div>
 
