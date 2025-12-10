@@ -6,6 +6,7 @@ import GuestLayout from "@components/layout/GuestLayout";
 import UserLayout from "@components/layout/UserLayout";
 import useUserStore from "@stores/userStore";
 import { tryRefresh } from "@utils/authFlow";
+import PageLoader from "@components/PageLoader";
 
 const LandingPage = lazy(() => import("@pages/LandingPage"));
 const LoginPage = lazy(() => import("@pages/Auth/LoginPage"));
@@ -31,7 +32,11 @@ const ReservationPage = lazy(() => import("@pages/Guesthouse/ReservationPage"));
 const ProfilePage = lazy(() => import("@pages/ProfilePage"));
 
 // 공통 Suspense 래퍼
-const S = (el) => <Suspense fallback={<div>로딩중…</div>}>{el}</Suspense>;
+const S = (el) => (
+  <Suspense fallback={<PageLoader message="페이지를 불러오는 중입니다" />}>
+    {el}
+  </Suspense>
+);
 
 function RequireAuth({ children }) {
   const accessToken = useUserStore((s) => s.accessToken);
