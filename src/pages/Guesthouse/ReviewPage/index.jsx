@@ -315,10 +315,16 @@ export default function ReviewPage() {
                     {/* 유저 + 삭제요청 */}
                     <div className="flex justify-between">
                       <div className="flex gap-2 items-center">
-                        <img
-                          src={review?.userImgUrl}
-                          className="w-10 h-10 rounded-full bg-grayscale-400"
-                        />
+                        {review?.userImgUrl == null ||
+                        review.userImgUrl == "사진을 추가해주세요" ? (
+                          <div className="w-10 h-10 rounded-full bg-grayscale-200" />
+                        ) : (
+                          <img
+                            src={review?.userImgUrl}
+                            className="w-10 h-10 rounded-full bg-grayscale-200"
+                          />
+                        )}
+
                         <div className="font-medium">{review.nickname}</div>
                       </div>
                       <button
