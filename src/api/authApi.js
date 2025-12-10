@@ -73,6 +73,9 @@ const authApi = {
   //비밀번호 찾기
   findPassword: (body) =>
     api.post("/auth/find/password", body, { withAuth: false }),
+
+  //프로필 수정
+  updateProfile: (body) => api.put("/host/my", body),
 };
 
 export default authApi;

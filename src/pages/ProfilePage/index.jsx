@@ -1,5 +1,10 @@
 import React from "react";
+import EditProfile from "./EditProfile";
 
 export default function ProfilePage() {
-  return <div>ProfilePage</div>;
+  return (
+    <div>
+      <EditProfile />
+    </div>
+  );
 }
