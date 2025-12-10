@@ -7,7 +7,6 @@ import guesthouseApi from "@api/guesthouseApi";
 import SelectModal from "@components/SelectModal";
 import { useNavigate } from "react-router-dom";
 import ReservationDeleteModal from "./ReservationDeleteModal";
-import { dummyReservationsResponse } from "./dummyData";
 import ButtonWhite from "@components/ButtonWhite";
 
 const STATUS_LABELS = {
@@ -20,7 +19,10 @@ const STATUS_LABELS = {
 export default function ReservationPage() {
   const [guesthouses, setGuesthouses] = useState([]);
   const [selected, setSelected] = useState(); // 선택된 게스트하우스 id
-  const [reservations, setReservations] = useState([]); // 원본 예약 목록 (dummy)
+
+  // 서버에서 받아온 예약 목록 (현재 페이지 content)
+  const [reservations, setReservations] = useState([]);
+
   const [errorModal, setErrorModal] = useState({
     visible: false,
     title: "",
@@ -55,14 +57,15 @@ export default function ReservationPage() {
     status: "", // PENDING | CONFIRMED | CANCELLED | COMPLETED | ""
     startDate: "", // "YYYY-MM-DD"
     endDate: "",
-    searchText: "",
+    searchText: "", // → keyword 로 서버에 전달
   });
+
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     tryFetchGuesthouse();
-    setReservations(dummyReservationsResponse.content || []);
   }, []);
 
   // 게스트하우스 목록 조회
@@ -111,7 +114,7 @@ export default function ReservationPage() {
     }
   };
 
-  // 검색 파라미터 변경 핸들러
+  // 검색 파라미터 변경 핸들러 (변경 시 page 0으로)
   const handleChangeSearchParam = (field, value) => {
     setSearchParams((prev) => ({
       ...prev,
@@ -155,81 +158,90 @@ export default function ReservationPage() {
     });
   };
 
-  // 필터링된 예약 목록 (게스트하우스 + 날짜 + 상태 + 검색어)
-  const filteredReservations = useMemo(() => {
-    let list = [...reservations];
+  // ---------------------- 서버에서 예약 목록 조회 ----------------------
+  const tryFetchReservations = async () => {
+    if (!selected) return;
 
-    // 선택된 게스트하우스 기준 필터
-    if (selected) {
-      list = list.filter((r) => r.guesthouseId === selected);
-    }
+    setLoading(true);
+    try {
+      const params = {
+        page,
+        size: searchParams.size,
+        status: searchParams.status || undefined,
+        startDate: searchParams.startDate || undefined,
+        endDate: searchParams.endDate || undefined,
+        keyword: searchParams.searchText?.trim() || undefined, // 회원명 검색
+        guesthouseId: selected,
+      };
 
-    const { status, startDate, endDate, searchText } = searchParams;
+      const res = await guesthouseApi.searchGuesthouseReservations(params);
+      const data = res?.data || res; // 혹시 data 랩핑 안돼있을 수도 있으니
 
-    // 상태 필터
-    if (status) {
-      list = list.filter((r) => r.status === status);
-    }
+      const content = Array.isArray(data?.content) ? data.content : [];
 
-    // 날짜 필터 (체크인/체크아웃 기준 단순 포함)
-    if (startDate) {
-      list = list.filter((r) => r.checkInDate >= startDate);
-    }
-    if (endDate) {
-      list = list.filter((r) => r.checkOutDate <= endDate);
-    }
-
-    // 검색어 필터 (예약자 이름, 전화번호, 게스트하우스명, 객실명, 예약번호)
-    if (searchText.trim()) {
-      const q = searchText.trim();
-      list = list.filter((r) =>
-        [
-          r.userName,
-          r.userPhone,
-          r.guesthouseName,
-          r.roomName,
-          String(r.reservationId),
-        ].some((field) => field && field.includes(q))
+      setReservations(content);
+      setPageInfo({
+        totalPages: data?.totalPages ?? 0,
+        totalElements: data?.totalElements ?? 0,
+        first: data?.first ?? page === 0,
+        last:
+          data?.last ??
+          (data?.totalPages != null ? page === data.totalPages - 1 : true),
+      });
+    } catch (error) {
+      console.warn(
+        "게스트하우스 예약 목록 조회 실패:",
+        error?.response?.data?.message || error
       );
+      setErrorModal({
+        visible: true,
+        title: "예약 목록 조회 실패",
+        message:
+          error?.response?.data?.message ||
+          "예약 목록 조회 중 오류가 발생했습니다.",
+        buttonText: "확인",
+        buttonText2: null,
+        onPress: () =>
+          setErrorModal((prev) => ({
+            ...prev,
+            visible: false,
+          })),
+        onPress2: null,
+        imgUrl: null,
+      });
+      setReservations([]);
+      setPageInfo({
+        totalPages: 0,
+        totalElements: 0,
+        first: true,
+        last: true,
+      });
+    } finally {
+      setLoading(false);
     }
+  };
 
-    return list;
-  }, [reservations, selected, searchParams]);
-
-  // 페이징 처리
-  const pageSize = searchParams.size;
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filteredReservations.length / pageSize || 1)
-  );
-
-  // 현재 페이지 범위 보정
+  // 선택된 게하 / 검색 조건 / 페이지가 바뀔 때마다 서버 호출
   useEffect(() => {
-    if (page >= totalPages) {
-      setPage(0);
-    }
-  }, [page, totalPages]);
-
-  const paginatedReservations = useMemo(() => {
-    const start = page * pageSize;
-    const end = start + pageSize;
-    return filteredReservations.slice(start, end);
-  }, [filteredReservations, page, pageSize]);
-
-  // pageInfo 갱신 (UI용)
-  useEffect(() => {
-    setPageInfo({
-      totalPages,
-      totalElements: filteredReservations.length,
-      first: page === 0,
-      last: page === totalPages - 1,
-    });
-  }, [filteredReservations.length, page, totalPages]);
+    if (!selected) return;
+    tryFetchReservations();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    selected,
+    page,
+    searchParams.status,
+    searchParams.startDate,
+    searchParams.endDate,
+    searchParams.searchText,
+    searchParams.size,
+  ]);
 
   // 페이지 이동
   const handleChangePage = (newPage) => {
     if (newPage === page) return;
-    if (newPage < 0 || newPage >= totalPages) return;
+    if (newPage < 0) return;
+    if (pageInfo.totalPages && newPage >= pageInfo.totalPages) return;
+
     setPage(newPage);
     setSearchParams((prev) => ({ ...prev, page: newPage }));
   };
@@ -331,7 +343,7 @@ export default function ReservationPage() {
           <input
             type="text"
             className="flex-1 w-full form-input"
-            placeholder="예약자 이름, 연락처, 객실명, 예약번호 등으로 검색"
+            placeholder="회원 이름으로 검색"
             value={searchParams.searchText}
             onChange={(e) =>
               handleChangeSearchParam("searchText", e.target.value)
@@ -360,7 +372,7 @@ export default function ReservationPage() {
       </div>
 
       {/* 결과 영역 */}
-      {paginatedReservations.length === 0 ? (
+      {reservations.length === 0 && !loading ? (
         <div className="body-container scrollbar-hide h-[500px]">
           <EmptyComponent title="해당 조건에 맞는 예약이 없어요" />
         </div>
@@ -376,75 +388,86 @@ export default function ReservationPage() {
               건의 예약이 있습니다.
             </p>
             <p className="text-sm text-grayscale-500">
-              {page + 1} / {pageInfo.totalPages} 페이지
+              {page + 1} / {pageInfo.totalPages || 1} 페이지
             </p>
           </div>
 
           {/* 테이블 */}
           <div className="overflow-x-auto rounded-2xl border border-grayscale-200">
-            <table className="min-w-full text-sm">
+            <table className="min-w-[1100px] text-sm table-auto">
               <thead className="bg-grayscale-50">
                 <tr className="h-10 text-center text-sm text-grayscale-500">
-                  <th className="px-3">상태</th>
-                  <th className="px-3">예약번호</th>
-                  <th className="px-3">게스트하우스 / 객실</th>
-                  <th className="px-3">예약자 이름</th>
-                  <th className="px-3">예약자 전화번호</th>
-                  <th className="px-3">인원수</th>
-                  <th className="px-3">요청 사항</th>
-                  <th className="px-3">결제 금액</th>
-                  <th className="px-3">예약 취소</th>
+                  <th className="px-3 whitespace-nowrap w-24">상태</th>
+                  <th className="px-3 whitespace-nowrap w-28">예약번호</th>
+                  <th className="px-3 whitespace-nowrap w-56">
+                    게스트하우스 / 객실
+                  </th>
+                  <th className="px-3 whitespace-nowrap w-44">예약 기간</th>
+                  <th className="px-3 whitespace-nowrap w-32">예약자 이름</th>
+                  <th className="px-3 whitespace-nowrap w-40">
+                    예약자 전화번호
+                  </th>
+                  <th className="px-3 whitespace-nowrap w-24">인원수</th>
+                  <th className="px-3 whitespace-nowrap w-44">요청 사항</th>
+                  <th className="px-3 whitespace-nowrap w-32">결제 금액</th>
+                  <th className="px-3 whitespace-nowrap w-32">예약 취소</th>
                 </tr>
               </thead>
+
               <tbody>
-                {paginatedReservations.map((item) => (
+                {reservations.map((item) => (
                   <tr
                     key={item.reservationId}
                     className="h-12 border-t border-grayscale-100 text-sm text-grayscale-700"
                   >
                     {/* 상태 */}
-                    <td className="px-3 text-center align-middle">
+                    <td className="px-3 text-center align-middle whitespace-nowrap">
                       {renderStatusBadge(item.status)}
                     </td>
 
                     {/* 예약번호 */}
-                    <td className="px-3 text-center align-middle">
+                    <td className="px-3 text-center align-middle whitespace-nowrap">
                       {item.reservationId}
                     </td>
 
                     {/* 게스트하우스 / 객실 */}
                     <td className="px-3 text-left align-middle">
                       <div className="flex flex-col">
-                        <span className="font-medium text-grayscale-900">
+                        <span className="font-medium text-grayscale-900 truncate">
                           {item.guesthouseName}
                         </span>
-                        <span className="text-sm text-grayscale-500">
+                        <span className="text-sm text-grayscale-500 whitespace-nowrap">
                           {item.roomName} · {item.roomCapacity}인실
                         </span>
                       </div>
                     </td>
 
+                    {/* 예약 기간 */}
+                    <td className="px-3 text-center align-middle whitespace-nowrap">
+                      {item.checkInDate} ~ {item.checkOutDate}
+                    </td>
+
                     {/* 예약자 이름 */}
-                    <td className="px-3 text-center align-middle">
+                    <td className="px-3 text-center align-middle whitespace-nowrap">
                       {item.userName}
                     </td>
 
                     {/* 예약자 전화번호 */}
-                    <td className="px-3 text-center align-middle">
+                    <td className="px-3 text-center align-middle whitespace-nowrap">
                       {item.userPhone}
                     </td>
 
                     {/* 인원수 */}
-                    <td className="px-3 text-center align-middle">
+                    <td className="px-3 text-center align-middle whitespace-nowrap">
                       {item.guestCount}명
                     </td>
 
                     {/* 요청 사항 */}
-                    <td className="px-3 text-left align-middle max-w-[260px]">
-                      <p className=" text-grayscale-700 whitespace-pre-wrap leading-relaxed">
+                    <td className="px-3 text-left align-middle">
+                      <p className="text-grayscale-700 whitespace-nowrap leading-relaxed break-words max-w-50">
                         {item.requests && item.requests.trim()
                           ? item.requests
-                          : "요청 사항 없음"}
+                          : ""}
                       </p>
                     </td>
 
@@ -454,7 +477,7 @@ export default function ReservationPage() {
                     </td>
 
                     {/* 예약 취소 버튼 */}
-                    <td className="px-3 text-center align-middle">
+                    <td className="px-3 text-center align-middle whitespace-nowrap">
                       {(item.status === "PENDING" ||
                         item.status === "CONFIRMED") && (
                         <button
@@ -487,7 +510,7 @@ export default function ReservationPage() {
               이전
             </button>
             <span className="text-sm text-grayscale-600">
-              {page + 1} / {pageInfo.totalPages}
+              {page + 1} / {pageInfo.totalPages || 1}
             </span>
             <button
               type="button"
