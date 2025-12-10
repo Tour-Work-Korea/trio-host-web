@@ -2,6 +2,8 @@ import { useNavigate } from "react-router-dom";
 import { useCallback } from "react";
 
 import ButtonOrange from "@components/ButtonOrange";
+
+import ButtonWhite from "@components/ButtonWhite";
 import useUserStore from "@stores/userStore";
 
 import WaLogo from "@assets/images/wa_logo.svg";
@@ -22,18 +24,27 @@ export default function Header() {
     }
   }, [navigate]);
   return (
-    <header className="w-full flex bg-white py-4 px-4 sm:px-12 justify-between items-center cursor-pointer">
+    <header className="w-full flex bg-white py-4 px-4 sm:px-12 justify-between items-center">
       <img
         src={WaLogo}
         alt="WorkAway"
-        className="h-12 w-auto"
-        onClick={() => (isLoggedIn ? navigate("guesthouse/my") : navigate("/"))}
+        className="h-12 w-auto  cursor-pointer"
+        onClick={() => navigate("/")}
       />
       <div>
         {isLoggedIn ? (
-          <ButtonOrange title="로그아웃" onPress={onLogout} />
+          <div className="flex gap-2">
+            <div className="w-40">
+              <ButtonOrange title="사장님 페이지" onPress={onLogout} />
+            </div>
+            <div>
+              <ButtonWhite title="로그아웃" onPress={onLogout} />
+            </div>
+          </div>
         ) : (
-          <ButtonOrange title="로그인" to="/login" />
+          <div>
+            <ButtonOrange title="로그인" to="/login" />
+          </div>
         )}
       </div>
     </header>
