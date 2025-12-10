@@ -65,6 +65,8 @@ export default function ReviewPage() {
       if (options.length > 0) {
         setSelected(options[0].id);
         tryFetchReviews(options[0].id);
+      } else {
+        setLoading(false);
       }
       setGuesthouses(options);
     } catch (error) {
@@ -260,6 +262,9 @@ export default function ReviewPage() {
           className="w-full rounded-xl border-2 border-primary-blue px-3 py-2 
                    outline-none"
         >
+          {guesthouses.length == 0 && (
+            <option>등록된 게스트하우스가 없습니다</option>
+          )}
           {/* 전체 옵션 */}
           {guesthouses.map((opt) => (
             <option key={opt.id} value={opt.id}>
