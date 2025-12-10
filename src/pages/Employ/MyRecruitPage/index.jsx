@@ -297,13 +297,15 @@ export default function MyRecruitPage() {
                       src={recruit.thumbnailImage}
                       className="w-36 h-36 rounded-lg"
                     />
-                    <div className="flex flex-col flex-1 w-full justify-between">
-                      <div className="truncate">{recruit.guesthouseName}</div>
-                      <div className="text-2xl font-semibold truncate">
+                    <div className="flex flex-col flex-1 w-full justify-between font-medium">
+                      <div className="truncate text-grayscale-700">
+                        {recruit.guesthouseName}
+                      </div>
+                      <div className="text-xl font-semibold truncate">
                         {recruit.recruitTitle}
                       </div>
                       <div className="flex justify-between items-end">
-                        <div className="flex-col flex-1">
+                        <div className="flex-col flex-1 text-grayscale-600">
                           <div className="flex gap-2 ">
                             <p className=" text-grayscale-400 w-20">주소</p>
                             <p className="truncate">{recruit.address}</p>
