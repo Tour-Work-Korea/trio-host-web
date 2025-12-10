@@ -18,9 +18,7 @@ const STATUS_LABELS = {
 
 export default function ReservationPage() {
   const [guesthouses, setGuesthouses] = useState([]);
-  const [selected, setSelected] = useState(); // 선택된 게스트하우스 id
-
-  // 서버에서 받아온 예약 목록 (현재 페이지 content)
+  const [selected, setSelected] = useState(-1); // 선택된 게스트하우스 id
   const [reservations, setReservations] = useState([]);
 
   const [errorModal, setErrorModal] = useState({
@@ -86,10 +84,6 @@ export default function ReservationPage() {
       }));
 
       setGuesthouses(options);
-
-      if (options.length > 0) {
-        setSelected(options[0].id);
-      }
     } catch (error) {
       console.warn(
         "나의 게스트하우스 조회 실패:",
@@ -160,8 +154,6 @@ export default function ReservationPage() {
 
   // ---------------------- 서버에서 예약 목록 조회 ----------------------
   const tryFetchReservations = async () => {
-    if (!selected) return;
-
     setLoading(true);
     try {
       const params = {
@@ -170,10 +162,9 @@ export default function ReservationPage() {
         status: searchParams.status || undefined,
         startDate: searchParams.startDate || undefined,
         endDate: searchParams.endDate || undefined,
-        keyword: searchParams.searchText?.trim() || undefined, // 회원명 검색
-        guesthouseId: selected,
+        keyword: searchParams.searchText?.trim() || undefined,
+        ...(selected !== -1 && { guesthouseId: selected }),
       };
-
       const res = await guesthouseApi.searchGuesthouseReservations(params);
       const data = res?.data || res; // 혹시 data 랩핑 안돼있을 수도 있으니
 
@@ -277,13 +268,12 @@ export default function ReservationPage() {
           </p>
           <select
             id="guesthouse"
-            value={selected ?? ""}
+            value={selected}
             onChange={handleChangeGuesthouse}
             className="flex-1 w-full form-input"
           >
-            {guesthouses.length === 0 && (
-              <option value="">등록된 게스트하우스가 없습니다</option>
-            )}
+            <option value={-1}>전체 게스트하우스</option>
+
             {guesthouses.map((opt) => (
               <option key={opt.id} value={opt.id}>
                 {opt.title} ({opt.subtitle})
