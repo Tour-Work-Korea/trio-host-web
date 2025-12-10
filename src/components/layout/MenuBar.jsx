@@ -36,8 +36,8 @@ export default function MenuBar() {
             {profile.photoUrl ? (
               <img
                 src={profile.photoUrl}
-                alt={name}
-                className="w-20 h-20 rounded-lg object-cover bg-grayscale-200"
+                width={20}
+                className="w-20 min-w-20 h-20 rounded-lg object-cover"
               />
             ) : (
               <div className="w-20 h-20 bg-gray-300 rounded-lg" />

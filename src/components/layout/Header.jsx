@@ -35,7 +35,10 @@ export default function Header() {
         {isLoggedIn ? (
           <div className="flex gap-2">
             <div className="w-40">
-              <ButtonOrange title="사장님 페이지" onPress={onLogout} />
+              <ButtonOrange
+                title="사장님 페이지"
+                onPress={() => navigate("/guesthouse/my")}
+              />
             </div>
             <div>
               <ButtonWhite title="로그아웃" onPress={onLogout} />
