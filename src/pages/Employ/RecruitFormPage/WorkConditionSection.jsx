@@ -4,44 +4,23 @@ import React, { useEffect, useState } from "react";
 import DisabledRadioButton from "@assets/images/radio_button_disabled.svg";
 import EnabledRadioButton from "@assets/images/radio_button_enabled.svg";
 
+import {
+  WORK_PART_TAGS,
+  WORK_PART_ETC_ID,
+  WELFARE_TAGS,
+  WELFARE_ETC_ID,
+  WORK_DURATION_OPTIONS,
+  WORK_DURATION_ETC_ID,
+} from "@data/recruitOptions";
+
 export default function WorkConditionSection({
   handleInputChange,
   formData,
   visible,
 }) {
-  // 옵션들 -------------------------------------------------
-  const [workParts] = useState([
-    { id: 1, title: "예약 관리" },
-    { id: 2, title: "파티 보조" },
-    { id: 3, title: "객실 청소" },
-    { id: 4, title: "침구 정리 및 교체" },
-    { id: 5, title: "욕실/화장실 청소" },
-    { id: 6, title: "간단한 고객 응대" },
-    { id: 7, title: "조식 준비 보조" },
-    { id: 8, title: "비품 확인 및 정리" },
-  ]);
-  const WORK_PART_ETC_ID = 9;
-
-  const [welfares] = useState([
-    { id: 1, title: "무료 서핑 강습" },
-    { id: 2, title: "숙식 제공" },
-    { id: 3, title: "스탭 전용 숙소 제공" },
-    { id: 4, title: "렌트카 제공" },
-    { id: 5, title: "자전거 무료 대여" },
-    { id: 6, title: "스쿠터 무료 대여" },
-    { id: 7, title: "무료 숙박 제공" },
-    { id: 8, title: "BBQ 무제한 참여" },
-  ]);
-  const WELFARE_ETC_ID = 9;
-
-  const [workDurations] = useState([
-    { id: 1, title: "2주 이상" },
-    { id: 2, title: "3주 이상" },
-    { id: 3, title: "한달 이상" },
-    { id: 4, title: "2달 이상" },
-  ]);
-  const WORK_DURATION_ETC_ID = 5;
-
+  const workParts = WORK_PART_TAGS;
+  const welfares = WELFARE_TAGS;
+  const workDurations = WORK_DURATION_OPTIONS;
   const [selectedWorkParts, setSelectedWorkParts] = useState(
     formData.workPart ?? []
   );

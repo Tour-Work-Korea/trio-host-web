@@ -7,7 +7,10 @@ import Minus from "@assets/images/minus_gray.svg";
 import Calendar from "@assets/images/calendar_gray.svg";
 import DisabledRadioButton from "@assets/images/radio_button_disabled.svg";
 import EnabledRadioButton from "@assets/images/radio_button_enabled.svg";
-
+import {
+  RECRUIT_CONDITION_TAGS,
+  RECRUIT_CONDITION_ETC_ID,
+} from "@data/recruitOptions";
 export default function RecruitConditionSection({
   handleInputChange,
   formData,
@@ -17,24 +20,21 @@ export default function RecruitConditionSection({
   const [selectedRecruitField, setSelectedRecruitField] =
     useState("recruitStart");
 
-  const tags = [
-    { id: 1, title: "외국어 능력자" },
-    { id: 2, title: "서비스업 경험자" },
-    { id: 3, title: "이벤트 기획 경험자" },
-    { id: 4, title: "즉시입도 가능자" },
-    { id: 5, title: "SNS 운영 경험자" },
-    { id: 6, title: "운전 가능자" },
-  ];
+  const tags = RECRUIT_CONDITION_TAGS;
 
   const [selectedTags, setSelectedTags] = useState(
     formData.recruitCondition ?? []
   );
   const [etcText, setEtcText] = useState(() => {
-    const etc = formData?.recruitCondition?.find((item) => item.id === 7);
+    const etc = formData?.recruitCondition?.find(
+      (item) => item.id === RECRUIT_CONDITION_ETC_ID
+    );
     return etc ? etc.title : "";
   });
 
-  const isSelectedEtc = selectedTags?.some((t) => t.id === 7);
+  const isSelectedEtc = selectedTags?.some(
+    (t) => t.id === RECRUIT_CONDITION_ETC_ID
+  );
 
   // 모달 열릴 때마다 formData 기준으로 태그 동기화
   useEffect(() => {
@@ -341,7 +341,11 @@ export default function RecruitConditionSection({
                 const text = e.target.value;
                 setEtcText(text);
                 setSelectedTags((prev) =>
-                  prev.map((t) => (t.id === 7 ? { ...t, title: text } : t))
+                  prev.map((t) =>
+                    t.id === RECRUIT_CONDITION_ETC_ID
+                      ? { ...t, title: text }
+                      : t
+                  )
                 );
               }}
               disabled={!isSelectedEtc}

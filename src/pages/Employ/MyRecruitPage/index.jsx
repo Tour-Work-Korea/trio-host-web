@@ -8,6 +8,7 @@ import ButtonOrange from "@components/ButtonOrange";
 import guesthouseApi from "@api/guesthouseApi";
 import EmptyIcon from "@assets/images/wa_blue_empty.svg";
 import { useNavigate } from "react-router-dom";
+import SelectModal from "@components/SelectModal";
 
 export default function MyRecruitPage() {
   const [guesthouses, setGuesthouses] = useState([]);
@@ -28,6 +29,7 @@ export default function MyRecruitPage() {
     imgUrl: null,
   });
   const [loading, setLoading] = useState(true);
+  const [selectModal, setSelectModal] = useState(false);
 
   const navigate = useNavigate();
 
@@ -209,7 +211,29 @@ export default function MyRecruitPage() {
         imgUrl: EmptyIcon,
       });
     } else {
-      navigate(`/employ/recruit-form/`);
+      setErrorModal({
+        visible: true,
+        title: "기존 공고를 가져올까요?",
+        message: null,
+        buttonText: "기존 공고 가져오기",
+        buttonText2: "처음부터 작성하기",
+        onPress: () => {
+          setErrorModal((prev) => ({
+            ...prev,
+            visible: false,
+          }));
+          setSelectModal(true);
+        },
+        onPress2: () => {
+          setErrorModal((prev) => ({
+            ...prev,
+            visible: false,
+          }));
+          navigate(`/employ/recruit-form/`);
+        },
+        imgUrl: EmptyIcon,
+      });
+      // navigate(`/employ/recruit-form/`);
     }
   };
 
@@ -308,6 +332,18 @@ export default function MyRecruitPage() {
           </div>
         )}
       </div>
+
+      {/* 기존 공고 가져오기 모달 */}
+      <SelectModal
+        visible={selectModal}
+        title={"입점신청서를 선택해 주세요"}
+        items={recruits}
+        onClose={() => setSelectModal(false)}
+        onPress={(recruitId) => {
+          setSelectModal({ visible: false });
+          navigate(`/employ/recruit-form/${recruitId}`);
+        }}
+      />
 
       <ErrorModal
         visible={errorModal.visible}

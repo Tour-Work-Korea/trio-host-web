@@ -4,13 +4,10 @@ import ButtonOrange from "./ButtonOrange";
 import ButtonWhite from "./ButtonWhite";
 
 /**
- * 라디오 선택 모달 (예시는 지원자 조회 페이지)
- * props:
- * - items: [{ id, title, subtitle? }]
- * - setSelect: (id) => void   // 선택 결과 전달
- * - initialSelectedId?: number|string
- * - requireSelection?: boolean // 선택 없으면 적용 비활성화 (기본 true)
- * - onClose?: () => void       // 닫기(선택사항)
+ * 라디오 선택 모달
+ * - items: 자유형태
+ *   - 기본 기대: { id, title, subtitle }
+ *   - 지원: { recruitId, recruitTitle, guesthouseName } 등도 자동 매핑
  */
 export default function SelectModal({
   visible,
@@ -29,11 +26,22 @@ export default function SelectModal({
   const [selected, setSelected] = useState(initialSelectedId);
 
   useEffect(() => {
-    // 모달이 켜질 때 초기 선택값 동기화
     if (visible) setSelected(initialSelectedId);
   }, [visible, initialSelectedId]);
 
   if (!visible) return null;
+
+  // ✅ items 정규화
+  // recruits가 들어오면:
+  //  - id        ← recruitId
+  //  - title     ← recruitTitle
+  //  - subtitle  ← guesthouseName
+  const normalizedItems = items.map((item) => ({
+    id: item.id ?? item.recruitId ?? item.value, // 혹시 다른 케이스 대비
+    title: item.title ?? item.recruitTitle ?? item.label, // 공고 제목
+    subtitle: item.subtitle ?? item.guesthouseName ?? item.description ?? "", // 게하 이름
+    raw: item,
+  }));
 
   const handleApply = () => {
     if (onPress) {
@@ -80,15 +88,14 @@ export default function SelectModal({
           role="radiogroup"
           aria-label="옵션 선택"
         >
-          {items.map((item) => {
+          {normalizedItems.map((item) => {
             const isSelected = item.id === selected;
             return (
               <label
                 key={item.id}
-                className={`flex items-start gap-3 p-3 border rounded-xl cursor-pointer transition-colors border-grayscale-200 hover:border-grayscale-300`}
+                className="flex items-start gap-3 p-3 border rounded-xl cursor-pointer transition-colors border-grayscale-200 hover:border-grayscale-300"
                 onClick={() => setSelected(item.id)}
               >
-                {/* 기본 라디오 */}
                 <input
                   type="radio"
                   name="modal-radio"
@@ -97,7 +104,9 @@ export default function SelectModal({
                   onChange={() => setSelected(item.id)}
                 />
                 <div className="flex-1 min-w-0">
+                  {/* ✅ 공고 제목 */}
                   <div className="font-medium truncate">{item.title}</div>
+                  {/* ✅ 게스트하우스 이름 */}
                   {item.subtitle ? (
                     <div className="text-sm text-grayscale-600 line-clamp-2">
                       {item.subtitle}
@@ -107,7 +116,7 @@ export default function SelectModal({
               </label>
             );
           })}
-          {items.length === 0 && (
+          {normalizedItems.length === 0 && (
             <div className="text-sm text-grayscale-500 text-center py-6">
               선택할 항목이 없습니다.
             </div>
