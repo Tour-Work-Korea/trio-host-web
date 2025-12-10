@@ -37,6 +37,7 @@ export default function ReviewPage() {
   });
   const [replyState, setReplyState] = useState({});
   const [deleteModal, setDeleteModal] = useState({ visible: false, id: null });
+  const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
 
@@ -92,6 +93,7 @@ export default function ReviewPage() {
 
   // 리뷰 조회
   const tryFetchReviews = async (guesthouseId, pageParam = 0) => {
+    setLoading(true);
     try {
       const response = await guesthouseApi.getGuesthouseReviews({
         guesthouseId,
@@ -100,10 +102,9 @@ export default function ReviewPage() {
       });
 
       const data = response.data;
-      // const data = getDummyReviews(pageParam);
 
       setReviews(data?.content || []);
-      setPage(data?.number ?? pageParam); // 서버가 준 현재 페이지
+      setPage(data?.number ?? pageParam);
       setPageInfo({
         totalPages: data?.totalPages ?? 0,
         totalElements: data?.totalElements ?? 0,
@@ -131,6 +132,8 @@ export default function ReviewPage() {
         onPress2: null,
         imgUrl: null,
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -266,7 +269,7 @@ export default function ReviewPage() {
         </select>
       </div>
 
-      {reviews.length === 0 ? (
+      {reviews.length === 0 && !loading ? (
         <div className="body-container scrollbar-hide h-[500px]">
           <EmptyComponent title="해당 게스트하우스에 등록된 리뷰가 없어요" />
         </div>
