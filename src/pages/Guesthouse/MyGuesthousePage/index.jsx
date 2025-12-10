@@ -52,7 +52,7 @@ export default function MyGuesthousePage() {
   // 게스트하우스 목록 조회
   const tryFetchGuesthouses = async () => {
     try {
-      const res = await guesthouseApi.getMyGuesthouses();
+      const res = await guesthouseApi.getMyGuesthousesWithRooms();
       setGuesthouses(res.data || []);
     } catch (error) {
       console.warn(
