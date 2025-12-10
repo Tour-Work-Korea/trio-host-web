@@ -60,7 +60,7 @@ export default function ReservationPage() {
     searchText: "", // → keyword 로 서버에 전달
   });
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
 
