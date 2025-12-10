@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import useUserStore from "@stores/userStore";
 import { formatPhoneKR } from "@utils/formatPhone";
 
@@ -9,6 +9,7 @@ const linkIdle = "text-grayscale-800 hover:text-primary-orange";
 
 export default function MenuBar() {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
 
   //프로필 정보
   const profile = useUserStore((s) => s.profile);
@@ -30,7 +31,7 @@ export default function MenuBar() {
     <div className="space-y-12">
       {/* 유저 프로필 */}
       <div className="flex-col">
-        <div className="bg-white flex items-center gap-3">
+        <div className="bg-white flex items-end gap-3">
           <div className="bg-white flex items-center gap-3">
             {profile.photoUrl ? (
               <img
@@ -42,7 +43,15 @@ export default function MenuBar() {
               <div className="w-20 h-20 bg-gray-300 rounded-lg" />
             )}
           </div>
-          <div className="font-semibold">{profile.name}</div>
+          <div className="flex flex-col w-full items-start gap-2">
+            <p className="font-semibold">{profile.name}</p>
+            <button
+              onClick={() => navigate("/profile")}
+              className="cursor-pointer border-1 border-grayscale-300 px-2 text-sm rounded-full text-grayscale-500"
+            >
+              프로필 수정
+            </button>
+          </div>
         </div>
         <div className="mt-4 space-y-1 text-sm">
           <div className="flex gap-4">

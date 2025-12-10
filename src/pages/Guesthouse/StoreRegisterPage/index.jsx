@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
 
 import EmptyComponent from "@components/EmptyComponent";
-import employApi from "@api/employApi";
 import ErrorModal from "@components/ErrorModal";
 import ButtonOrange from "@components/ButtonOrange";
 import guesthouseApi from "@api/guesthouseApi";
-import EmptyIcon from "@assets/images/wa_blue_empty.svg";
 import { useNavigate } from "react-router-dom";
 
 export default function StoreRegisterPage() {
@@ -67,7 +65,7 @@ export default function StoreRegisterPage() {
       <div className="body-container scrollbar-hide">
         {/* 공고가 없는 경우 empty page 띄움 */}
 
-        {applications.length === 0 && (
+        {applications.length === 0 && !loading ? (
           <div className="h-[500x]">
             <EmptyComponent
               title="등록한 입점신청서가 없어요"
@@ -76,10 +74,7 @@ export default function StoreRegisterPage() {
               onPress={handleCreateApplication}
             />
           </div>
-        )}
-
-        {/* 공고가 존재하는 경우 */}
-        {applications.length > 0 && (
+        ) : (
           <div>
             {/* 공고 리스트 */}
             <div className="flex-col flex gap-2">

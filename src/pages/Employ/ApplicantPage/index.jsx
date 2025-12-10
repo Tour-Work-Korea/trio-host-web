@@ -6,7 +6,6 @@ import ErrorModal from "@components/ErrorModal";
 import ButtonOrange from "@components/ButtonOrange";
 import guesthouseApi from "@api/guesthouseApi";
 import EmptyIcon from "@assets/images/wa_blue_empty.svg";
-import SelectModal from "@components/SelectModal";
 import { useNavigate } from "react-router-dom";
 import ApplicantList from "./ApplicantList";
 
@@ -29,8 +28,7 @@ export default function ApplicantPage() {
     onPress2: null,
     imgUrl: null,
   });
-  const [selectModal, setSelectModal] = useState({ visible: false }); //게스트하우스 선택 모달
-
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -83,6 +81,7 @@ export default function ApplicantPage() {
 
   // 공고 조회 (id = -1 이면 전체)
   const tryFetchMyRecruit = async (id = -1) => {
+    setLoading(true);
     try {
       let response;
 
@@ -120,34 +119,33 @@ export default function ApplicantPage() {
         onPress2: null,
         imgUrl: null,
       });
+    } finally {
+      setLoading(false);
     }
   };
 
   // 공고 등록 핸들러
   const handleCreateRecruit = () => {
-    if (guesthouses.length > 0) setSelectModal({ visible: true });
-    else {
-      setErrorModal({
-        visible: true,
-        title: "입점된 게스트하우스가 없습니다",
-        message: "게스트하우스를 등록하러 가볼까요?",
-        buttonText: "게스트하우스 등록하기",
-        buttonText2: "다음에 할게요",
-        onPress: () => {
-          setErrorModal((prev) => ({
-            ...prev,
-            visible: false,
-          }));
-          navigate(`/employ/recruit-form/`);
-        },
-        onPress2: () =>
-          setErrorModal((prev) => ({
-            ...prev,
-            visible: false,
-          })),
-        imgUrl: EmptyIcon,
-      });
-    }
+    setErrorModal({
+      visible: true,
+      title: "입점된 게스트하우스가 없습니다",
+      message: "게스트하우스를 등록하러 가볼까요?",
+      buttonText: "게스트하우스 등록하기",
+      buttonText2: "다음에 할게요",
+      onPress: () => {
+        setErrorModal((prev) => ({
+          ...prev,
+          visible: false,
+        }));
+        navigate(`/employ/recruit-form/`);
+      },
+      onPress2: () =>
+        setErrorModal((prev) => ({
+          ...prev,
+          visible: false,
+        })),
+      imgUrl: EmptyIcon,
+    });
   };
 
   // 게스트하우스 선택 변경 핸들러
@@ -185,7 +183,7 @@ export default function ApplicantPage() {
 
       <div className="body-container scrollbar-hide">
         {/* 공고가 없는 경우 empty page 띄움 */}
-        {applicants.length === 0 && (
+        {applicants.length === 0 && !loading ? (
           <div className="h-[500px]">
             <EmptyComponent
               title="등록한 알바 공고가 없어요"
@@ -194,10 +192,7 @@ export default function ApplicantPage() {
               onPress={handleCreateRecruit}
             />
           </div>
-        )}
-
-        {/* 공고가 존재하는 경우 */}
-        {applicants.length > 0 && (
+        ) : (
           <div>
             {/* 공고 리스트 */}
             <div className="flex-col flex gap-2">

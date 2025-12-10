@@ -29,7 +29,7 @@ export default function MyGuesthousePage() {
     imgUrl: null,
   });
   const [selectModal, setSelectModal] = useState({ visible: false }); // 게스트하우스 선택 모달
-
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -51,8 +51,9 @@ export default function MyGuesthousePage() {
 
   // 게스트하우스 목록 조회
   const tryFetchGuesthouses = async () => {
+    setLoading(true);
     try {
-      const res = await guesthouseApi.getMyGuesthouses();
+      const res = await guesthouseApi.getMyGuesthousesWithRooms();
       setGuesthouses(res.data || []);
     } catch (error) {
       console.warn(
@@ -75,6 +76,8 @@ export default function MyGuesthousePage() {
         onPress2: null,
         imgUrl: null,
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -205,17 +208,6 @@ export default function MyGuesthousePage() {
         imgUrl: null,
       });
     }
-    // 더미 데이터 용
-    // setGuesthouses((prev) =>
-    //   prev.map((gh) =>
-    //     getGuesthouseId(gh) === guesthouseId
-    //       ? {
-    //           ...gh,
-    //           rooms: (gh.rooms || []).filter((r) => getRoomId(r) !== roomId),
-    //         }
-    //       : gh
-    //   )
-    // );
   };
 
   // 게스트하우스 수정
@@ -226,8 +218,6 @@ export default function MyGuesthousePage() {
   // 게스트하우스 등록 핸들러
   const handleCreateGuesthouse = () => {
     if (applications.length > 0) {
-      // 입점신청서 고르지 않고 바로 폼으로 이동
-      // setSelectModal({ visible: true });
       navigate(`/guesthouse/form/`);
     } else {
       setErrorModal({
@@ -272,7 +262,9 @@ export default function MyGuesthousePage() {
       </div>
 
       <div className="body-container scrollbar-hide">
-        {guesthouses.length === 0 && (
+        {loading ? (
+          <></>
+        ) : guesthouses.length === 0 ? (
           <div className="h-[500px]">
             <EmptyComponent
               title="등록한 게스트하우스가 없어요"
@@ -281,10 +273,7 @@ export default function MyGuesthousePage() {
               onPress={handleCreateGuesthouse}
             />
           </div>
-        )}
-
-        {/* 게스트하우스가 존재하는 경우 */}
-        {guesthouses.length > 0 && (
+        ) : (
           <div className="flex flex-col gap-3">
             {guesthouses.map((item) => {
               const ghId = getGuesthouseId(item);

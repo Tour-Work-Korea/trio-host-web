@@ -27,6 +27,7 @@ export default function MyRecruitPage() {
     onPress2: null,
     imgUrl: null,
   });
+  const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
 
@@ -80,6 +81,7 @@ export default function MyRecruitPage() {
 
   // 공고 조회 (id = -1 이면 전체)
   const tryFetchMyRecruit = async (id = -1) => {
+    setLoading(true);
     try {
       let response;
 
@@ -117,6 +119,8 @@ export default function MyRecruitPage() {
         onPress2: null,
         imgUrl: null,
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -246,8 +250,7 @@ export default function MyRecruitPage() {
       </div>
 
       <div className="body-container scrollbar-hide">
-        {/* 공고가 없는 경우 empty page 띄움 */}
-        {recruits.length === 0 && (
+        {recruits.length === 0 && !loading ? (
           <div className="h-[500px]">
             <EmptyComponent
               title="등록한 알바 공고가 없어요"
@@ -256,10 +259,7 @@ export default function MyRecruitPage() {
               onPress={handleCreateRecruit}
             />
           </div>
-        )}
-
-        {/* 공고가 존재하는 경우 */}
-        {recruits.length > 0 && (
+        ) : (
           <div>
             {/* 공고 리스트 */}
             <div className="flex-col flex gap-2">
