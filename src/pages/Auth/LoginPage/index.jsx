@@ -5,7 +5,7 @@ import { tryLogin } from "@utils/authFlow";
 export default function LoginPage() {
   const nav = useNavigate();
   const loc = useLocation();
-  const from = (loc.state && loc.state.from) || "/profile";
+  const from = (loc.state && loc.state.from) || "/guesthouse/my";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
