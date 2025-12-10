@@ -49,14 +49,20 @@ export default function ReservationPage() {
     last: true,
   });
 
+  // 🔹 서버로 보낼 검색 조건 상태
   const [searchParams, setSearchParams] = useState({
     page: 0,
     size: 10,
-    status: "", // PENDING | CONFIRMED | CANCELLED | COMPLETED | ""
-    startDate: "", // "YYYY-MM-DD"
+    status: "",
+    startDate: "",
     endDate: "",
-    searchText: "", // → keyword 로 서버에 전달
+    searchText: "", // 실제 서버로 나가는 keyword
   });
+
+  // 🔹 인풋에 표시되는 검색어 (타이핑용)
+  const [keywordInput, setKeywordInput] = useState("");
+  // 🔹 디바운스된 검색어 (요청 트리거용)
+  const [debouncedKeyword, setDebouncedKeyword] = useState("");
 
   const [loading, setLoading] = useState(true);
 
@@ -108,7 +114,7 @@ export default function ReservationPage() {
     }
   };
 
-  // 검색 파라미터 변경 핸들러 (변경 시 page 0으로)
+  // 🔹 검색 파라미터 변경 (검색어 외 필드용)
   const handleChangeSearchParam = (field, value) => {
     setSearchParams((prev) => ({
       ...prev,
@@ -152,6 +158,21 @@ export default function ReservationPage() {
     });
   };
 
+  // 🔹 검색어 디바운스: 500ms 동안 입력 멈추면 searchParams에 반영
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedKeyword(keywordInput.trim());
+      setSearchParams((prev) => ({
+        ...prev,
+        page: 0,
+        searchText: keywordInput.trim(),
+      }));
+      setPage(0);
+    }, 500); // 0.5초
+
+    return () => clearTimeout(timer);
+  }, [keywordInput]);
+
   // ---------------------- 서버에서 예약 목록 조회 ----------------------
   const tryFetchReservations = async () => {
     setLoading(true);
@@ -162,11 +183,11 @@ export default function ReservationPage() {
         status: searchParams.status || undefined,
         startDate: searchParams.startDate || undefined,
         endDate: searchParams.endDate || undefined,
-        keyword: searchParams.searchText?.trim() || undefined,
+        keyword: debouncedKeyword || undefined, // ✅ 디바운스된 값만 서버로
         ...(selected !== -1 && { guesthouseId: selected }),
       };
       const res = await guesthouseApi.searchGuesthouseReservations(params);
-      const data = res?.data || res; // 혹시 data 랩핑 안돼있을 수도 있으니
+      const data = res?.data || res;
 
       const content = Array.isArray(data?.content) ? data.content : [];
 
@@ -214,7 +235,7 @@ export default function ReservationPage() {
 
   // 선택된 게하 / 검색 조건 / 페이지가 바뀔 때마다 서버 호출
   useEffect(() => {
-    if (!selected) return;
+    // selected는 -1도 truthy라, 전체 조회도 허용하는 현재 로직 유지
     tryFetchReservations();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -223,8 +244,8 @@ export default function ReservationPage() {
     searchParams.status,
     searchParams.startDate,
     searchParams.endDate,
-    searchParams.searchText,
     searchParams.size,
+    debouncedKeyword, // ✅ 실제 요청 트리거는 이 값
   ]);
 
   // 페이지 이동
@@ -334,10 +355,8 @@ export default function ReservationPage() {
             type="text"
             className="flex-1 w-full form-input"
             placeholder="회원 이름으로 검색"
-            value={searchParams.searchText}
-            onChange={(e) =>
-              handleChangeSearchParam("searchText", e.target.value)
-            }
+            value={keywordInput} // 🔹 인풋은 타이핑용 상태 사용
+            onChange={(e) => setKeywordInput(e.target.value)}
           />
         </div>
 
@@ -354,6 +373,8 @@ export default function ReservationPage() {
                   endDate: "",
                   searchText: "",
                 });
+                setKeywordInput(""); // 🔹 인풋도 리셋
+                setDebouncedKeyword("");
                 setPage(0);
               }}
             />
