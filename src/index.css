@@ -178,3 +178,13 @@ body,
   display: block;
   height: 100%;
 }
+*:not(input):not(textarea):not([contenteditable="true"]) {
+  caret-color: transparent;
+}
+input,
+textarea,
+[contenteditable="true"],
+input:focus,
+textarea:focus {
+  caret-color: var(--color-grayscale-900); /* 아니면 #000 */
+}
