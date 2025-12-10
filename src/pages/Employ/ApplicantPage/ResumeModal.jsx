@@ -112,7 +112,14 @@ function ProfileHeader({ data }) {
             {data?.instagramId && (
               <>
                 <span className=" text-gray-400">Insta</span>
-                <span className=" text-gray-900">@{data.instagramId}</span>
+                <a
+                  href={`https://www.instagram.com/${data.instagramId}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline hover:text-primary-orange"
+                >
+                  @{data.instagramId}
+                </a>
               </>
             )}
           </div>

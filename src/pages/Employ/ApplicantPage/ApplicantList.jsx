@@ -97,7 +97,17 @@ export default function ApplicantList({ recruitId }) {
                   </div>
                   <div className="flex gap-2">
                     <div className="w-16 text-grayscale-500">insta</div>
-                    <div>{el.instagram}</div>
+                    <a
+                      href={`https://www.instagram.com/${el.instagram}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="underline hover:text-primary-orange"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
+                    >
+                      {el.instagram}
+                    </a>
                   </div>
                 </div>
               </div>

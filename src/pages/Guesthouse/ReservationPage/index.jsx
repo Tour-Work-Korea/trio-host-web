@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import EmptyComponent from "@components/EmptyComponent";
 import ErrorModal from "@components/ErrorModal";
