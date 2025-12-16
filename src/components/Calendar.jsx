@@ -1,5 +1,7 @@
 /* eslint-disable react/prop-types */
 import React, { useMemo } from "react";
+import ChevronLeftIcon from "@assets/images/chevron_left_gray.svg";
+import ChevronRightIcon from "@assets/images/chevron_right_gray.svg";
 
 const pad2 = (n) => String(n).padStart(2, "0");
 const toKey = (d) =>
@@ -54,25 +56,15 @@ export default function ReservationCalendar({
   return (
     <div className="w-full">
       {/* 헤더 */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-center gap-4 mb-3">
+        <button type="button" onClick={onPrevMonth} className="cursor-pointer">
+          <img src={ChevronLeftIcon} />
+        </button>
         <div className="text-lg font-semibold">{title}</div>
 
-        <div className="flex gap-2">
-          <button
-            type="button"
-            className="px-3 py-1 rounded-lg border border-grayscale-300"
-            onClick={onPrevMonth}
-          >
-            이전
-          </button>
-          <button
-            type="button"
-            className="px-3 py-1 rounded-lg border border-grayscale-300"
-            onClick={onNextMonth}
-          >
-            다음
-          </button>
-        </div>
+        <button type="button" className="cursor-pointer" onClick={onNextMonth}>
+          <img src={ChevronRightIcon} />
+        </button>
       </div>
 
       {/* 상단 커스텀 영역(상태/필터/레전드 등) */}
