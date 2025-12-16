@@ -5,6 +5,7 @@ import EmptyComponent from "@components/EmptyComponent";
 import ErrorModal from "@components/ErrorModal";
 import guesthouseApi from "@api/guesthouseApi";
 import ReservationCalendar from "@components/Calendar";
+import ReservationDetailModal from "./ReservationDetailModal";
 
 const pad2 = (n) => String(n).padStart(2, "0");
 const toYMD = (d) =>
@@ -67,20 +68,14 @@ export default function ReservationCalendarPage() {
   const [selected, setSelected] = useState(-1); // -1=전체
 
   const [reservations, setReservations] = useState([]);
+  const [detailModal, setDetailModal] = useState({
+    visible: false,
+    reservation: null,
+  });
   const [loading, setLoading] = useState(true);
 
   // 달력 표시 월
   const [monthDate, setMonthDate] = useState(() => new Date());
-
-  // 페이징 정보 (ReservationPage 스타일 유지)
-  const [page, setPage] = useState(0);
-  const [pageInfo, setPageInfo] = useState({
-    totalPages: 0,
-    totalElements: 0,
-    first: true,
-    last: true,
-  });
-
   const [errorModal, setErrorModal] = useState({
     visible: false,
     title: "",
@@ -143,12 +138,11 @@ export default function ReservationCalendarPage() {
     }
   };
 
-  // ✅ 달/게하/페이지가 바뀌면: 해당 달 기간으로 서버 조회
+  // 달/게하/페이지가 바뀌면: 해당 달 기간으로 서버 조회
   const tryFetchReservations = async () => {
     setLoading(true);
     try {
       const params = {
-        page,
         size: 200, // 달력은 넉넉히 (필요시 조절)
         startDate: monthRange.startDate,
         endDate: monthRange.endDate,
@@ -160,14 +154,6 @@ export default function ReservationCalendarPage() {
       const content = Array.isArray(data?.content) ? data.content : [];
 
       setReservations(content);
-      setPageInfo({
-        totalPages: data?.totalPages ?? 0,
-        totalElements: data?.totalElements ?? 0,
-        first: data?.first ?? page === 0,
-        last:
-          data?.last ??
-          (data?.totalPages != null ? page === data.totalPages - 1 : true),
-      });
     } catch (error) {
       setErrorModal({
         visible: true,
@@ -182,7 +168,6 @@ export default function ReservationCalendarPage() {
         imgUrl: null,
       });
       setReservations([]);
-      setPageInfo({ totalPages: 0, totalElements: 0, first: true, last: true });
     } finally {
       setLoading(false);
     }
@@ -191,12 +176,11 @@ export default function ReservationCalendarPage() {
   useEffect(() => {
     tryFetchReservations();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selected, page, monthRange.startDate, monthRange.endDate]);
+  }, [selected, monthRange.startDate, monthRange.endDate]);
 
   const handleChangeGuesthouse = (e) => {
     const id = Number(e.target.value);
     setSelected(id);
-    setPage(0);
   };
 
   // ✅ 달력 셀에 표시할 “날짜별 예약 묶음”
@@ -216,7 +200,10 @@ export default function ReservationCalendarPage() {
 
   const renderItem = (item) => {
     return (
-      <div className="flex items-center gap-1">
+      <div
+        className="flex items-center gap-1"
+        onClick={() => setDetailModal({ visible: true, reservation: item })}
+      >
         <div>{renderStatusBadge(item.status)}</div>
         <div className="text-sm font-medium text-grayscale-800 truncate">
           {item.roomName}
@@ -275,13 +262,11 @@ export default function ReservationCalendarPage() {
           <ReservationCalendar
             monthDate={monthDate}
             onPrevMonth={() => {
-              setPage(0);
               setMonthDate(
                 (d) => new Date(d.getFullYear(), d.getMonth() - 1, 1)
               );
             }}
             onNextMonth={() => {
-              setPage(0);
               setMonthDate(
                 (d) => new Date(d.getFullYear(), d.getMonth() + 1, 1)
               );
@@ -297,6 +282,12 @@ export default function ReservationCalendarPage() {
         )}
       </div>
 
+      <ReservationDetailModal
+        visible={detailModal.visible}
+        reservation={detailModal.reservation}
+        onClose={() => setDetailModal({ visible: false, reservation: null })}
+        setErrorModal={setErrorModal}
+      />
       <ErrorModal
         visible={errorModal.visible}
         title={errorModal.title}
