@@ -9,12 +9,7 @@ import { useNavigate } from "react-router-dom";
 import ReservationDeleteModal from "./ReservationDeleteModal";
 import ButtonWhite from "@components/ButtonWhite";
 
-const STATUS_LABELS = {
-  PENDING: "예약 대기",
-  CONFIRMED: "예약 확정",
-  CANCELLED: "예약 취소",
-  COMPLETED: "사용 완료",
-};
+import { renderStatusBadge } from "@utils/reservationStatus";
 
 export default function ReservationPage() {
   const [guesthouses, setGuesthouses] = useState([]);
@@ -258,22 +253,6 @@ export default function ReservationPage() {
     setSearchParams((prev) => ({ ...prev, page: newPage }));
   };
 
-  const renderStatusBadge = (status) => {
-    const label = STATUS_LABELS[status] || status;
-    let bg = "bg-gray-100 text-gray-700";
-
-    if (status === "PENDING") bg = "bg-yellow-50 text-yellow-700";
-    if (status === "CONFIRMED") bg = "bg-green-50 text-green-700";
-    if (status === "CANCELLED") bg = "bg-red-50 text-red-600";
-    if (status === "COMPLETED") bg = "bg-blue-50 text-blue-700";
-
-    return (
-      <span className={`rounded-full px-3 py-1 text-sm font-semibold ${bg}`}>
-        {label}
-      </span>
-    );
-  };
-
   return (
     <div className="container">
       <div className="flex items-center justify-between mb-4">
@@ -433,7 +412,7 @@ export default function ReservationPage() {
                   >
                     {/* 상태 */}
                     <td className="px-3 text-center align-middle whitespace-nowrap">
-                      {renderStatusBadge(item.status)}
+                      {renderStatusBadge({ status: item.status })}
                     </td>
 
                     {/* 예약번호 */}

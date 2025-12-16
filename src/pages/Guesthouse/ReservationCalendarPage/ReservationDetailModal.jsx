@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import ButtonOrange from "@components/ButtonOrange";
 import ReservationDeleteModal from "../ReservationPage/ReservationDeleteModal";
+import { renderStatusBadge } from "@utils/reservationStatus";
 
 export default function ReservationDetailModal({
   visible,
@@ -52,7 +53,10 @@ export default function ReservationDetailModal({
             />
           )}
           <div className="flex flex-col gap-1 w-full">
-            <p className="font-semibold">{reservation.guesthouseName}</p>
+            <div className="flex justify-between items-center">
+              <p className="font-semibold">{reservation.guesthouseName}</p>
+              <div>{renderStatusBadge({ status: reservation.status })}</div>
+            </div>
             <p className="">
               {reservation.roomName} · {reservation.roomCapacity}인실
             </p>

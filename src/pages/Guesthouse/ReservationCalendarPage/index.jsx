@@ -6,6 +6,11 @@ import ErrorModal from "@components/ErrorModal";
 import guesthouseApi from "@api/guesthouseApi";
 import ReservationCalendar from "@components/Calendar";
 import ReservationDetailModal from "./ReservationDetailModal";
+import {
+  renderStatusBadge,
+  STATUS_LABELS,
+  STATUS_ORDER,
+} from "@utils/reservationStatus";
 
 const pad2 = (n) => String(n).padStart(2, "0");
 const toYMD = (d) =>
@@ -36,31 +41,6 @@ const buildDateKeysInRange = (checkIn, checkOut) => {
     cur.setDate(cur.getDate() + 1);
   }
   return keys;
-};
-
-const STATUS_LABELS = {
-  PENDING: "예약 대기",
-  CONFIRMED: "예약 확정",
-  CANCELLED: "예약 취소",
-  COMPLETED: "사용 완료",
-};
-
-const STATUS_ORDER = ["PENDING", "CONFIRMED", "COMPLETED", "CANCELLED"];
-
-const renderStatusBadge = (status) => {
-  const label = STATUS_LABELS[status] || status;
-  let bg = "bg-gray-100 text-gray-700";
-
-  if (status === "PENDING") bg = "bg-yellow-50 text-yellow-700";
-  if (status === "CONFIRMED") bg = "bg-green-50 text-green-700";
-  if (status === "CANCELLED") bg = "bg-red-50 text-red-600";
-  if (status === "COMPLETED") bg = "bg-blue-50 text-blue-700";
-
-  return (
-    <span className={`rounded-full px-1 py-1 text-sm font-semibold ${bg}`}>
-      {label[3]}
-    </span>
-  );
 };
 
 export default function ReservationCalendarPage() {
@@ -204,7 +184,7 @@ export default function ReservationCalendarPage() {
         className="flex items-center gap-1"
         onClick={() => setDetailModal({ visible: true, reservation: item })}
       >
-        <div>{renderStatusBadge(item.status)}</div>
+        <div>{renderStatusBadge({ isFull: false, status: item.status })}</div>
         <div className="text-sm font-medium text-grayscale-800 truncate">
           {item.roomName}
         </div>
@@ -217,7 +197,7 @@ export default function ReservationCalendarPage() {
       <div className="flex gap-2">
         {STATUS_ORDER.map((el, id) => (
           <div key={id} className="flex gap-1 items-center">
-            <div>{renderStatusBadge(el)}</div>
+            <div>{renderStatusBadge({ isFull: false, status: el })}</div>
             <div className="text-sm">{STATUS_LABELS[el]}</div>
           </div>
         ))}
