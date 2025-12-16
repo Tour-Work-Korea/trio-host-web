@@ -16,6 +16,7 @@ export default function MenuBar() {
 
   const guesthouseLinks = [
     { to: "/guesthouse/my", label: "나의 게스트하우스" },
+    { to: "/reservation-calendar", label: "예약 캘린더" },
     { to: "/reservation", label: "예약 관리" },
     { to: "/guesthouse/review", label: "리뷰 관리" },
     { to: "/guesthouse/store-register", label: "입점 신청" },
