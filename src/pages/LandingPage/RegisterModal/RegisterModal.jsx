@@ -25,6 +25,8 @@ export default function RegisterModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="error-modal-title"
+      onWheel={(e) => e.stopPropagation()}
+      onTouchMove={(e) => e.stopPropagation()}
     >
       <div className="w-[90%] max-w-2xl h-[90%] rounded-2xl bg-grayscale-0 px-20 py-12 text-center shadow-lg overflow-y-scroll scrollbar-hide">
         {/* 헤더 */}
@@ -55,6 +57,7 @@ export default function RegisterModal({
             formData={formData}
             handleInputChange={handleInputChange}
             setPage={setPage}
+            setVisible={setVisible}
           />
         )}
       </div>

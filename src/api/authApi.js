@@ -76,6 +76,28 @@ const authApi = {
 
   //프로필 수정
   updateProfile: (body) => api.put("/host/my", body),
+
+  //사장님 회원가입
+  signUp: (dtoObj, imgFile) => {
+    const fd = new FormData();
+
+    // ✅ dto를 JSON Blob으로 추가 (핵심)
+    fd.append(
+      "dto",
+      new Blob([JSON.stringify(dtoObj)], { type: "application/json" })
+    );
+
+    // ✅ img는 File 그대로
+    fd.append("img", imgFile);
+
+    return api.post("/auth/host/web/signup", fd, {
+      headers: {
+        // axios가 boundary 포함해서 자동으로 multipart 설정하게 둠
+        "Content-Type": undefined,
+      },
+      transformRequest: (data) => data,
+    });
+  },
 };
 
 export default authApi;

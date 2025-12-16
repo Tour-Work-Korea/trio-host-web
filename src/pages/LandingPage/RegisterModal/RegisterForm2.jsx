@@ -11,6 +11,25 @@ import { checkCodeForEmail, sendCodeForEmail } from "@utils/confirmEmail";
 import ErrorModal from "@components/ErrorModal";
 
 import { registerValidation } from "@utils/validation/registerValidation";
+import authApi from "@api/authApi";
+import { AGREEMENT_CONTENTS } from "@data/agreeContents";
+import CheckDisabledIcon from "@assets/images/check_black.svg";
+import CheckAbleIcon from "@assets/images/check_orange.svg";
+
+// 이용약관 상태
+const AGREEMENT_KEYS = [
+  "TERMS_OF_SERVICE",
+  "AGE_OVER_14_CONFIRMATION",
+  "PRIVACY_POLICY",
+  "LOCATION_BASED_SERVICE",
+  "MARKETING_NOTIFICATION",
+];
+
+const REQUIRED_KEYS = [
+  "TERMS_OF_SERVICE",
+  "AGE_OVER_14_CONFIRMATION",
+  "PRIVACY_POLICY",
+];
 
 // mm:ss 포맷
 const fmt = (s) => {
@@ -21,8 +40,6 @@ const fmt = (s) => {
   return `${m}:${ss}`;
 };
 
-// 간단한 로컬 체크(버튼 활성화 UX용)
-// - 최종 판정은 registerValidation에서 수행
 const isLikelyEmail = (v) =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v || "").trim());
 const isLikelyPhone = (v) => /^0\d{8,}$/.test(String(v || "")); // 0 시작, 9자리+
@@ -31,6 +48,7 @@ export default function RegisterForm2({
   formData,
   handleInputChange,
   setPage,
+  setVisible,
 }) {
   const [phoneCode, setPhoneCode] = useState("");
   const [emailCode, setEmailCode] = useState("");
@@ -57,6 +75,33 @@ export default function RegisterForm2({
         visible: false,
       })),
   });
+  const [agreements, setAgreements] = useState(
+    AGREEMENT_KEYS.map((key) => ({
+      key,
+      agreed: false,
+    }))
+  );
+  const [agreeModal, setAgreeModal] = useState({
+    visible: false,
+    title: "",
+    html: "",
+  });
+
+  const isAllAgreed = agreements.every((a) => a.agreed);
+  const isRequiredAgreed = agreements
+    .filter((a) => REQUIRED_KEYS.includes(a.key))
+    .every((a) => a.agreed);
+
+  const toggleAgreement = (key) => {
+    if (key === "ALL") {
+      const next = !isAllAgreed;
+      setAgreements((prev) => prev.map((a) => ({ ...a, agreed: next })));
+    } else {
+      setAgreements((prev) =>
+        prev.map((a) => (a.key === key ? { ...a, agreed: !a.agreed } : a))
+      );
+    }
+  };
 
   // 타이머 틱
   useEffect(() => {
@@ -173,26 +218,92 @@ export default function RegisterForm2({
   };
 
   // 제출 전 단일 검증 호출
-  const handleNext = () => {
-    const { allValid, firstError } = registerValidation(formData, {
-      requirePhoneVerify: true,
-      phoneChecked,
-      requireEmailVerify: true,
-      emailChecked,
-    });
+  const handleNext = async () => {
+    // const { allValid, firstError } = registerValidation(formData, {
+    //   requirePhoneVerify: true,
+    //   phoneChecked,
+    //   requireEmailVerify: true,
+    //   emailChecked,
+    // });
 
-    if (!allValid) {
-      setErrorModal((prev) => ({
-        ...prev,
+    // if (!allValid) {
+    //   setErrorModal((prev) => ({
+    //     ...prev,
+    //     visible: true,
+    //     title: firstError || "입력값을 확인해주세요.",
+    //     message: "",
+    //   }));
+    //   return;
+    // }
+
+    // if (!isRequiredAgreed) {
+    //   setErrorModal((p) => ({
+    //     ...p,
+    //     visible: true,
+    //     title: "필수 이용약관에 동의해주세요.",
+    //     message: "",
+    //   }));
+    //   return;
+    // }
+
+    const dto = {
+      applyStoreReqDTO: {
+        name: formData.businessName,
+        employeeCount: Number(formData.employeeCount),
+        address: formData.address,
+        detailAddress: formData.detailAddress,
+        managerName: formData.managerName,
+        managerEmail: formData.managerEmail,
+        businessPhone: formData.businessPhone,
+        businessType: formData.businessType,
+      },
+      hostSignUpReqDTO: {
+        userRole: "HOST",
+        phoneNum: formData.phone,
+        email: formData.email,
+        password: formData.password,
+        passwordConfirm: formData.passwordConfirm,
+        name: formData.name,
+        bussinessNum: formData.businessRegistrationNumber,
+        agreements: agreements.map((a) => ({
+          agreementType: a.key,
+          agreed: a.agreed,
+        })),
+      },
+    };
+
+    try {
+      if (!formData.img) {
+        setErrorModal((p) => ({
+          ...p,
+          visible: true,
+          title: "사업자 등록증 이미지를 첨부해주세요.",
+          message: "",
+        }));
+        return;
+      }
+
+      await authApi.signUp(dto, formData.img);
+      setErrorModal((p) => ({
+        ...p,
         visible: true,
-        title: firstError || "입력값을 확인해주세요.",
+        title: "신청이 완료되었습니다.",
+        message: "검토 후 담당자가 순차적으로 연락드립니다.",
+        onPress: () => {
+          setErrorModal((pp) => ({ ...pp, visible: false }));
+          setVisible(false);
+          setPage(1);
+        },
+      }));
+    } catch (e) {
+      setErrorModal((p) => ({
+        ...p,
+        visible: true,
+        title:
+          e?.response?.data?.message || "회원가입 신청 중 오류가 발생했습니다.",
         message: "",
       }));
-      return;
     }
-
-    // TODO: 제출 or 다음 단계
-    console.log("validated:", formData);
   };
 
   return (
@@ -411,6 +522,65 @@ export default function RegisterForm2({
             </p>
           ) : null}
         </div>
+
+        {/* 이용약관 동의 */}
+        <div className="mt-10 w-full border-t pt-6">
+          {/* 전체 동의 */}
+          <div
+            className="flex items-center gap-2 cursor-pointer mb-4"
+            onClick={() => toggleAgreement("ALL")}
+          >
+            <img
+              src={isAllAgreed ? CheckAbleIcon : CheckDisabledIcon}
+              alt=""
+              className="w-5 h-5"
+            />
+            <span className="font-semibold">전체 동의</span>
+          </div>
+
+          {/* 개별 약관 */}
+          <div className="flex flex-col gap-3">
+            {agreements.map(({ key, agreed }) => {
+              const content = AGREEMENT_CONTENTS[key];
+              const isRequired = REQUIRED_KEYS.includes(key);
+
+              return (
+                <div key={key} className="flex items-center justify-between">
+                  <div
+                    className="flex items-center gap-2 cursor-pointer"
+                    onClick={() => toggleAgreement(key)}
+                  >
+                    <img
+                      src={agreed ? CheckAbleIcon : CheckDisabledIcon}
+                      alt=""
+                      className="w-5 h-5"
+                    />
+                    <span className="text-sm">
+                      {isRequired && (
+                        <span className="text-orange-500 mr-1">[필수]</span>
+                      )}
+                      {content.title}
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="text-sm text-orange-500 cursor-pointer"
+                    onClick={() =>
+                      setAgreeModal({
+                        visible: true,
+                        title: content.title,
+                        html: content.detailHtml,
+                      })
+                    }
+                  >
+                    보기
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       <div className="flex mt-8 w-full justify-between">
@@ -421,6 +591,20 @@ export default function RegisterForm2({
           <ButtonOrange title="가입하기" onPress={handleNext} />
         </div>
       </div>
+
+      {/* 약관 상세 모달 */}
+      <ErrorModal
+        visible={agreeModal.visible}
+        title={agreeModal.title}
+        message={
+          <div
+            className="agree-detail"
+            dangerouslySetInnerHTML={{ __html: agreeModal.html }}
+          />
+        }
+        buttonText="닫기"
+        onPress={() => setAgreeModal((p) => ({ ...p, visible: false }))}
+      />
 
       {/* 에러 모달 */}
       <ErrorModal
