@@ -14,6 +14,18 @@ export default function ErrorModal({
   imgUrl = null,
   onClose = null,
 }) {
+  // ✅ 모달 열리면 뒤(body) 스크롤 막기
+  useEffect(() => {
+    if (!visible) return;
+
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [visible]);
+
   if (!visible) return null;
 
   return (
@@ -25,27 +37,39 @@ export default function ErrorModal({
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose?.();
       }}
+      onWheel={(e) => e.stopPropagation()}
+      onTouchMove={(e) => e.stopPropagation()}
     >
       <div
-        className="w-[90%] max-w-md rounded-2xl bg-grayscale-0 p-6 text-center shadow-lg flex flex-col gap-4 items-center"
+        className="
+          w-[90%] max-w-md rounded-2xl bg-grayscale-0 p-6 text-center shadow-lg
+          flex flex-col gap-4 items-center
+          max-h-[80vh] overflow-hidden
+        "
         onClick={(e) => e.stopPropagation()}
       >
-        <div>
+        <div className="w-full">
           <h2
             id="error-modal-title"
             className="text-lg font-semibold text-grayscale-900 whitespace-pre-line"
           >
             {title}
           </h2>
-
-          {message ? (
-            <p className="mt-1 text-sm text-grayscale-600 whitespace-pre-line">
-              {message}
-            </p>
-          ) : null}
         </div>
 
-        {imgUrl && <img src={imgUrl} className="h-20 my-4" />}
+        {message ? (
+          <div
+            className="w-full text-sm text-grayscale-600 whitespace-pre-line
+                       overflow-y-auto overscroll-contain max-h-[45vh] pr-1"
+            // (옵션) 내용 스크롤이 끝났을 때도 뒤로 튀지 않게
+            onWheel={(e) => e.stopPropagation()}
+            onTouchMove={(e) => e.stopPropagation()}
+          >
+            {message}
+          </div>
+        ) : null}
+
+        {imgUrl && <img src={imgUrl} className="h-20 my-4" alt="" />}
 
         {/* 버튼 영역 */}
         {buttonText2 ? (
@@ -54,7 +78,9 @@ export default function ErrorModal({
             <ButtonOrange title={buttonText} onPress={onPress} />
           </div>
         ) : (
-          <ButtonOrange title={buttonText} onPress={onPress} />
+          <div className="w-full">
+            <ButtonOrange title={buttonText} onPress={onPress} />
+          </div>
         )}
       </div>
     </div>

@@ -29,6 +29,9 @@ const StoreRegisterFormPage = lazy(() =>
 );
 const ReviewPage = lazy(() => import("@pages/Guesthouse/ReviewPage"));
 const ReservationPage = lazy(() => import("@pages/Guesthouse/ReservationPage"));
+const ReservationCalendarPage = lazy(() =>
+  import("@pages/Guesthouse/ReservationCalendarPage")
+);
 const ProfilePage = lazy(() => import("@pages/ProfilePage"));
 
 // 공통 Suspense 래퍼
@@ -106,6 +109,7 @@ export const router = createBrowserRouter([
       },
       { path: "guesthouse/review", element: S(<ReviewPage />) },
       { path: "reservation", element: S(<ReservationPage />) },
+      { path: "reservation-calendar", element: S(<ReservationCalendarPage />) },
 
       // 기타
       { path: "profile", element: S(<ProfilePage />) },
