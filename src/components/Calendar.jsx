@@ -30,7 +30,7 @@ const buildGrid = (monthDate) => {
   return days;
 };
 
-export default function ReservationCalendar({
+export default function Calendar({
   monthDate, // Date (해당 월 아무 날짜)
   onPrevMonth,
   onNextMonth,

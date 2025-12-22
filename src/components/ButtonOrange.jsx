@@ -22,6 +22,7 @@ export default function ButtonOrange({
       onClick={handleClick}
       disabled={disabled}
       className={`py-2 w-full inline-flex items-center rounded-full px-6 justify-center border-1
+        text-center text-md font-semibold 
         ${
           disabled
             ? "bg-grayscale-200 border-grayscale-200"
@@ -30,8 +31,7 @@ export default function ButtonOrange({
         ${className}`}
     >
       <span
-        className={`flex-1 text-center text-md font-semibold 
-        ${disabled ? "text-grayscale-400" : "text-white"}`}
+        className={`flex-1 ${disabled ? "text-grayscale-400" : "text-white"}`}
       >
         {title}
       </span>

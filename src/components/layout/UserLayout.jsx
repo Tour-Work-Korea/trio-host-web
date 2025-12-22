@@ -20,7 +20,6 @@ export default function UserLayout() {
       </header>
 
       <main className="pt-24">
-        {" "}
         {/* 헤더 높이만큼 여유 */}
         {/* 사이드바 토글 버튼 */}
         <button
@@ -42,7 +41,7 @@ export default function UserLayout() {
             </div>
           )}
 
-          <div className="flex-1 min-w-0 overflow-x-hidden">
+          <div className="flex-1 min-w-0 overflow-x-hidden scrollbar-hide">
             <Outlet />
           </div>
         </div>
