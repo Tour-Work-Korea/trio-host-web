@@ -112,11 +112,17 @@ export default function ReservationCancelModal({
               </p>
               <div className="bg-grayscale-100 w-full flex p-3 rounded-lg items-center justify-between gap-4">
                 <div className="w-full font-medium">
-                  {reservation.checkInDate}
+                  <p>{reservation.checkInDate}</p>
+                  <p className="text-sm text-grayscale-500">
+                    {reservation.checkInTime.slice(0, 5)}
+                  </p>
                 </div>
                 <p>~</p>
                 <div className="w-full font-medium">
-                  {reservation.checkOutDate}
+                  <p> {reservation.checkOutDate}</p>
+                  <p className="text-sm text-grayscale-500">
+                    {reservation.checkOutTime.slice(0, 5)}
+                  </p>
                 </div>
               </div>
             </div>
