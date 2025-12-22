@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import Calendar from "@components/Calendar";
 import ButtonOrange from "@components/ButtonOrange";
 import ButtonWhite from "@components/ButtonWhite";
@@ -60,20 +60,25 @@ function SimpleModal({ open, title, description, onClose }) {
   );
 }
 
+// 선택 키(date + roomId) 생성
+const selKey = (dateKey, roomId) => `${dateKey}__${roomId}`;
+
 export default function RoomManagementPage() {
   const [monthDate, setMonthDate] = useState(() => new Date());
-  const [selectedDateKey, setSelectedDateKey] = useState(() =>
-    toKey(new Date())
-  );
+
   // 안내 토글
   const [introduceToggle, setIntroduceToggle] = useState(false);
 
   // 상단 필터: ALL | OPEN | BLOCKED
   const [filter, setFilter] = useState("ALL");
 
-  // 선택된 방(열기/막기 영역에 표시)
-  const [selectedToOpen, setSelectedToOpen] = useState([]); // OPEN 상태 방 클릭 시
-  const [selectedToBlock, setSelectedToBlock] = useState([]); // BLOCKED 상태 방 클릭 시
+  // (UI 표시용) 마지막으로 클릭한 날짜만 보여주고 싶을 때 사용
+  const [viewDateKey, setViewDateKey] = useState(() => toKey(new Date()));
+
+  // 선택된 방(열기/막기 영역에 표시) - ✅ dateKey를 포함한 payload로 관리
+  // RoomSelection: { id, name, status, isReserved, dateKey }
+  const [selectedToOpen, setSelectedToOpen] = useState([]); // 닫힌 방(BLOCKED) 클릭 시 들어감
+  const [selectedToBlock, setSelectedToBlock] = useState([]); // 열린 방(OPEN) 클릭 시 들어감
 
   // 모달
   const [modalOpen, setModalOpen] = useState(false);
@@ -85,13 +90,6 @@ export default function RoomManagementPage() {
       return items.filter((x) => x.status === "BLOCKED");
     return items;
   };
-
-  const selectedDateRooms = useMemo(() => {
-    const items = DUMMY_ROOMS_BY_DATE[selectedDateKey] ?? [];
-    // (선택 영역 표시용) 필터와 상관없이 원본 기준으로 계산해도 되고,
-    // 여기선 "선택된 날짜의 실제 방 목록" 기준으로 둠.
-    return items;
-  }, [selectedDateKey]);
 
   const onPrevMonth = () => {
     const d = new Date(monthDate);
@@ -106,10 +104,21 @@ export default function RoomManagementPage() {
   };
 
   const onClickDate = (dateKey) => {
-    setSelectedDateKey(dateKey);
-    // 날짜 바꾸면 선택 목록은 초기화(원하면 유지로 바꿔도 됨)
-    setSelectedToOpen([]);
-    setSelectedToBlock([]);
+    // ✅ 날짜를 클릭해도 선택 리스트는 비우지 않음 (날짜+방 단위로 누적 선택 가능)
+    setViewDateKey(dateKey);
+  };
+
+  const toggleSelect = (listSetter, picked) => {
+    // picked: { ...room, dateKey }
+    listSetter((prev) => {
+      const k = selKey(picked.dateKey, picked.id);
+      const idx = prev.findIndex((x) => selKey(x.dateKey, x.id) === k);
+      if (idx >= 0) {
+        // ✅ 같은 날짜+방을 다시 클릭하면 토글로 제거
+        return prev.filter((_, i) => i !== idx);
+      }
+      return [...prev, picked];
+    });
   };
 
   const handleClickRoom = (room, dateKey) => {
@@ -119,30 +128,19 @@ export default function RoomManagementPage() {
       return;
     }
 
-    // 날짜 칸에서 클릭한 경우 해당 날짜로 선택도 같이 맞춰주기
-    if (dateKey && dateKey !== selectedDateKey) {
-      setSelectedDateKey(dateKey);
-      setSelectedToOpen([]);
-      setSelectedToBlock([]);
+    const picked = { ...room, dateKey }; // ✅ 항상 dateKey 포함해서 저장
+
+    // UI 표시용 날짜도 맞춰주기(선택 로직과는 분리)
+    setViewDateKey(dateKey);
+
+    // ✅ 열린 방 클릭 => "방 막기" 리스트
+    if (room.status === "OPEN") {
+      toggleSelect(setSelectedToBlock, picked);
+      return;
     }
 
-    if (room.status === "OPEN") {
-      setSelectedToOpen((prev) => {
-        const exists = prev.some(
-          (x) => x.id === room.id && x.dateKey === (dateKey ?? selectedDateKey)
-        );
-        if (exists) return prev;
-        return [...prev, { ...room, dateKey: dateKey ?? selectedDateKey }];
-      });
-    } else {
-      setSelectedToBlock((prev) => {
-        const exists = prev.some(
-          (x) => x.id === room.id && x.dateKey === (dateKey ?? selectedDateKey)
-        );
-        if (exists) return prev;
-        return [...prev, { ...room, dateKey: dateKey ?? selectedDateKey }];
-      });
-    }
+    // ✅ 닫힌 방 클릭 => "방 열기" 리스트
+    toggleSelect(setSelectedToOpen, picked);
   };
 
   const renderTop = () => {
@@ -201,13 +199,17 @@ export default function RoomManagementPage() {
       <button
         type="button"
         onClick={(e) => {
-          e.stopPropagation(); // 날짜 버튼 클릭 전파 방지
+          e.stopPropagation();
           handleClickRoom(room, dateKey);
         }}
         className={[
-          "w-full flex items-center gap-2 px-2 py-1 rounded-md border",
+          "w-full flex items-center gap-2 px-2 py-1 rounded-md cursor-pointer",
           "hover:bg-grayscale-50",
-          room.isReserved ? "border-primary-orange/40" : "border-grayscale-200",
+          room.isReserved
+            ? "bg-orange-100"
+            : isOpen
+            ? "bg-white"
+            : "bg-grayscale-100",
         ].join(" ")}
         title={
           room.isReserved ? "이미 예약된 방" : isOpen ? "열린 방" : "닫힌 방"
@@ -217,12 +219,10 @@ export default function RoomManagementPage() {
           {room.name}
         </span>
         {room.isReserved ? (
-          <span className="ml-auto text-[10px] px-2 py-[2px] rounded-full bg-primary-orange/10 text-primary-orange font-medium">
-            예약됨
-          </span>
+          <span className="ml-auto text-xs text-primary-orange">예약</span>
         ) : (
-          <span className="ml-auto text-[10px] text-grayscale-500">
-            {isOpen ? "OPEN" : "BLOCKED"}
+          <span className="ml-auto text-xs text-grayscale-500">
+            {isOpen ? "열림" : "닫힘"}
           </span>
         )}
       </button>
@@ -240,23 +240,24 @@ export default function RoomManagementPage() {
   return (
     <div className="container">
       <div className="flex items-center">
-        <div className="page-title">리뷰 관리</div>
+        <div className="page-title">방 관리</div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         {/* 캘린더 */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-3">
           {/* 메뉴얼/레전드 */}
           <div className="text-sm text-grayscale-700 bg-grayscale-100 w-full p-4 rounded-md mb-4">
-            <div className="flex justify-between items-center w-full">
+            <div
+              className="flex justify-between items-center w-full cursor-pointer"
+              onClick={() => setIntroduceToggle(!introduceToggle)}
+            >
               <p className="text-base font-semibold text-grayscale-900">
                 방 관리 안내
               </p>
-              <img
-                src={introduceToggle ? ChevronUp : ChevronDown}
-                onClick={() => setIntroduceToggle(!introduceToggle)}
-              />
+              <img src={introduceToggle ? ChevronUp : ChevronDown} />
             </div>
+
             {introduceToggle && (
               <ul className="list-disc pl-5 mt-1 space-y-1">
                 <li>
@@ -273,9 +274,16 @@ export default function RoomManagementPage() {
                   방을 클릭하면 상태에 따라 “방 열기/방 막기” 영역에 추가됩니다.
                 </li>
                 <li>이미 예약된 방은 막을 수 없습니다.</li>
+                <li className="list-none pl-0 mt-2 text-xs text-grayscale-600">
+                  현재 선택 날짜:{" "}
+                  <span className="font-medium text-grayscale-900">
+                    {viewDateKey}
+                  </span>
+                </li>
               </ul>
             )}
           </div>
+
           <div className="border-grayscale-200 border-2 rounded-lg bg-white p-4 scrollbar-hide ">
             <Calendar
               monthDate={monthDate}
@@ -298,8 +306,12 @@ export default function RoomManagementPage() {
               <div>
                 <ButtonOrange
                   title="방 열기"
-                  onPress={() => {}}
-                  disabled={selectedToOpen.length == 0}
+                  onPress={() => {
+                    // TODO: API 호출 시 selectedToOpen을 그대로 보내면 됨 (dateKey 포함)
+                    // console.log(selectedToOpen);
+                  }}
+                  className="text-[14px] h-8"
+                  disabled={selectedToOpen.length === 0}
                 />
               </div>
             </div>
@@ -316,7 +328,7 @@ export default function RoomManagementPage() {
               ) : (
                 selectedToOpen.map((r, idx) => (
                   <div
-                    key={`${r.dateKey}-${r.id}-${idx}`}
+                    key={selKey(r.dateKey, r.id)}
                     className="flex items-center gap-2 p-2 rounded-lg border border-grayscale-200 bg-white"
                   >
                     <div className="text-sm font-semibold text-grayscale-900">
@@ -345,8 +357,12 @@ export default function RoomManagementPage() {
               <div>
                 <ButtonOrange
                   title="방 막기"
-                  onPress={() => {}}
-                  disabled={selectedToOpen.length == 0}
+                  onPress={() => {
+                    // TODO: API 호출 시 selectedToBlock을 그대로 보내면 됨 (dateKey 포함)
+                    // console.log(selectedToBlock);
+                  }}
+                  className="text-[14px] h-8"
+                  disabled={selectedToBlock.length === 0}
                 />
               </div>
             </div>
@@ -363,7 +379,7 @@ export default function RoomManagementPage() {
               ) : (
                 selectedToBlock.map((r, idx) => (
                   <div
-                    key={`${r.dateKey}-${r.id}-${idx}`}
+                    key={selKey(r.dateKey, r.id)}
                     className="flex items-center gap-2 p-2 rounded-lg border border-grayscale-200 bg-white"
                   >
                     <div className="text-sm font-semibold text-grayscale-900">
