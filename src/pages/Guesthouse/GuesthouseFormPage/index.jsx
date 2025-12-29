@@ -23,6 +23,9 @@ import RulesSection from "./RulesSection";
 import AmenitiesSection from "./AmenitiesSection";
 import RoomsSection from "./RoomsSection";
 
+// 임시저장 import
+import { createDraftStore } from "@utils/draftStorage";
+
 // ===== 유틸 =====
 const isNonEmpty = (v) =>
   (typeof v === "string" && v.trim().length > 0) ||
@@ -174,6 +177,17 @@ export default function GuesthouseForm() {
   useEffect(() => {
     setValid(computeValidSections(formData, { isEditMode }));
   }, [formData, isEditMode]);
+
+  //임시저장 namespace 정의
+  const draftStore = createDraftStore(
+    isEditMode ? "guesthouse:edit" : "guesthouse:new"
+  );
+  useEffect(() => {
+    const loaded = draftStore.load();
+    if (loaded.exists) {
+      setFormData(loaded.data);
+    }
+  }, []);
 
   // 수정 모드일 때: 기존 게스트하우스 상세 조회해서 formData 초기화
   useEffect(() => {
@@ -337,11 +351,11 @@ export default function GuesthouseForm() {
     fetchApplications();
   }, [isEditMode]);
 
+  //자동 임시저장
   const handleInputChange = (field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    const next = { ...formData, [field]: value };
+    setFormData(next);
+    draftStore.save(next);
   };
 
   const handleTimeChange = (field, value) => {
@@ -630,6 +644,8 @@ export default function GuesthouseForm() {
           imgUrl: null,
         });
       }
+
+      draftStore.clear(); //임시저장 삭제
     } catch (error) {
       const serverMessage =
         error?.response?.data?.message ||
