@@ -11,6 +11,16 @@ const gh_cards = [
   { title: "백패커스홈", url: gh2 },
   { title: "비지터 게스트하우스", url: gh3 },
   { title: "캡틴 제주 게스트하우스", url: gh4 },
+  { title: "베드라디오 동문점", url: gh1 },
+  { title: "백패커스홈", url: gh2 },
+  { title: "비지터 게스트하우스", url: gh3 },
+  { title: "캡틴 제주 게스트하우스", url: gh4 },
+  { title: "베드라디오 동문점", url: gh1 },
+  { title: "백패커스홈", url: gh2 },
+  { title: "비지터 게스트하우스", url: gh3 },
+  { title: "캡틴 제주 게스트하우스", url: gh4 },
+  { title: "베드라디오 동문점", url: gh1 },
+  { title: "백패커스홈", url: gh2 },
 ];
 
 export default function StoreGuesthouses() {
@@ -18,7 +28,7 @@ export default function StoreGuesthouses() {
     dots: false,
     arrows: false,
     infinite: true,
-    slidesToShow: 3,
+    slidesToShow: 5,
     slidesToScroll: 1,
     autoplay: true,
     speed: 5000, // 한 번 트랙을 도는 시간
@@ -34,10 +44,19 @@ export default function StoreGuesthouses() {
         워커웨이 입점 게스트하우스
       </h1>
       <Slider {...settings}>
-        {gh_cards?.map((el, id) => (
-          <div key={id} className="flex-col flex items-center px-4">
-            <img src={el.url} className="w-full rounded-xl" />
-            <p className="text-center mt-4 text-lg">{el.title}</p>
+        {gh_cards?.slice(0, 7).map((el, id) => (
+          <div key={id} className="flex-col flex items-center px-2">
+            <img src={el.url} className="w-full rounded-lg" />
+            <p className="font-medium text-center mt-4 text-base">{el.title}</p>
+          </div>
+        ))}
+      </Slider>
+      <div className="h-10" />
+      <Slider {...settings}>
+        {gh_cards?.slice(7, 14).map((el, id) => (
+          <div key={id} className="flex-col flex items-center px-2">
+            <img src={el.url} className="w-full rounded-lg" />
+            <p className="font-medium text-center mt-4 text-base">{el.title}</p>
           </div>
         ))}
       </Slider>
