@@ -18,6 +18,9 @@ import ShortDescriptionModal from "./ShortDescriptionModal";
 import CheckOrange from "@assets/images/check_orange.svg";
 import ChevronBlack from "@assets/images/chevron_right_black.svg";
 
+// 임시저장 import
+import { createDraftStore } from "@utils/draftStorage";
+
 import {
   WORK_PART_TAGS,
   WORK_PART_ETC_ID,
@@ -97,6 +100,15 @@ export default function RecruitmentForm() {
     guesthouseId: 0,
   });
 
+  //임시저장 namespace 정의
+  const draftStore = createDraftStore("recruit:new");
+  useEffect(() => {
+    const loaded = draftStore.load();
+    if (loaded.exists) {
+      setFormData(loaded.data);
+    }
+  }, []);
+
   // 모달 상태
   const [modalVisible, setModalVisible] = useState({
     title: false,
@@ -152,12 +164,11 @@ export default function RecruitmentForm() {
     setValid(computeValidSections(formData));
   }, [formData]);
 
-  // formData 업데이트
+  //자동 임시저장
   const handleInputChange = (field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    const next = { ...formData, [field]: value };
+    setFormData(next);
+    draftStore.save(next);
   };
 
   // 기존 공고 가져오기
@@ -269,6 +280,7 @@ export default function RecruitmentForm() {
   const fetchNewRecruit = async (payload) => {
     try {
       await employApi.createRecruit(payload);
+      draftStore.clear(); //임시저장 삭제
       setErrorModal({
         visible: true,
         title: "새로운 공고를 등록했습니다",

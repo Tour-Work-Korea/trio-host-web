@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import ButtonOrange from "@components/ButtonOrange";
 import { handleSearchAddress } from "@utils/searchAddress";
 import ErrorModal from "@components/ErrorModal";
@@ -8,8 +8,11 @@ import { onlyDigits, isValidBizNo } from "@utils/validation/validationUtils";
 import { computeStoreRegister } from "@utils/validation/storeRegisterValidation";
 import ImageDropzone from "@components/ImageDropzone";
 import { BizCertPreview } from "@components/BizCertPreview";
-import guesthouseApi from "../../../api/guesthouseApi";
+import guesthouseApi from "@api/guesthouseApi";
 import { useNavigate } from "react-router-dom";
+
+// 임시저장 import
+import { createDraftStore } from "@utils/draftStorage";
 
 export default function RegisterFormPage() {
   const navigate = useNavigate();
@@ -34,6 +37,15 @@ export default function RegisterFormPage() {
     businessRegistrationNumber: "", //사업자 등록번호
     img: null, //사업자 등록증 이미지
   });
+
+  //임시저장 namespace 정의
+  const draftStore = createDraftStore("storeRegister:new");
+  useEffect(() => {
+    const loaded = draftStore.load();
+    if (loaded.exists) {
+      setFormData(loaded.data);
+    }
+  }, []);
 
   const bizNo = formData.businessRegistrationNumber ?? "";
   const canVerifyBiz = useMemo(
@@ -63,9 +75,14 @@ export default function RegisterFormPage() {
       setBizChecking(false);
     }
   };
+
+  //자동 임시저장
   const handleInputChange = (field, value) => {
-    setFormData({ ...formData, [field]: value });
+    const next = { ...formData, [field]: value };
+    setFormData(next);
+    draftStore.save(next);
   };
+
   const handleNext = () => {
     const result = computeStoreRegister(formData, { bizChecked });
     if (!result.allValid) {
@@ -85,6 +102,7 @@ export default function RegisterFormPage() {
   const tryFetchApplications = async () => {
     try {
       await guesthouseApi.postApplication(formData);
+      draftStore.clear(); //임시저장 삭제
       navigate("/guesthouse/store-register");
     } catch (error) {
       setErrorModal({
