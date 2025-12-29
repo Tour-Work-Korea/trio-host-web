@@ -6,11 +6,29 @@ import gh1 from "@assets/images/landing/gh_1.png";
 import gh2 from "@assets/images/landing/gh_2.png";
 import gh3 from "@assets/images/landing/gh_3.png";
 import gh4 from "@assets/images/landing/gh_4.png";
+import gh5 from "@assets/images/landing/gh_5.png";
+import gh6 from "@assets/images/landing/gh_6.png";
+import gh7 from "@assets/images/landing/gh_7.png";
+import gh8 from "@assets/images/landing/gh_8.png";
+import gh9 from "@assets/images/landing/gh_9.png";
+import gh10 from "@assets/images/landing/gh_10.png";
+import gh11 from "@assets/images/landing/gh_11.png";
+import gh12 from "@assets/images/landing/gh_12.png";
+import gh13 from "@assets/images/landing/gh_13.png";
 const gh_cards = [
   { title: "베드라디오 동문점", url: gh1 },
   { title: "백패커스홈", url: gh2 },
   { title: "비지터 게스트하우스", url: gh3 },
   { title: "캡틴 제주 게스트하우스", url: gh4 },
+  { title: "샘나도", url: gh5 },
+  { title: "히든스테이", url: gh6 },
+  { title: "미조", url: gh7 },
+  { title: "김녕기억", url: gh8 },
+  { title: "알멩이", url: gh9 },
+  { title: "이호웨이브", url: gh10 },
+  { title: "예스준", url: gh11 },
+  { title: "이상한 밤", url: gh12 },
+  { title: "제주 신촌 바다뷰", url: gh13 },
 ];
 
 export default function StoreGuesthouses() {
@@ -18,7 +36,7 @@ export default function StoreGuesthouses() {
     dots: false,
     arrows: false,
     infinite: true,
-    slidesToShow: 3,
+    slidesToShow: 5,
     slidesToScroll: 1,
     autoplay: true,
     speed: 5000, // 한 번 트랙을 도는 시간
@@ -34,10 +52,19 @@ export default function StoreGuesthouses() {
         워커웨이 입점 게스트하우스
       </h1>
       <Slider {...settings}>
-        {gh_cards?.map((el, id) => (
-          <div key={id} className="flex-col flex items-center px-4">
-            <img src={el.url} className="w-full rounded-xl" />
-            <p className="text-center mt-4 text-lg">{el.title}</p>
+        {gh_cards?.slice(0, 7).map((el, id) => (
+          <div key={id} className="flex-col flex items-center px-2">
+            <img src={el.url} className="w-full rounded-lg" />
+            <p className="font-medium text-center mt-4 text-base">{el.title}</p>
+          </div>
+        ))}
+      </Slider>
+      <div className="h-10" />
+      <Slider {...settings}>
+        {gh_cards?.slice(7, 14).map((el, id) => (
+          <div key={id} className="flex-col flex items-center px-2">
+            <img src={el.url} className="w-full rounded-lg" />
+            <p className="font-medium text-center mt-4 text-base">{el.title}</p>
           </div>
         ))}
       </Slider>
