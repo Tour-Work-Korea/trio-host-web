@@ -274,109 +274,148 @@ export default function MyGuesthousePage() {
             />
           </div>
         ) : (
-          <div className="flex flex-col gap-3">
-            {guesthouses.map((item) => {
-              const ghId = getGuesthouseId(item);
-              const ghThumb = getGuesthouseThumb(item);
+          <div>
+            <div className="flex flex-col gap-3">
+              {guesthouses.map((item) => {
+                const ghId = getGuesthouseId(item);
+                const ghThumb = getGuesthouseThumb(item);
 
-              return (
-                <div
-                  key={ghId}
-                  className="flex flex-col rounded-lg border border-grayscale-200 p-4 duration-300 hover:shadow-md"
-                >
-                  <div className="flex gap-6">
-                    <div className="flex w-64 min-w-64 flex-col gap-3">
-                      <div className="flex items-center justify-between">
-                        <h1 className="text-xl font-semibold text-grayscale-900">
-                          {item.guesthouseName}
-                        </h1>
-                        <div className="flex gap-2 items-center">
-                          {/* 수정 버튼 */}
-                          <button
-                            type="button"
-                            onClick={() => handleEditGuesthouse(ghId)}
-                          >
-                            <img src={EditIcon} />
-                          </button>
-                          {/* 삭제 버튼 */}
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteGuesthouse(ghId)}
-                          >
-                            <img src={DeleteIcon} />
-                          </button>
+                return (
+                  <div
+                    key={ghId}
+                    className="flex flex-col rounded-lg border border-grayscale-200 p-4 duration-300 hover:shadow-md"
+                  >
+                    <div className="flex gap-6">
+                      <div className="flex w-64 min-w-64 flex-col gap-3">
+                        <div className="flex items-center justify-between">
+                          <h1 className="text-xl font-semibold text-grayscale-900">
+                            {item.guesthouseName}
+                          </h1>
+                          <div className="flex gap-2 items-center">
+                            {/* 수정 버튼 */}
+                            <button
+                              type="button"
+                              onClick={() => handleEditGuesthouse(ghId)}
+                            >
+                              <img src={EditIcon} />
+                            </button>
+                            {/* 삭제 버튼 */}
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteGuesthouse(ghId)}
+                            >
+                              <img src={DeleteIcon} />
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                      <img
-                        src={ghThumb}
-                        alt={item.guesthouseName}
-                        className="h-64 w-64 rounded-lg bg-grayscale-100 object-cover"
-                      />
-                    </div>
-
-                    {/* 오른쪽: 객실 정보 */}
-                    <div className="flex flex-1 min-w-0 flex-col gap-3">
-                      {/* 상단 제목 영역 */}
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-medium text-grayscale-800">
-                          등록된 객실
-                        </h3>
+                        <img
+                          src={ghThumb}
+                          alt={item.guesthouseName}
+                          className="h-64 w-64 rounded-lg bg-grayscale-100 object-cover"
+                        />
                       </div>
 
-                      {/* 객실 영역: 두 줄 그리드 + 가로 스크롤 */}
-                      <div className="w-full overflow-x-auto scrollbar-hide h-full">
-                        <div className="grid grid-flow-col auto-cols-max grid-rows-2 gap-3 h-full">
-                          {item.rooms?.map((room) => {
-                            const roomId = getRoomId(room);
-                            const roomThumb = getRoomThumb(room);
+                      {/* 오른쪽: 객실 정보 */}
+                      <div className="flex flex-1 min-w-0 flex-col gap-3">
+                        {/* 상단 제목 영역 */}
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-lg font-medium text-grayscale-800">
+                            등록된 객실
+                          </h3>
+                        </div>
 
-                            return (
-                              <div
-                                key={roomId}
-                                className="flex w-80 flex-shrink-0 gap-3 rounded-lg border border-grayscale-200 bg-white p-2"
-                              >
-                                <img
-                                  src={roomThumb}
-                                  alt={room.roomName}
-                                  className="h-full w-24 rounded-lg bg-grayscale-100 object-cover"
-                                />
-                                <div className="flex flex-1 flex-col justify-between">
-                                  <div>
-                                    <span className="text-md font-medium text-grayscale-900">
-                                      {room.roomName}
-                                    </span>
-                                    <div className="text-sm text-grayscale-600">
-                                      {room.roomMaxCapacity ??
-                                        room.roomCapacity}
-                                      인실 {getRoomTypeLabel(room.roomType)}
+                        {/* 객실 영역: 두 줄 그리드 + 가로 스크롤 */}
+                        <div className="w-full overflow-x-auto scrollbar-hide h-full">
+                          <div className="grid grid-flow-col auto-cols-max grid-rows-2 gap-3 h-full">
+                            {item.rooms?.map((room) => {
+                              const roomId = getRoomId(room);
+                              const roomThumb = getRoomThumb(room);
+
+                              return (
+                                <div
+                                  key={roomId}
+                                  className="flex w-80 flex-shrink-0 gap-3 rounded-lg border border-grayscale-200 bg-white p-2"
+                                >
+                                  <img
+                                    src={roomThumb}
+                                    alt={room.roomName}
+                                    className="h-full w-24 rounded-lg bg-grayscale-100 object-cover"
+                                  />
+                                  <div className="flex flex-1 flex-col justify-between">
+                                    <div>
+                                      <span className="text-md font-medium text-grayscale-900">
+                                        {room.roomName}
+                                      </span>
+                                      <div className="text-sm text-grayscale-600">
+                                        {room.roomMaxCapacity ??
+                                          room.roomCapacity}
+                                        인실 {getRoomTypeLabel(room.roomType)}
+                                      </div>
                                     </div>
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        handleDeleteRoom(ghId, roomId)
+                                      }
+                                      className="self-end"
+                                    >
+                                      <img src={DeleteIcon} width={20} />
+                                    </button>
                                   </div>
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      handleDeleteRoom(ghId, roomId)
-                                    }
-                                    className="self-end"
-                                  >
-                                    <img src={DeleteIcon} width={20} />
-                                  </button>
                                 </div>
-                              </div>
-                            );
-                          })}
+                              );
+                            })}
 
-                          {(!item.rooms || item.rooms.length === 0) && (
-                            <div className="text-sm text-grayscale-400">
-                              등록된 객실이 없습니다.
-                            </div>
-                          )}
+                            {(!item.rooms || item.rooms.length === 0) && (
+                              <div className="text-sm text-grayscale-400">
+                                등록된 객실이 없습니다.
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
+                );
+              })}
+            </div>
+
+            <div className="bg-amber-400 flex p-4">
+              {/** 왼쪽(게하 이름, 게하 사진) */}
+              <div className="min-w-64 flex flex-col">
+                {/** 비지터 게스트하우스+아이콘 */}
+                <div className="flex justify-between">
+                  <p className="text-xl font-medium">비지터 게스트하우스</p>
+                  <div className="flex gap-2">
+                    <img src={EditIcon} />
+                    <img src={DeleteIcon} />
+                  </div>
                 </div>
-              );
-            })}
+                {/** 게스트하우스 이미지 */}
+                <div className="bg-grayscale-100 w-64 h-64 rounded-lg mt-4" />
+              </div>
+
+              {/* 오른쪽(방 정보 리스트들) */}
+              <div className="bg-blue-300 w-full flex flex-col">
+                <p>등록된 객실</p>
+                {/** 객실 리스트 */}
+                <div className="grid grid-cols-2 grid-rows-2 gap-4">
+                  <div className="bg-blue-800 h-40 w-full flex">
+                    {/* 방 사진 */}
+                    <div className="bg-blue-200 w-40"></div>
+                    {/** 방 정보들 */}
+                    <div className="bg-blue-500">
+                      <p>더블형 1인실</p>
+                      <p>1인실 혼성</p>
+                      <img src={DeleteIcon} />
+                    </div>
+                  </div>
+                  <div className="bg-blue-800 h-40"></div>
+                  <div className="bg-blue-800 h-40"></div>
+                  <div className="bg-blue-800 h-40"></div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>

@@ -336,8 +336,10 @@ export default function ReviewPage() {
                     </div>
 
                     {/* 리뷰 내용 */}
-                    <div className="border-1 border-grayscale-200 p-4 rounded-lg">
-                      {review.reviewDetail}
+                    <div className="border-1 border-grayscale-200 p-4 rounded-lg bg-primary-blue">
+                      <p className="bg-primary-orange font-semibold text-white">
+                        {review.reviewDetail}
+                      </p>
                     </div>
 
                     <div className="border-1 w-full border-grayscale-200" />
