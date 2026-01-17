@@ -161,6 +161,27 @@ const guesthouseApi = {
     api.delete(`/order/reservation/${reservationId}`, {
       data: { type: "GUESTHOUSE" },
     }),
+
+  // 날짜별 운영 상태 변경 (여러개 동시)
+  updateRoomInventoryStatuses: (guesthouseId, roomId, statuses) =>
+    api.put(
+      `/host/guesthouses/${guesthouseId}/rooms/${roomId}/statuses`,
+      statuses
+    ),
+
+  // "방막기(날짜별)" 헬퍼: isClosed=true
+  closeRoomDates: (guesthouseId, roomId, dates) =>
+    api.put(
+      `/host/guesthouses/${guesthouseId}/rooms/${roomId}/statuses`,
+      dates.map((date) => ({ date, isClosed: true }))
+    ),
+
+  // "방열기(날짜별)" 헬퍼: isClosed=false
+  openRoomDates: (guesthouseId, roomId, dates) =>
+    api.put(
+      `/host/guesthouses/${guesthouseId}/rooms/${roomId}/statuses`,
+      dates.map((date) => ({ date, isClosed: false }))
+    ),
 };
 
 export default guesthouseApi;
