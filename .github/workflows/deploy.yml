@@ -2,7 +2,7 @@ name: Deploy Host Web
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, dev ]
 
 jobs:
   build-and-deploy:

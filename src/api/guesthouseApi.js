@@ -169,14 +169,14 @@ const guesthouseApi = {
       statuses
     ),
 
-  // "방막기(날짜별)" 헬퍼: isClosed=true
+  // "방막기(날짜별)"
   closeRoomDates: (guesthouseId, roomId, dates) =>
     api.put(
       `/host/guesthouses/${guesthouseId}/rooms/${roomId}/statuses`,
       dates.map((date) => ({ date, isClosed: true }))
     ),
 
-  // "방열기(날짜별)" 헬퍼: isClosed=false
+  // "방열기(날짜별)"
   openRoomDates: (guesthouseId, roomId, dates) =>
     api.put(
       `/host/guesthouses/${guesthouseId}/rooms/${roomId}/statuses`,

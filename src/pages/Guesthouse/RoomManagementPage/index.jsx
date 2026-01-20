@@ -7,6 +7,16 @@ import ChevronDown from "@assets/images/chevron_down_black.svg";
 import ChevronUp from "@assets/images/chevron_up_black.svg";
 import Delete from "@assets/images/delete_gray.svg";
 
+import guesthouseApi from "@/api/guesthouseApi"; // 경로는 프로젝트에 맞게
+
+const uniq = (arr) => [...new Set(arr)];
+const groupBy = (arr, keyFn) =>
+  arr.reduce((acc, cur) => {
+    const k = String(keyFn(cur));
+    (acc[k] ||= []).push(cur);
+    return acc;
+  }, {});
+
 const pad2 = (n) => String(n).padStart(2, "0");
 const toKey = (d) =>
   `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
@@ -16,24 +26,27 @@ const toKey = (d) =>
 // isReserved: true면 "이미 예약된 방" (클릭 시 모달)
 const DUMMY_ROOMS_BY_DATE = {
   "2025-12-22": [
-    { id: "r-101", name: "101호", status: "OPEN", isReserved: false },
-    { id: "r-102", name: "102호", status: "BLOCKED", isReserved: false },
-    { id: "r-201", name: "201호", status: "OPEN", isReserved: true }, // 예약됨
+    { id: 101, name: "101호", status: "OPEN", isReserved: false },
+    { id: 102, name: "102호", status: "BLOCKED", isReserved: false },
+    { id: 201, name: "201호", status: "OPEN", isReserved: true }, // 예약됨
   ],
   "2025-12-23": [
-    { id: "r-101", name: "101호", status: "BLOCKED", isReserved: false },
-    { id: "r-102", name: "102호", status: "OPEN", isReserved: false },
-    { id: "r-201", name: "201호", status: "OPEN", isReserved: false },
-    { id: "r-202", name: "202호", status: "OPEN", isReserved: true }, // 예약됨
+    { id: 101, name: "101호", status: "BLOCKED", isReserved: false },
+    { id: 102, name: "102호", status: "OPEN", isReserved: false },
+    { id: 201, name: "201호", status: "OPEN", isReserved: false },
+    { id: 202, name: "202호", status: "OPEN", isReserved: true }, // 예약됨
   ],
   "2025-12-24": [
-    { id: "r-101", name: "101호", status: "OPEN", isReserved: false },
-    { id: "r-102", name: "102호", status: "OPEN", isReserved: false },
-    { id: "r-201", name: "201호", status: "BLOCKED", isReserved: false },
+    { id: 101, name: "101호", status: "OPEN", isReserved: false },
+    { id: 102, name: "102호", status: "OPEN", isReserved: false },
+    { id: 201, name: "201호", status: "BLOCKED", isReserved: false },
   ],
 };
 
 function SimpleModal({ open, title, description, onClose }) {
+  // TODO: 실제 guesthouseId로 교체 (라우터/스토어/props 등)
+  const guesthouseId = 1;
+
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -104,7 +117,7 @@ export default function RoomManagementPage() {
   };
 
   const onClickDate = (dateKey) => {
-    // ✅ 날짜를 클릭해도 선택 리스트는 비우지 않음 (날짜+방 단위로 누적 선택 가능)
+    // 날짜를 클릭해도 선택 리스트는 비우지 않음 (날짜+방 단위로 누적 선택 가능)
     setViewDateKey(dateKey);
   };
 
@@ -114,7 +127,7 @@ export default function RoomManagementPage() {
       const k = selKey(picked.dateKey, picked.id);
       const idx = prev.findIndex((x) => selKey(x.dateKey, x.id) === k);
       if (idx >= 0) {
-        // ✅ 같은 날짜+방을 다시 클릭하면 토글로 제거
+        // 같은 날짜+방을 다시 클릭하면 토글로 제거
         return prev.filter((_, i) => i !== idx);
       }
       return [...prev, picked];
@@ -237,6 +250,70 @@ export default function RoomManagementPage() {
     }
   };
 
+  const [openLoading, setOpenLoading] = useState(false);
+  const [blockLoading, setBlockLoading] = useState(false);
+
+  // ✅ 방 열기 (entries 기반 succeededRoomIds, normalizeRoomId 미사용)
+  const submitOpen = async () => {
+    if (selectedToOpen.length === 0) return;
+    setOpenLoading(true);
+
+    try {
+      const byRoom = groupBy(selectedToOpen, (x) => x.id);
+      const entries = Object.entries(byRoom); // ✅ entries 기반
+
+      const results = await Promise.allSettled(
+        entries.map(([roomId, items]) => {
+          const dates = uniq(items.map((i) => i.dateKey));
+          return guesthouseApi.openRoomDates(guesthouseId, roomId, dates);
+        })
+      );
+
+      const succeededRoomIds = entries
+        .filter((_, idx) => results[idx].status === "fulfilled")
+        .map(([roomId]) => String(roomId));
+
+      setSelectedToOpen((prev) =>
+        prev.filter((x) => !succeededRoomIds.includes(String(x.id)))
+      );
+    } catch (e) {
+      console.error(e);
+      alert("방 열기 처리 중 오류가 발생했습니다.");
+    } finally {
+      setOpenLoading(false);
+    }
+  };
+
+    const submitBlock = async () => {
+    if (selectedToBlock.length === 0) return;
+    setBlockLoading(true);
+
+    try {
+      const byRoom = groupBy(selectedToBlock, (x) => x.id);
+      const entries = Object.entries(byRoom); // ✅ entries 기반
+
+      const results = await Promise.allSettled(
+        entries.map(([roomId, items]) => {
+          const dates = uniq(items.map((i) => i.dateKey));
+          return guesthouseApi.closeRoomDates(guesthouseId, roomId, dates);
+        })
+      );
+
+      const succeededRoomIds = entries
+        .filter((_, idx) => results[idx].status === "fulfilled")
+        .map(([roomId]) => String(roomId));
+
+      setSelectedToBlock((prev) =>
+        prev.filter((x) => !succeededRoomIds.includes(String(x.id)))
+      );
+    } catch (e) {
+      console.error(e);
+      alert("방 막기 처리 중 오류가 발생했습니다.");
+    } finally {
+      setBlockLoading(false);
+    }
+  };
+
   return (
     <div className="container">
       <div className="flex items-center">
@@ -305,13 +382,10 @@ export default function RoomManagementPage() {
               <div className="text-lg font-semibold">방 열기</div>
               <div>
                 <ButtonOrange
-                  title="방 열기"
-                  onPress={() => {
-                    // TODO: API 호출 시 selectedToOpen을 그대로 보내면 됨 (dateKey 포함)
-                    // console.log(selectedToOpen);
-                  }}
+                  title={openLoading ? "처리중..." : "방 열기"}
+                  onPress={submitOpen}
                   className="text-[14px] h-8"
-                  disabled={selectedToOpen.length === 0}
+                  disabled={selectedToOpen.length === 0 || openLoading}
                 />
               </div>
             </div>
@@ -356,13 +430,10 @@ export default function RoomManagementPage() {
               <div className="text-lg font-semibold">방 막기</div>
               <div>
                 <ButtonOrange
-                  title="방 막기"
-                  onPress={() => {
-                    // TODO: API 호출 시 selectedToBlock을 그대로 보내면 됨 (dateKey 포함)
-                    // console.log(selectedToBlock);
-                  }}
+                  title={blockLoading ? "처리중..." : "방 막기"}
+                  onPress={submitBlock}
                   className="text-[14px] h-8"
-                  disabled={selectedToBlock.length === 0}
+                  disabled={selectedToBlock.length === 0 || blockLoading}
                 />
               </div>
             </div>
