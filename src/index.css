@@ -52,6 +52,7 @@
   --color-grayscale-0: #ffffff;
 
   --color-modal-background: rgb(0 0 0 / 0.1);
+  --color-cancel-btn-bg: #FEE9E8;
 }
 
 @layer components {
