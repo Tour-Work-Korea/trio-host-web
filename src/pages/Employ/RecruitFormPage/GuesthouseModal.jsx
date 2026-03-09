@@ -86,7 +86,7 @@ export default function GuesthouseModal({
       <button
         key={gh.id}
         type="button"
-        className="w-full flex items-center gap-3 rounded-2xl bg-grayscale-50 px-3 py-3 hover:bg-grayscale-100 transition duration-300"
+        className="w-full flex items-center gap-3 rounded-2xl bg-neutral-gray px-3 py-3 hover:bg-grayscale-100 transition duration-300"
         onClick={() => setSelectedId(gh.id)}
       >
         <div className="flex items-center justify-center">

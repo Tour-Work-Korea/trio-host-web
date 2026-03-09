@@ -70,30 +70,35 @@ const compressToJPEGWeb = async (file, options = {}) => {
 };
 
 const uploadBlobToS3Web = (presignedUrl, blob, onProgress) => {
+  const uploadedUrl = presignedUrl.split("?")[0];
+
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open("PUT", presignedUrl);
-
     xhr.setRequestHeader("Content-Type", "image/*");
 
-    if (onProgress && xhr.upload) {
+    if (typeof onProgress === "function" && xhr.upload) {
       xhr.upload.onprogress = (e) => {
         if (e.lengthComputable) {
-          const p = Math.round((e.loaded * 100) / e.total);
-          onProgress(p);
+          onProgress(Math.round((e.loaded * 100) / e.total));
         }
       };
     }
 
     xhr.onload = () => {
       if (xhr.status >= 200 && xhr.status < 300) {
-        resolve(presignedUrl.split("?")[0]);
+        resolve(uploadedUrl);
       } else {
-        reject(new Error("Upload failed: " + xhr.status));
+        reject(
+          new Error(
+            `Upload failed: ${xhr.status} ${xhr.statusText || ""}`.trim()
+          )
+        );
       }
     };
 
-    xhr.onerror = () => reject(new Error("Network error"));
+    xhr.onerror = () =>
+      reject(new Error("Network error while uploading to S3"));
     xhr.send(blob);
   });
 };
@@ -119,22 +124,3 @@ export const uploadSingleImageToS3Web = async (file, onProgress) => {
 
   return uploadedUrl;
 };
-
-// export const uploadSingleImageToS3Web = (file, onProgress) => {
-//   if (!file) return Promise.resolve(null);
-
-//   return new Promise((resolve) => {
-//     const objectUrl = URL.createObjectURL(file); // 브라우저 로컬 URL (새로고침 시 사라짐)
-//     let p = 0;
-
-//     const timer = setInterval(() => {
-//       p += 10;
-//       if (onProgress) onProgress(p);
-
-//       if (p >= 100) {
-//         clearInterval(timer);
-//         resolve(objectUrl);
-//       }
-//     }, 80); // 0.8초 정도에 100% 도달
-//   });
-// };

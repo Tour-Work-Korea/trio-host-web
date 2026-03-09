@@ -10,7 +10,7 @@ export default function VisionMission() {
         <div className="landing-divide mt-16 flex gap-8 items-stretch w-full">
           {/* Vision 카드 */}
           <div className="landing-blue-box w-full flex flex-col justify-start">
-            <div className="rounded-xl bg-primary-blue text-white px-5 py-2.5 text-2xl font-bold">
+            <div className="rounded-xl bg-primary-blue text-neutral-white px-5 py-2.5 text-2xl font-bold">
               Vision
             </div>
             <div className="flex flex-col text-center mt-8 items-center justify-center flex-1">
@@ -28,7 +28,7 @@ export default function VisionMission() {
 
           {/* Mission 카드 */}
           <div className="landing-blue-box w-full flex flex-col justify-start">
-            <div className="rounded-xl bg-primary-blue text-white px-5 py-2.5 text-2xl font-bold">
+            <div className="rounded-xl bg-primary-blue text-neutral-white px-5 py-2.5 text-2xl font-bold">
               Mission
             </div>
             <div className="flex flex-col text-center mt-8 flex-1">

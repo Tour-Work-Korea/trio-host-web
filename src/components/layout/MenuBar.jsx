@@ -33,8 +33,8 @@ export default function MenuBar() {
     <div className="space-y-12">
       {/* 유저 프로필 */}
       <div className="flex-col">
-        <div className="bg-white flex items-end gap-3">
-          <div className="bg-white flex items-center gap-3">
+        <div className="bg-neutral-white flex items-end gap-3">
+          <div className="bg-neutral-white flex items-center gap-3">
             {profile.photoUrl ? (
               <img
                 src={profile.photoUrl}
@@ -68,14 +68,14 @@ export default function MenuBar() {
       </div>
 
       {/* 메뉴 */}
-      <div className="bg-white">
+      <div className="bg-neutral-white">
         {/* 게스트하우스 */}
         <div>
           <div
             className={`font-bold text-lg ${
               pathname.startsWith("/guesthouse") ||
               pathname.startsWith("/reservation")
-                ? "text-orange-blue"
+                ? "text-primary-blue"
                 : ""
             }`}
           >
@@ -100,7 +100,7 @@ export default function MenuBar() {
         <div className="mt-8">
           <div
             className={`font-bold text-lg ${
-              pathname.startsWith("/employ") ? "text-orange-blue" : ""
+              pathname.startsWith("/employ") ? "text-primary-blue" : ""
             }`}
           >
             알바

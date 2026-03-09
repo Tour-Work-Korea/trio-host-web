@@ -119,7 +119,7 @@ export default function WorkInfoSection({
 
                 {/* 썸네일 뱃지 (선택 사항) */}
                 {isThumb && (
-                  <span className="absolute bottom-1.5 left-1.5 text-xs px-2 py-0.5 rounded-full bg-primary-orange text-white">
+                  <span className="absolute bottom-1.5 left-1.5 text-xs px-2 py-0.5 rounded-full bg-primary-orange text-neutral-white">
                     대표
                   </span>
                 )}

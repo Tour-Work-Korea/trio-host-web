@@ -24,7 +24,7 @@ export default function Header() {
     }
   }, [navigate]);
   return (
-    <header className="w-full flex bg-white py-4 px-4 sm:px-12 justify-between items-center">
+    <header className="w-full flex bg-neutral-white py-4 px-4 sm:px-12 justify-between items-center">
       <img
         src={WaLogo}
         alt="WorkAway"

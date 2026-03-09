@@ -16,10 +16,25 @@ const createEmptyRoom = () => ({
   roomCapacity: "",
   roomMaxCapacity: "",
   roomType: "",
+  dormitoryGenderType: "",
+  femaleOnly: false,
+  isVisible: true,
+  roomExtraFees: [],
   roomPrice: "",
 });
 
 const translateRoomType = (type) => {
+  switch (type) {
+    case "DORMITORY":
+      return "도미토리";
+    case "PRIVATE":
+      return "일반 객실";
+    default:
+      return "";
+  }
+};
+
+const translateDormitoryGender = (type) => {
   switch (type) {
     case "FEMALE_ONLY":
       return "여성전용";
@@ -91,6 +106,15 @@ export default function RoomsSection({
     const target = rooms[index];
     if (!target) return;
 
+    const legacyDormitoryType = ["MIXED", "MALE_ONLY", "FEMALE_ONLY"];
+    const roomType =
+      target.roomType === "DORMITORY" || target.roomType === "PRIVATE"
+        ? target.roomType
+        : "DORMITORY";
+    const dormitoryGenderType = legacyDormitoryType.includes(target.roomType)
+      ? target.roomType
+      : target.dormitoryGenderType ?? "MIXED";
+
     setEditingIndex(index);
     setDraft({
       id: target.id ?? null, // ✅ id 유지해서 나중에 submit 시 update/새로생성 구분
@@ -102,7 +126,11 @@ export default function RoomsSection({
         target.roomMaxCapacity?.toString() ??
         target.roomCapacity?.toString() ??
         "",
-      roomType: target.roomType ?? "",
+      roomType,
+      dormitoryGenderType,
+      femaleOnly: !!target.femaleOnly,
+      isVisible: target.isVisible ?? true,
+      roomExtraFees: target.roomExtraFees ?? [],
       roomPrice: target.roomPrice?.toString() ?? "",
     });
   };
@@ -123,12 +151,19 @@ export default function RoomsSection({
     const trimmedName = draft.roomName.trim();
     const trimmedDesc = draft.roomDesc.trim();
     const capacityNum = Number(draft.roomCapacity);
+    const roomMaxCapacityNum = Number(draft.roomMaxCapacity ?? draft.roomCapacity);
     const priceNum = Number(draft.roomPrice);
+    const isDormitory = draft.roomType === "DORMITORY";
+    const normalizedMaxCapacity =
+      Number.isNaN(roomMaxCapacityNum) || roomMaxCapacityNum <= 0
+        ? capacityNum
+        : Math.max(capacityNum, roomMaxCapacityNum);
 
     if (
       !trimmedName ||
       !trimmedDesc ||
       !draft.roomType ||
+      (isDormitory && !draft.dormitoryGenderType) ||
       !draft.roomImages.length ||
       !draft.roomImages.some((img) => img.isThumbnail) ||
       Number.isNaN(capacityNum) ||
@@ -145,9 +180,13 @@ export default function RoomsSection({
       roomDesc: trimmedDesc,
       roomImages: draft.roomImages,
       roomCapacity: capacityNum,
-      roomMaxCapacity: capacityNum,
+      roomMaxCapacity: normalizedMaxCapacity,
       roomType: draft.roomType,
+      dormitoryGenderType: isDormitory ? draft.dormitoryGenderType : "MIXED",
+      femaleOnly: draft.roomType === "PRIVATE" ? !!draft.femaleOnly : false,
+      isVisible: draft.isVisible ?? true,
       roomPrice: priceNum,
+      roomExtraFees: draft.roomExtraFees ?? [],
     };
 
     const next = [...rooms];
@@ -163,10 +202,12 @@ export default function RoomsSection({
   const isSaveDisabled = (() => {
     const capacityNum = Number(draft.roomCapacity);
     const priceNum = Number(draft.roomPrice);
+    const isDormitory = draft.roomType === "DORMITORY";
     return (
       !draft.roomName.trim() ||
       !draft.roomDesc.trim() ||
       !draft.roomType ||
+      (isDormitory && !draft.dormitoryGenderType) ||
       !draft.roomImages.length ||
       !draft.roomImages.some((img) => img.isThumbnail) ||
       Number.isNaN(capacityNum) ||
@@ -204,6 +245,17 @@ export default function RoomsSection({
                     ?.roomImageUrl ??
                   room.roomImages?.[0]?.roomImageUrl ??
                   "";
+                const roomTypeText = translateRoomType(room.roomType);
+                const roomMetaDetail =
+                  room.roomType === "DORMITORY"
+                    ? translateDormitoryGender(room.dormitoryGenderType)
+                    : room.femaleOnly
+                    ? "여성전용"
+                    : "";
+                const roomMeta =
+                  roomTypeText && roomMetaDetail
+                    ? `${roomTypeText}(${roomMetaDetail})`
+                    : roomTypeText;
 
                 return (
                   <div
@@ -223,8 +275,7 @@ export default function RoomsSection({
                           {room.roomName}
                         </p>
                         <p className="text-sm text-gray-500">
-                          {room.roomCapacity}인실{" "}
-                          {translateRoomType(room.roomType)}
+                          {room.roomCapacity}인실 {roomMeta}
                         </p>
                         <p className="text-sm font-semibold text-gray-800">
                           {room.roomPrice.toLocaleString()}원
@@ -385,32 +436,14 @@ export default function RoomsSection({
             </div>
 
             {/* 객실 타입 / 이용대상 / 가격 */}
-            <div className="flex gap-8">
-              {/* 인원 */}
-              <div className="max-w-30 flex-1 flex-col">
-                <p className="text-sm text-gray-700 mb-1">수용 인원</p>
-                <input
-                  type="number"
-                  className="form-input"
-                  placeholder="예: 4"
-                  value={draft.roomCapacity}
-                  onChange={(e) =>
-                    setDraft((prev) => ({
-                      ...prev,
-                      roomCapacity: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-
-              {/* 이용대상 */}
-              <div className="flex flex-col">
-                <p className="text-sm text-gray-700 mb-1">객실 이용대상</p>
+            <div className="flex flex-wrap items-start gap-x-6 gap-y-5">
+              {/* 객실 유형 */}
+              <div className="w-full min-w-[180px] md:flex-[1_1_220px]">
+                <p className="text-sm text-gray-700 mb-1">객실 유형</p>
                 <div className="flex flex-wrap gap-2">
                   {[
-                    { value: "MIXED", label: "혼숙" },
-                    { value: "MALE_ONLY", label: "남성전용" },
-                    { value: "FEMALE_ONLY", label: "여성전용" },
+                    { value: "DORMITORY", label: "도미토리" },
+                    { value: "PRIVATE", label: "일반 객실" },
                   ].map((opt) => {
                     const active = draft.roomType === opt.value;
                     return (
@@ -421,6 +454,12 @@ export default function RoomsSection({
                           setDraft((prev) => ({
                             ...prev,
                             roomType: opt.value,
+                            dormitoryGenderType:
+                              opt.value === "DORMITORY"
+                                ? prev.dormitoryGenderType || "MIXED"
+                                : "",
+                            femaleOnly:
+                              opt.value === "PRIVATE" ? prev.femaleOnly : false,
                           }))
                         }
                         className={`rounded-full px-4 py-2 font-medium ${
@@ -436,13 +475,88 @@ export default function RoomsSection({
                 </div>
               </div>
 
+              {/* 인원 */}
+              <div className="w-full min-w-[140px] sm:max-w-[220px] md:flex-[0_1_180px]">
+                <p className="text-sm text-gray-700 mb-1">수용 인원</p>
+                <input
+                  type="number"
+                  className="form-input min-w-0"
+                  placeholder="예: 4"
+                  value={draft.roomCapacity}
+                  onChange={(e) =>
+                    setDraft((prev) => ({
+                      ...prev,
+                      roomCapacity: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+
+              {/* 이용대상 */}
+              <div className="w-full min-w-[260px] md:flex-[1.4_1_340px]">
+                <p className="text-sm text-gray-700 mb-1">객실 이용대상</p>
+                {draft.roomType === "DORMITORY" && (
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { value: "MIXED", label: "혼숙" },
+                      { value: "MALE_ONLY", label: "남성전용" },
+                      { value: "FEMALE_ONLY", label: "여성전용" },
+                    ].map((opt) => {
+                      const active = draft.dormitoryGenderType === opt.value;
+                      return (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() =>
+                            setDraft((prev) => ({
+                              ...prev,
+                              dormitoryGenderType: opt.value,
+                            }))
+                          }
+                          className={`rounded-full px-4 py-2 font-medium ${
+                            active
+                              ? "bg-primary-orange text-white"
+                              : "bg-gray-100 text-gray-600"
+                          }`}
+                        >
+                          {opt.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+                {draft.roomType === "PRIVATE" && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setDraft((prev) => ({
+                        ...prev,
+                        femaleOnly: !prev.femaleOnly,
+                      }))
+                    }
+                    className={`rounded-full px-4 py-2 font-medium ${
+                      draft.femaleOnly
+                        ? "bg-primary-orange text-white"
+                        : "bg-gray-100 text-gray-600"
+                    }`}
+                  >
+                    여성전용 객실
+                  </button>
+                )}
+                {!draft.roomType && (
+                  <p className="text-sm text-gray-400">
+                    먼저 객실 유형을 선택해 주세요.
+                  </p>
+                )}
+              </div>
+
               {/* 가격 */}
-              <div className="flex-1 flex-col max-w-50 min-w-50">
+              <div className="w-full min-w-[240px] md:flex-[1_1_280px]">
                 <p className="text-sm text-gray-700 mb-1">객실 가격</p>
-                <div className="flex items-center gap-2">
+                <div className="flex min-w-0 items-center gap-2">
                   <input
                     type="number"
-                    className="form-input"
+                    className="form-input min-w-0"
                     placeholder="예: 45000"
                     value={draft.roomPrice}
                     onChange={(e) =>
@@ -454,7 +568,7 @@ export default function RoomsSection({
                   />
                   <span className="text-sm text-gray-700">원</span>
                 </div>
-                <p className="text-sm text-primary-orange">
+                <p className="text-sm text-primary-orange break-keep whitespace-normal">
                   최소 금액은 10,000원 이상입니다.
                 </p>
               </div>

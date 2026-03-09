@@ -31,7 +31,7 @@ export default function ButtonOrange({
         ${className}`}
     >
       <span
-        className={`flex-1 ${disabled ? "text-grayscale-400" : "text-white"}`}
+        className={`flex-1 ${disabled ? "text-grayscale-400" : "text-neutral-white"}`}
       >
         {title}
       </span>

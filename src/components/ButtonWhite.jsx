@@ -24,7 +24,7 @@ export default function ButtonWhite({
         ${
           disabled
             ? "bg-grayscale-200 border-grayscale-300 text-grayscale-400"
-            : "bg-white border-grayscale-300 text-neutral-black hover:bg-grayscale-100"
+            : "bg-neutral-white border-grayscale-300 text-neutral-black hover:bg-grayscale-100"
         }
         ${className}`}
     >
