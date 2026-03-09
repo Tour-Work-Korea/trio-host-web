@@ -349,7 +349,7 @@ export default function ReviewPage() {
                     <div className="flex-col gap-2 flex">
                       {review?.replies?.map((reply, id) => (
                         <p
-                          className="w-full border-grayscale-200 border-1 p-4 rounded-lg bg-grayscale-50"
+                          className="w-full border-grayscale-200 border-1 p-4 rounded-lg bg-neutral-gray"
                           key={id}
                         >
                           {reply}
@@ -413,8 +413,8 @@ export default function ReviewPage() {
                     onClick={() => handleChangePage(idx)}
                     className={`px-3 py-1 rounded-lg border ${
                       idx === page
-                        ? "bg-primary-blue text-white border-primary-blue"
-                        : "bg-white text-grayscale-700 border-grayscale-300 hover:bg-grayscale-100"
+                        ? "bg-primary-blue text-neutral-white border-primary-blue"
+                        : "bg-neutral-white text-grayscale-700 border-grayscale-300 hover:bg-grayscale-100"
                     }`}
                   >
                     {idx + 1}

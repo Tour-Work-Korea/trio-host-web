@@ -94,7 +94,7 @@ export default function FindAccount({ mode, setChecked, phone, setPhone }) {
     setChecked(true);
   };
   return (
-    <div className="w-full max-w-sm bg-white space-y-4 p-8">
+    <div className="w-full max-w-sm bg-neutral-white space-y-4 p-8">
       <h1 className="text-3xl font-semibold mb-8">
         {findTitle}를 찾으려면
         <br />

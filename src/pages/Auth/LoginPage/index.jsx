@@ -32,7 +32,7 @@ export default function LoginPage() {
     <div className="flex items-center justify-center p-6 flex-1">
       <form
         onSubmit={onSubmit}
-        className="w-full max-w-sm bg-white  p-6 space-y-4"
+        className="w-full max-w-sm bg-neutral-white  p-6 space-y-4"
       >
         <h1 className="text-3xl font-semibold mb-8">로그인해주세요</h1>
 
@@ -67,11 +67,11 @@ export default function LoginPage() {
         {err && <p className="text-sm text-red-500">{err}</p>}
 
         <div className="flex justify-end text-sm gap-2 text-grayscale-400">
-          <a href="/find-id" className="hover:underline hover:text-black">
+          <a href="/find-id" className="hover:underline hover:text-grayscale-900">
             아이디 찾기
           </a>
           <p>|</p>
-          <a href="/find-password" className="hover:underline hover:text-black">
+          <a href="/find-password" className="hover:underline hover:text-grayscale-900">
             비밀번호 찾기
           </a>
         </div>
@@ -79,7 +79,7 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={submitting}
-          className="w-full rounded-lg bg-primary-orange text-white py-2 disabled:opacity-60 font-semibold"
+          className="w-full rounded-lg bg-primary-orange text-neutral-white py-2 disabled:opacity-60 font-semibold"
         >
           {submitting ? "로그인 중..." : "로그인"}
         </button>

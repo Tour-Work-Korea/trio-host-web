@@ -74,7 +74,7 @@ function ProfileHeader({ data }) {
   const meta = [gender, age, birth].filter(Boolean).join(" • ");
 
   return (
-    <section className="rounded-lg bg-white p-4">
+    <section className="rounded-lg bg-neutral-white p-4">
       <div className="grid grid-cols-2 gap-8 items-start">
         {/* 사진: 가로=세로 */}
         <div className="w-full aspect-square rounded-lg bg-gray-200 overflow-hidden">
@@ -181,14 +181,14 @@ export default function ResumeModal({ visible, onClose, resumeId }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center"
+      className="fixed inset-0 z-50 bg-grayscale-900/40 flex items-center justify-center"
       role="dialog"
       aria-modal="true"
       aria-labelledby="resume-modal-title"
       onClick={() => onClose?.()}
     >
       <div
-        className="w-[92%] max-w-3xl h-[90%] rounded-2xl bg-white px-5 md:px-8 py-5 shadow-xl overflow-y-auto scrollbar-hide"
+        className="w-[92%] max-w-3xl h-[90%] rounded-2xl bg-neutral-white px-5 md:px-8 py-5 shadow-xl overflow-y-auto scrollbar-hide"
         onClick={(e) => e.stopPropagation()}
       >
         {/* 헤더 */}
@@ -226,7 +226,7 @@ export default function ResumeModal({ visible, onClose, resumeId }) {
               <ProfileHeader data={resume} />
 
               {/* 나를 표현하는 한 마디 */}
-              <section className="rounded-lg bg-white p-4">
+              <section className="rounded-lg bg-neutral-white p-4">
                 <p className=" text-gray-400 mb-2">나를 표현하는 한 마디</p>
                 <p className="font-medium text-gray-900">
                   {resume?.resumeTitle || resume?.title || "내용 없음"}
@@ -234,7 +234,7 @@ export default function ResumeModal({ visible, onClose, resumeId }) {
               </section>
 
               {/* 태그 */}
-              <section className="rounded-lg bg-white p-4">
+              <section className="rounded-lg bg-neutral-white p-4">
                 <div className="flex  gap-2 items-end mb-2">
                   <p className="text-gray-400">태그</p>
                   <p className="text-sm text-primary-blue">
@@ -245,7 +245,7 @@ export default function ResumeModal({ visible, onClose, resumeId }) {
               </section>
 
               {/* 경력 */}
-              <section className="rounded-lg bg-white p-4">
+              <section className="rounded-lg bg-neutral-white p-4">
                 <p className="text-gray-400 mb-3">경력</p>
                 <ExperienceList
                   experiences={resume?.workExperience || resume?.experiences}
@@ -253,7 +253,7 @@ export default function ResumeModal({ visible, onClose, resumeId }) {
               </section>
 
               {/* 자기소개 */}
-              <section className="rounded-lg bg-white p-4">
+              <section className="rounded-lg bg-neutral-white p-4">
                 <div className="flex items-center justify-between">
                   <p className="text-gray-400 mb-3">자기소개</p>
                   <p className="text-sm text-gray-400">

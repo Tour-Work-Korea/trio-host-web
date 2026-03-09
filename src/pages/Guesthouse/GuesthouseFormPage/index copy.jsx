@@ -646,14 +646,14 @@ export default function GuesthouseForm() {
                             className="h-full w-full object-cover"
                           />
                           {img.isThumbnail && (
-                            <div className="absolute left-2 top-2 rounded-full bg-white px-1">
+                            <div className="absolute left-2 top-2 rounded-full bg-neutral-white px-1">
                               <img src={StarFilled} width={20} height={20} />
                             </div>
                           )}
                           {!img.isThumbnail && (
                             <button
                               type="button"
-                              className="absolute left-2 top-2 rounded-full px-1 bg-white"
+                              className="absolute left-2 top-2 rounded-full px-1 bg-neutral-white"
                               onClick={() => setThumbnail(index)}
                             >
                               <img src={StarEmpty} width={20} height={20} />
@@ -661,7 +661,7 @@ export default function GuesthouseForm() {
                           )}
                           <button
                             type="button"
-                            className="absolute right-2 top-2 rounded-full bg-white px-1"
+                            className="absolute right-2 top-2 rounded-full bg-neutral-white px-1"
                             onClick={() => deleteImage(index)}
                           >
                             <img src={XBtn} width={20} height={20} />
@@ -918,8 +918,8 @@ function AmenityGroup({ title, options, selectedIds, toggleAmenity }) {
               onClick={() => toggleAmenity(opt.id)}
               className={`m-1  truncate rounded-lg px-4 py-2 text-md font-medium ${
                 active
-                  ? "bg-primary-orange text-white"
-                  : "bg-white text-gray-500 border border-gray-200"
+                  ? "bg-primary-orange text-neutral-white"
+                  : "bg-neutral-white text-gray-500 border border-gray-200"
               }`}
             >
               {opt.name}

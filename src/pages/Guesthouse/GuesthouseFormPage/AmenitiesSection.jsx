@@ -69,8 +69,8 @@ function AmenityGroup({ title, options, selectedIds, toggleAmenity }) {
               onClick={() => toggleAmenity(opt.id)}
               className={`m-1 truncate rounded-lg px-4 py-2 text-md font-medium ${
                 active
-                  ? "bg-primary-orange text-white"
-                  : "bg-white text-gray-500 border border-gray-200"
+                  ? "bg-primary-orange text-neutral-white"
+                  : "bg-neutral-white text-gray-500 border border-gray-200"
               }`}
             >
               {opt.name}

@@ -97,7 +97,7 @@ export default function ReservationCancelModal({
 
         {/* 예약 요약 영역 (옵션) */}
         {reservation && (
-          <div className="flex gap-3 rounded-xl bg-grayscale-50 text-left w-full">
+          <div className="flex gap-3 rounded-xl bg-neutral-gray text-left w-full">
             {reservation.imageUrl && (
               <img
                 src={reservation.imageUrl}

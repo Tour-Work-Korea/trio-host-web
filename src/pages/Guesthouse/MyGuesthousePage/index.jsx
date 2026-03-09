@@ -333,7 +333,7 @@ export default function MyGuesthousePage() {
                             return (
                               <div
                                 key={roomId}
-                                className="flex w-80 flex-shrink-0 gap-3 rounded-lg border border-grayscale-200 bg-white p-2"
+                                className="flex w-80 flex-shrink-0 gap-3 rounded-lg border border-grayscale-200 bg-neutral-white p-2"
                               >
                                 <img
                                   src={roomThumb}

@@ -385,7 +385,7 @@ export default function ReservationPage() {
           {/* 테이블 */}
           <div className="overflow-x-auto rounded-2xl border border-grayscale-200">
             <table className="min-w-[1100px] text-sm table-auto">
-              <thead className="bg-grayscale-50">
+              <thead className="bg-neutral-gray">
                 <tr className="h-10 text-center text-sm text-grayscale-500">
                   <th className="px-3 whitespace-nowrap w-24">상태</th>
                   <th className="px-3 whitespace-nowrap w-28">예약번호</th>
@@ -472,7 +472,7 @@ export default function ReservationPage() {
                         item.status === "CONFIRMED") && (
                         <button
                           type="button"
-                          className="rounded-full bg-primary-orange px-4 py-1 text-sm font-semibold text-white hover:opacity-90"
+                          className="rounded-full bg-primary-orange px-4 py-1 text-sm font-semibold text-neutral-white hover:opacity-90"
                           onClick={() => handleDeleteReservation(item)}
                         >
                           취소하기
@@ -492,7 +492,7 @@ export default function ReservationPage() {
               className={`rounded-full px-4 py-2 text-sm ${
                 pageInfo.first
                   ? "bg-grayscale-100 text-grayscale-400"
-                  : "bg-white text-grayscale-700 border border-grayscale-300 hover:bg-grayscale-50"
+                  : "bg-neutral-white text-grayscale-700 border border-grayscale-300 hover:bg-neutral-gray"
               }`}
               disabled={pageInfo.first}
               onClick={() => handleChangePage(page - 1)}
@@ -507,7 +507,7 @@ export default function ReservationPage() {
               className={`rounded-full px-4 py-2 text-sm ${
                 pageInfo.last
                   ? "bg-grayscale-100 text-grayscale-400"
-                  : "bg-white text-grayscale-700 border border-grayscale-300 hover:bg-grayscale-50"
+                  : "bg-neutral-white text-grayscale-700 border border-grayscale-300 hover:bg-neutral-gray"
               }`}
               disabled={pageInfo.last}
               onClick={() => handleChangePage(page + 1)}

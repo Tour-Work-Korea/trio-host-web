@@ -53,7 +53,7 @@ export default function FindIdPage() {
           setPhone={setPhone}
         />
         {isChecked && (
-          <div className="w-full max-w-sm bg-white shadow-md rounded-lg p-8 space-y-4">
+          <div className="w-full max-w-sm bg-neutral-white shadow-md rounded-lg p-8 space-y-4">
             <h1 className="text-3xl font-semibold mb-8">아이디를 찾았어요</h1>
             {id && (
               <div className="bg-grayscale-200 p-6 text-lg font-semibold rounded-lg">

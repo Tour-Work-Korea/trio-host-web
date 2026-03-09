@@ -7,7 +7,8 @@ import svgr from "vite-plugin-svgr";
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
-  const target = env.VITE_API_URL;
+  const envApiBase = env.VITE_API_URL || "";
+  const target = envApiBase.replace(/\/api\/v1\/?$/, "");
 
   return {
     base: "",
