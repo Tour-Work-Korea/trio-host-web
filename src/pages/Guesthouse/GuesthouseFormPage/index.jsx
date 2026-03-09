@@ -45,6 +45,41 @@ const displayTimeHHMM = (value) => {
   return value.slice(0, 5);
 };
 
+const normalizeRoomForPayload = (room) => {
+  const legacyDormitoryType = ["MIXED", "MALE_ONLY", "FEMALE_ONLY"];
+  const normalizedRoomType =
+    room.roomType === "DORMITORY" || room.roomType === "PRIVATE"
+      ? room.roomType
+      : "DORMITORY";
+  const dormitoryGenderType =
+    normalizedRoomType === "DORMITORY"
+      ? legacyDormitoryType.includes(room.roomType)
+        ? room.roomType
+        : room.dormitoryGenderType || "MIXED"
+      : "MIXED";
+  const roomCapacity = Number(room.roomCapacity);
+  const roomMaxCapacity = Number(room.roomMaxCapacity ?? room.roomCapacity);
+
+  return {
+    id: room.id ?? null,
+    roomName: room.roomName,
+    roomType: normalizedRoomType,
+    dormitoryGenderType,
+    femaleOnly: normalizedRoomType === "PRIVATE" ? !!room.femaleOnly : false,
+    isVisible: room.isVisible ?? true,
+    roomCapacity,
+    roomMaxCapacity,
+    roomDesc: room.roomDesc,
+    roomPrice: Number(room.roomPrice),
+    roomExtraFees: room.roomExtraFees ?? [],
+    roomImages:
+      room.roomImages?.map((img) => ({
+        roomImageUrl: img.roomImageUrl,
+        isThumbnail: !!img.isThumbnail,
+      })) ?? [],
+  };
+};
+
 // 수정: isEditMode에 따라 postRegister validation 다르게
 const computeValidSections = (formData, { isEditMode = false } = {}) => {
   const {
@@ -238,6 +273,9 @@ export default function GuesthouseForm() {
             roomCapacity: room.roomCapacity,
             roomMaxCapacity: room.roomMaxCapacity ?? room.roomCapacity,
             roomType: room.roomType,
+            dormitoryGenderType: room.dormitoryGenderType ?? "MIXED",
+            femaleOnly: !!room.femaleOnly,
+            isVisible: room.isVisible ?? true,
             roomPrice: room.roomPrice,
             roomExtraFees: room.roomExtraFees ?? [],
             roomImages:
@@ -253,6 +291,9 @@ export default function GuesthouseForm() {
             roomCapacity: room.roomCapacity ?? room.roomMaxCapacity,
             roomMaxCapacity: room.roomMaxCapacity ?? room.roomCapacity,
             roomType: room.roomType,
+            dormitoryGenderType: room.dormitoryGenderType ?? "MIXED",
+            femaleOnly: !!room.femaleOnly,
+            isVisible: room.isVisible ?? true,
             roomPrice: room.roomPrice ?? 0,
             roomExtraFees: [],
             roomImages:
@@ -496,20 +537,8 @@ export default function GuesthouseForm() {
         // 🚩 등록 모드
         // =========================
         const roomInfosPayload =
-          formData.roomInfos?.map((room) => ({
-            roomName: room.roomName,
-            roomType: room.roomType,
-            roomCapacity: Number(room.roomCapacity),
-            roomMaxCapacity: Number(room.roomMaxCapacity ?? room.roomCapacity),
-            roomDesc: room.roomDesc,
-            roomPrice: Number(room.roomPrice),
-            roomExtraFees: room.roomExtraFees ?? [],
-            roomImages:
-              room.roomImages?.map((img) => ({
-                roomImageUrl: img.roomImageUrl,
-                isThumbnail: !!img.isThumbnail,
-              })) ?? [],
-          })) ?? [];
+          formData.roomInfos?.map((room) => normalizeRoomForPayload(room)) ??
+          [];
 
         const payload = {
           applicationId: formData.applicationId,
@@ -582,20 +611,21 @@ export default function GuesthouseForm() {
 
         // 1) upsert (create / update)
         for (const room of currentRooms) {
+          const normalizedRoom = normalizeRoomForPayload(room);
           const basic = {
-            roomName: room.roomName,
-            roomType: room.roomType,
-            roomCapacity: Number(room.roomCapacity),
-            roomMaxCapacity: Number(room.roomMaxCapacity ?? room.roomCapacity),
-            roomDescription: room.roomDesc,
-            roomPrice: Number(room.roomPrice),
+            roomName: normalizedRoom.roomName,
+            roomType: normalizedRoom.roomType,
+            dormitoryGenderType: normalizedRoom.dormitoryGenderType,
+            femaleOnly: normalizedRoom.femaleOnly,
+            isVisible: normalizedRoom.isVisible,
+            roomCapacity: normalizedRoom.roomCapacity,
+            roomMaxCapacity: normalizedRoom.roomMaxCapacity,
+            roomDesc: normalizedRoom.roomDesc,
+            roomDescription: normalizedRoom.roomDesc,
+            roomPrice: normalizedRoom.roomPrice,
           };
 
-          const images =
-            room.roomImages?.map((img) => ({
-              roomImageUrl: img.roomImageUrl,
-              isThumbnail: !!img.isThumbnail,
-            })) ?? [];
+          const images = normalizedRoom.roomImages;
 
           if (room.id) {
             // 기존 방 → update
@@ -613,7 +643,7 @@ export default function GuesthouseForm() {
             // 새 방 → create
             const createPayload = {
               ...basic,
-              roomExtraFees: room.roomExtraFees ?? [],
+              roomExtraFees: normalizedRoom.roomExtraFees,
               roomImages: images,
             };
             await guesthouseApi.createRoom(numericGuesthouseId, createPayload);

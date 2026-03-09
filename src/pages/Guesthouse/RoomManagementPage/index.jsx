@@ -39,18 +39,18 @@ function SimpleModal({ open, title, description, onClose }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <button
         type="button"
-        className="absolute inset-0 bg-black/40"
+        className="absolute inset-0 bg-grayscale-900/40"
         onClick={onClose}
         aria-label="close backdrop"
       />
-      <div className="relative w-[92%] max-w-md rounded-2xl bg-white shadow-lg p-5">
+      <div className="relative w-[92%] max-w-md rounded-2xl bg-neutral-white shadow-lg p-5">
         <div className="text-lg font-semibold">{title}</div>
         <div className="mt-2 text-sm text-grayscale-700">{description}</div>
         <div className="mt-5 flex justify-end">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-lg bg-grayscale-900 text-white text-sm"
+            className="px-4 py-2 rounded-lg bg-grayscale-900 text-neutral-white text-sm"
           >
             확인
           </button>
@@ -154,8 +154,8 @@ export default function RoomManagementPage() {
             className={[
               "px-3 rounded-md text-sm border h-6",
               filter === "OPEN"
-                ? "bg-primary-blue text-white border-primary-blue"
-                : "bg-white text-grayscale-900 border-grayscale-300",
+                ? "bg-primary-blue text-neutral-white border-primary-blue"
+                : "bg-neutral-white text-grayscale-900 border-grayscale-300",
             ].join(" ")}
           >
             열린 방
@@ -166,8 +166,8 @@ export default function RoomManagementPage() {
             className={[
               "px-3 rounded-md text-sm border h-6",
               filter === "BLOCKED"
-                ? "bg-primary-blue text-white border-primary-blue"
-                : "bg-white text-grayscale-900 border-grayscale-300",
+                ? "bg-primary-blue text-neutral-white border-primary-blue"
+                : "bg-neutral-white text-grayscale-900 border-grayscale-300",
             ].join(" ")}
           >
             막힌 방
@@ -178,8 +178,8 @@ export default function RoomManagementPage() {
             className={[
               "ml-auto px-3 rounded-md text-sm border h-6",
               filter === "ALL"
-                ? "bg-primary-blue text-white border-primary-blue"
-                : "bg-white text-grayscale-900 border-grayscale-300",
+                ? "bg-primary-blue text-neutral-white border-primary-blue"
+                : "bg-neutral-white text-grayscale-900 border-grayscale-300",
             ].join(" ")}
           >
             전체 보기
@@ -204,11 +204,11 @@ export default function RoomManagementPage() {
         }}
         className={[
           "w-full flex items-center gap-2 px-2 py-1 rounded-md cursor-pointer",
-          "hover:bg-grayscale-50",
+          "hover:bg-neutral-gray",
           room.isReserved
             ? "bg-orange-100"
             : isOpen
-            ? "bg-white"
+            ? "bg-neutral-white"
             : "bg-grayscale-100",
         ].join(" ")}
         title={
@@ -284,7 +284,7 @@ export default function RoomManagementPage() {
             )}
           </div>
 
-          <div className="border-grayscale-200 border-2 rounded-lg bg-white p-4 scrollbar-hide ">
+          <div className="border-grayscale-200 border-2 rounded-lg bg-neutral-white p-4 scrollbar-hide ">
             <Calendar
               monthDate={monthDate}
               onPrevMonth={onPrevMonth}
@@ -329,7 +329,7 @@ export default function RoomManagementPage() {
                 selectedToOpen.map((r, idx) => (
                   <div
                     key={selKey(r.dateKey, r.id)}
-                    className="flex items-center gap-2 p-2 rounded-lg border border-grayscale-200 bg-white"
+                    className="flex items-center gap-2 p-2 rounded-lg border border-grayscale-200 bg-neutral-white"
                   >
                     <div className="text-sm font-semibold text-grayscale-900">
                       {r.name}
@@ -380,7 +380,7 @@ export default function RoomManagementPage() {
                 selectedToBlock.map((r, idx) => (
                   <div
                     key={selKey(r.dateKey, r.id)}
-                    className="flex items-center gap-2 p-2 rounded-lg border border-grayscale-200 bg-white"
+                    className="flex items-center gap-2 p-2 rounded-lg border border-grayscale-200 bg-neutral-white"
                   >
                     <div className="text-sm font-semibold text-grayscale-900">
                       {r.name}

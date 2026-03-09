@@ -139,7 +139,7 @@ export default function KoreanDatePicker({
 
   return (
     <div
-      className={`rounded-xl border border-gray-200 bg-white px-3 py-5 flex flex-col gap-5 ${className}`}
+      className={`rounded-xl border border-gray-200 bg-neutral-white px-3 py-5 flex flex-col gap-5 ${className}`}
     >
       {/* 상단 라벨/선택일 */}
       <div className="flex items-center justify-between">
@@ -191,7 +191,7 @@ export default function KoreanDatePicker({
         {cells.map((c) => {
           const baseText = !c.inMonth ? "text-gray-300" : "text-gray-900";
           const selectedClass = c.isSelected
-            ? "bg-primary-orange text-white"
+            ? "bg-primary-orange text-neutral-white"
             : "";
           const todayRing =
             c.isToday && !c.isSelected

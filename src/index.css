@@ -1,5 +1,5 @@
 @font-face {
-  font-family: "Pretendard Variable";
+  font-family: "Pretendard";
   src: url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.woff2")
     format("woff2-variations");
   font-weight: 45 920;
@@ -11,25 +11,19 @@
 
 @theme {
   /* 폰트 (기본 sans) */
-  --font-sans: "Pretendard Variable", Pretendard, ui-sans-serif, system-ui,
+  --font-sans: "Pretendard", "Pretendard Variable", ui-sans-serif, system-ui,
     -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", Roboto,
     "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji",
     "Segoe UI Symbol";
 
-  --color-white: #ffffff;
-  --color-black: #000000;
-  --color-scarlet: #ff6f61;
-  --color-light-gray: #f8f9fb;
-  --color-stroke-gray: #c8d1e2;
-  --color-gray: #747d8f;
-  --color-yellow: #ffef5e;
-  --color-light-orange: #ff865b;
-
   --color-primary-orange: #fe4401;
   --color-primary-blue: #5361db;
 
-  --color-secondary-blue: #adc4fa;
-  --color-secondary-green: #87986c;
+  --color-secondary-blue: #cfddff;
+  --color-secondary-khaki: #87986c;
+  --color-secondary-red: #fee9e8;
+  --color-secondary-yellow: #fdf6e7;
+  --color-secondary-green: #dbffed;
 
   --color-neutral-black: #121212;
   --color-neutral-gray: #fafafc;
@@ -38,7 +32,10 @@
   --color-semantic-blue: #0065ff;
   --color-semantic-green: #36b37e;
   --color-semantic-yellow: #ffab00;
-  --color-semantic-red: #ff5630;
+  --color-semantic-red: #ff3030;
+  --color-semantic-purple: #6554c0;
+  --color-semantic-pink: #ff7eb6;
+  --color-semantic-brown: #8b572a;
 
   --color-grayscale-900: #000000;
   --color-grayscale-800: #1c1d1f;
@@ -50,9 +47,7 @@
   --color-grayscale-200: #eaebed;
   --color-grayscale-100: #f7f8fa;
   --color-grayscale-0: #ffffff;
-
   --color-modal-background: rgb(0 0 0 / 0.1);
-  --color-cancel-btn-bg: #FEE9E8;
 }
 
 @layer components {
@@ -80,11 +75,11 @@
   /* 인풋 안쪽 오른쪽 버튼(주소검색 등) */
   .form-input-btn {
     @apply absolute right-1 top-1 bottom-1 px-3 rounded-full
-           bg-primary-orange text-white text-sm;
+           bg-primary-orange text-neutral-white text-sm;
   }
   /* 작은 버튼 */
   .form-input-small-btn {
-    @apply px-3 py-2 rounded-full bg-primary-orange text-white text-sm;
+    @apply px-3 py-2 rounded-full bg-primary-orange text-neutral-white text-sm;
   }
   /* 페이지 컨테이터 */
   .container {
@@ -103,7 +98,7 @@
   공고 등록용 css
   */
   .form-section-box {
-    @apply w-full rounded-2xl border-1 border-grayscale-200 bg-white px-4 py-3 flex flex-col gap-2 shadow-sm text-left;
+    @apply w-full rounded-2xl border-1 border-grayscale-200 bg-neutral-white px-4 py-3 flex flex-col gap-2 shadow-sm text-left;
   }
   .form-title-box {
     @apply flex items-center justify-between hover:cursor-pointer;
@@ -118,10 +113,10 @@
     @apply font-semibold mb-2;
   }
   .form-hashtag {
-    @apply px-3 py-1 rounded-full border transition bg-white text-gray-700 border-gray-300;
+    @apply px-3 py-1 rounded-full border transition bg-neutral-white text-gray-700 border-gray-300;
   }
   .form-hashtag-selected {
-    @apply bg-primary-orange text-white border-primary-orange;
+    @apply bg-primary-orange text-neutral-white border-primary-orange;
   }
   .form-input-textarea {
     @apply overflow-y-scroll w-full rounded-xl border max-h-72 border-gray-200 p-3 text-gray-800 outline-none focus:border-primary-orange overflow-hidden;
@@ -139,7 +134,7 @@
     @apply flex-col flex justify-center items-center p-[30px] rounded-2xl border-1 border-secondary-blue shadow-secondary-blue shadow-sm;
   }
   .landing-ui-box {
-    @apply w-full rounded-t-2xl border-b-4 border-primary-orange py-6 px-1.5 bg-white shadow-sm shadow-secondary-blue text-lg font-medium;
+    @apply w-full rounded-t-2xl border-b-4 border-primary-orange py-6 px-1.5 bg-neutral-white shadow-sm shadow-secondary-blue text-lg font-medium;
   }
   .landing-ui-intro-section {
     @apply flex flex-1 flex-col justify-between items-center py-2.5 w-full text-center md:max-w-[497px];
@@ -160,6 +155,31 @@
   .scrollbar-hide-y::-webkit-scrollbar:vertical {
     display: none;
   }
+
+  .fs_12_light { font-size: 12px; font-family: var(--font-sans); font-weight: 300; }
+  .fs_12_medium { font-size: 12px; font-family: var(--font-sans); font-weight: 500; }
+
+  .fs_14_light { font-size: 14px; font-family: var(--font-sans); font-weight: 300; }
+  .fs_14_regular { font-size: 14px; font-family: var(--font-sans); font-weight: 400; }
+  .fs_14_medium { font-size: 14px; font-family: var(--font-sans); font-weight: 500; }
+  .fs_14_semibold { font-size: 14px; font-family: var(--font-sans); font-weight: 600; }
+
+  .fs_16_regular { font-size: 16px; font-family: var(--font-sans); font-weight: 400; }
+  .fs_16_medium { font-size: 16px; font-family: var(--font-sans); font-weight: 500; }
+  .fs_16_semibold { font-size: 16px; font-family: var(--font-sans); font-weight: 600; }
+
+  .fs_18_regular { font-size: 18px; font-family: var(--font-sans); font-weight: 400; }
+  .fs_18_medium { font-size: 18px; font-family: var(--font-sans); font-weight: 500; }
+  .fs_18_semibold { font-size: 18px; font-family: var(--font-sans); font-weight: 600; }
+  .fs_18_bold { font-size: 18px; font-family: var(--font-sans); font-weight: 700; }
+
+  .fs_20_medium { font-size: 20px; font-family: var(--font-sans); font-weight: 500; }
+  .fs_20_semibold { font-size: 20px; font-family: var(--font-sans); font-weight: 600; }
+  .fs_20_bold { font-size: 20px; font-family: var(--font-sans); font-weight: 700; }
+
+  .fs_22_medium { font-size: 22px; font-family: var(--font-sans); font-weight: 500; }
+  .fs_22_semibold { font-size: 22px; font-family: var(--font-sans); font-weight: 600; }
+  .fs_22_bold { font-size: 22px; font-family: var(--font-sans); font-weight: 700; }
 }
 
 html,

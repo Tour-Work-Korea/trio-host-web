@@ -385,7 +385,7 @@ export default function EditProfile() {
               <div className="form-input-wrap">
                 <input
                   type="text"
-                  className="form-input bg-grayscale-50"
+                  className="form-input bg-neutral-gray"
                   value={profile.businessNum}
                   readOnly
                   disabled

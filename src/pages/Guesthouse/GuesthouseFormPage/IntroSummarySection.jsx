@@ -73,14 +73,14 @@ export default function IntroSummarySection({
                     className="h-full w-full object-cover"
                   />
                   {img.isThumbnail && (
-                    <div className="absolute left-2 top-2 rounded-full bg-white px-1">
+                    <div className="absolute left-2 top-2 rounded-full bg-neutral-white px-1">
                       <img src={StarFilled} width={20} height={20} />
                     </div>
                   )}
                   {!img.isThumbnail && (
                     <button
                       type="button"
-                      className="absolute left-2 top-2 rounded-full px-1 bg-white"
+                      className="absolute left-2 top-2 rounded-full px-1 bg-neutral-white"
                       onClick={() => setThumbnail(index)}
                     >
                       <img src={StarEmpty} width={20} height={20} />
@@ -88,7 +88,7 @@ export default function IntroSummarySection({
                   )}
                   <button
                     type="button"
-                    className="absolute right-2 top-2 rounded-full bg-white px-1"
+                    className="absolute right-2 top-2 rounded-full bg-neutral-white px-1"
                     onClick={() => deleteImage(index)}
                   >
                     <img src={XBtn} width={20} height={20} />
