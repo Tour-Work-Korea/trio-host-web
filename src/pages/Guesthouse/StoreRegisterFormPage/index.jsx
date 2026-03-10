@@ -4,7 +4,7 @@ import ButtonOrange from "@components/ButtonOrange";
 import { handleSearchAddress } from "@utils/searchAddress";
 import ErrorModal from "@components/ErrorModal";
 import authApi from "@/api/authApi";
-import { onlyDigits, isValidBizNo } from "@utils/validation/validationUtils";
+import { onlyDigits} from "@utils/validation/validationUtils";
 import { computeStoreRegister } from "@utils/validation/storeRegisterValidation";
 import ImageDropzone from "@components/ImageDropzone";
 import { BizCertPreview } from "@components/BizCertPreview";
@@ -32,7 +32,6 @@ export default function RegisterFormPage() {
     businessPhone: "", //사업장 전화번호
     address: "", //사업자 주소
     detailAddress: "", //사업자 상세 주소
-    businessRegistrationNumber: "", //사업자 등록번호
     img: null, //사업자 등록증 이미지
   });
 
@@ -55,14 +54,13 @@ export default function RegisterFormPage() {
   };
 
   const handleNext = () => {
-    const result = computeStoreRegister(formData, { bizChecked });
+    const result = computeStoreRegister(formData);
     if (!result.allValid) {
       let title = "입력값을 확인해주세요.";
       if (!result.business) title = "상호/유형/직원 수를 정확히 입력해주세요.";
       else if (!result.contact)
         title = "담당자 이름/이메일/전화번호를 확인해주세요.";
       else if (!result.addr) title = "주소와 상세 주소를 입력해주세요.";
-      else if (!result.bizReg) title = "사업자등록번호 확인을 완료해주세요.";
       else if (!result.image) title = "사업자 등록증 이미지를 첨부해주세요.";
       setErrorModal((p) => ({ ...p, visible: true, title, message: "" }));
       return;
