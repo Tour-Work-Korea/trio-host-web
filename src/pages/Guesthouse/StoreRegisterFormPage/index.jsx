@@ -4,7 +4,7 @@ import ButtonOrange from "@components/ButtonOrange";
 import { handleSearchAddress } from "@utils/searchAddress";
 import ErrorModal from "@components/ErrorModal";
 import authApi from "@/api/authApi";
-import { onlyDigits, isValidBizNo } from "@utils/validation/validationUtils";
+import { onlyDigits} from "@utils/validation/validationUtils";
 import { computeStoreRegister } from "@utils/validation/storeRegisterValidation";
 import ImageDropzone from "@components/ImageDropzone";
 import { BizCertPreview } from "@components/BizCertPreview";
@@ -16,8 +16,6 @@ import { createDraftStore } from "@utils/draftStorage";
 
 export default function RegisterFormPage() {
   const navigate = useNavigate();
-  const [bizChecking, setBizChecking] = useState(false);
-  const [bizChecked, setBizChecked] = useState(null); // null | true | false
   const [errorModal, setErrorModal] = useState({
     visible: false,
     title: "",
@@ -34,7 +32,6 @@ export default function RegisterFormPage() {
     businessPhone: "", //사업장 전화번호
     address: "", //사업자 주소
     detailAddress: "", //사업자 상세 주소
-    businessRegistrationNumber: "", //사업자 등록번호
     img: null, //사업자 등록증 이미지
   });
 
@@ -47,34 +44,7 @@ export default function RegisterFormPage() {
     }
   }, []);
 
-  const bizNo = formData.businessRegistrationNumber ?? "";
-  const canVerifyBiz = useMemo(
-    () => isValidBizNo(bizNo) && !bizChecking,
-    [bizNo, bizChecking]
-  );
 
-  // 사업자번호 서버 검증
-  const handleVerifyBizNo = async () => {
-    if (!canVerifyBiz) return;
-    try {
-      setBizChecking(true);
-      const digits = onlyDigits(bizNo);
-      await authApi.verifyBusiness(digits); // 200 OK면 유효
-      setBizChecked(true);
-    } catch (err) {
-      setBizChecked(false);
-      setErrorModal((prev) => ({
-        ...prev,
-        visible: true,
-        title:
-          err?.response?.data?.message ||
-          "유효하지 않은 사업자번호입니다. 다시 확인해주세요.",
-        message: "",
-      }));
-    } finally {
-      setBizChecking(false);
-    }
-  };
 
   //자동 임시저장
   const handleInputChange = (field, value) => {
@@ -84,14 +54,13 @@ export default function RegisterFormPage() {
   };
 
   const handleNext = () => {
-    const result = computeStoreRegister(formData, { bizChecked });
+    const result = computeStoreRegister(formData);
     if (!result.allValid) {
       let title = "입력값을 확인해주세요.";
       if (!result.business) title = "상호/유형/직원 수를 정확히 입력해주세요.";
       else if (!result.contact)
         title = "담당자 이름/이메일/전화번호를 확인해주세요.";
       else if (!result.addr) title = "주소와 상세 주소를 입력해주세요.";
-      else if (!result.bizReg) title = "사업자등록번호 확인을 완료해주세요.";
       else if (!result.image) title = "사업자 등록증 이미지를 첨부해주세요.";
       setErrorModal((p) => ({ ...p, visible: true, title, message: "" }));
       return;
@@ -283,59 +252,8 @@ export default function RegisterFormPage() {
           </div>
         </div>
 
-        {/* 8) 사업자 등록번호 + 확인 */}
-        <div className="form-group">
-          <label htmlFor="businessRegistrationNumber" className="form-label">
-            사업자 등록번호
-          </label>
-          <div className="form-input-wrap">
-            <input
-              id="businessRegistrationNumber"
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              maxLength={10}
-              className="form-input form-input--with-btn"
-              placeholder="숫자만 입력 (예: 1234567890)"
-              value={bizNo}
-              onChange={(e) =>
-                handleInputChange(
-                  "businessRegistrationNumber",
-                  onlyDigits(e.target.value)
-                )
-              }
-              required
-            />
-            <button
-              type="button"
-              className={`form-input-btn ${
-                canVerifyBiz ? "" : "opacity-50 cursor-not-allowed"
-              }`}
-              onClick={handleVerifyBizNo}
-              disabled={!canVerifyBiz}
-              title={!isValidBizNo(bizNo) ? "숫자 10자리여야 합니다." : ""}
-            >
-              {bizChecking ? "확인중..." : "확인"}
-            </button>
-          </div>
-          {bizNo && !isValidBizNo(bizNo) && (
-            <p className="mt-1 text-sm text-red-600">
-              사업자번호는 숫자 10자리여야 합니다.
-            </p>
-          )}
-          {bizChecked === true && (
-            <p className="mt-1 text-sm text-green-600">
-              유효한 사업자번호입니다.
-            </p>
-          )}
-          {bizChecked === false && (
-            <p className="mt-1 text-sm text-red-600">
-              유효하지 않은 사업자번호입니다.
-            </p>
-          )}
-        </div>
 
-        {/* 9) 사업자 등록증 이미지 업로드 */}
+        {/* 8) 사업자 등록증 이미지 업로드 */}
         <div className="form-group">
           <div className="form-label">사업자 등록증 이미지</div>
           <ImageDropzone
