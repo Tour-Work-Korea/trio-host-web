@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import ErrorModal from "@components/ErrorModal";
@@ -58,7 +58,9 @@ const normalizeRoomForPayload = (room) => {
         : room.dormitoryGenderType || "MIXED"
       : "MIXED";
   const roomCapacity = Number(room.roomCapacity);
-  const roomMaxCapacity = Number(room.roomMaxCapacity ?? room.roomCapacity);
+  const rawRoomMaxCapacity = Number(room.roomMaxCapacity ?? room.roomCapacity);
+  const roomMaxCapacity =
+    normalizedRoomType === "DORMITORY" ? roomCapacity : rawRoomMaxCapacity;
 
   return {
     id: room.id ?? null,
@@ -66,7 +68,6 @@ const normalizeRoomForPayload = (room) => {
     roomType: normalizedRoomType,
     dormitoryGenderType,
     femaleOnly: normalizedRoomType === "PRIVATE" ? !!room.femaleOnly : false,
-    isVisible: room.isVisible ?? true,
     roomCapacity,
     roomMaxCapacity,
     roomDesc: room.roomDesc,
@@ -617,7 +618,6 @@ export default function GuesthouseForm() {
             roomType: normalizedRoom.roomType,
             dormitoryGenderType: normalizedRoom.dormitoryGenderType,
             femaleOnly: normalizedRoom.femaleOnly,
-            isVisible: normalizedRoom.isVisible,
             roomCapacity: normalizedRoom.roomCapacity,
             roomMaxCapacity: normalizedRoom.roomMaxCapacity,
             roomDesc: normalizedRoom.roomDesc,

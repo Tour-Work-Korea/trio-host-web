@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { useState } from "react";
+import { useState } from "react";
 
 import CheckOrange from "@assets/images/check_orange.svg";
 import ChevronBlack from "@assets/images/chevron_right_black.svg";
@@ -151,19 +151,25 @@ export default function RoomsSection({
     const trimmedName = draft.roomName.trim();
     const trimmedDesc = draft.roomDesc.trim();
     const capacityNum = Number(draft.roomCapacity);
-    const roomMaxCapacityNum = Number(draft.roomMaxCapacity ?? draft.roomCapacity);
+    const roomMaxCapacityNum = Number(draft.roomMaxCapacity);
     const priceNum = Number(draft.roomPrice);
     const isDormitory = draft.roomType === "DORMITORY";
+    const isPrivate = draft.roomType === "PRIVATE";
+    const hasValidMaxForPrivate =
+      !Number.isNaN(roomMaxCapacityNum) &&
+      roomMaxCapacityNum > 0 &&
+      roomMaxCapacityNum >= capacityNum;
     const normalizedMaxCapacity =
-      Number.isNaN(roomMaxCapacityNum) || roomMaxCapacityNum <= 0
-        ? capacityNum
-        : Math.max(capacityNum, roomMaxCapacityNum);
+      isPrivate
+        ? roomMaxCapacityNum
+        : capacityNum;
 
     if (
       !trimmedName ||
       !trimmedDesc ||
       !draft.roomType ||
       (isDormitory && !draft.dormitoryGenderType) ||
+      (isPrivate && !hasValidMaxForPrivate) ||
       !draft.roomImages.length ||
       !draft.roomImages.some((img) => img.isThumbnail) ||
       Number.isNaN(capacityNum) ||
@@ -201,13 +207,20 @@ export default function RoomsSection({
 
   const isSaveDisabled = (() => {
     const capacityNum = Number(draft.roomCapacity);
+    const roomMaxCapacityNum = Number(draft.roomMaxCapacity);
     const priceNum = Number(draft.roomPrice);
     const isDormitory = draft.roomType === "DORMITORY";
+    const isPrivate = draft.roomType === "PRIVATE";
+    const hasValidMaxForPrivate =
+      !Number.isNaN(roomMaxCapacityNum) &&
+      roomMaxCapacityNum > 0 &&
+      roomMaxCapacityNum >= capacityNum;
     return (
       !draft.roomName.trim() ||
       !draft.roomDesc.trim() ||
       !draft.roomType ||
       (isDormitory && !draft.dormitoryGenderType) ||
+      (isPrivate && !hasValidMaxForPrivate) ||
       !draft.roomImages.length ||
       !draft.roomImages.some((img) => img.isThumbnail) ||
       Number.isNaN(capacityNum) ||
@@ -256,6 +269,12 @@ export default function RoomsSection({
                   roomTypeText && roomMetaDetail
                     ? `${roomTypeText}(${roomMetaDetail})`
                     : roomTypeText;
+                const capacityText =
+                  room.roomType === "PRIVATE"
+                    ? `기준 ${room.roomCapacity}인 / 최대 ${
+                        room.roomMaxCapacity ?? room.roomCapacity
+                      }인`
+                    : `${room.roomCapacity}인실`;
 
                 return (
                   <div
@@ -275,7 +294,7 @@ export default function RoomsSection({
                           {room.roomName}
                         </p>
                         <p className="text-sm text-gray-500">
-                          {room.roomCapacity}인실 {roomMeta}
+                          {capacityText} {roomMeta}
                         </p>
                         <p className="text-sm font-semibold text-gray-800">
                           {room.roomPrice.toLocaleString()}원
@@ -458,6 +477,10 @@ export default function RoomsSection({
                               opt.value === "DORMITORY"
                                 ? prev.dormitoryGenderType || "MIXED"
                                 : "",
+                            roomMaxCapacity:
+                              opt.value === "DORMITORY"
+                                ? prev.roomCapacity
+                                : prev.roomMaxCapacity,
                             femaleOnly:
                               opt.value === "PRIVATE" ? prev.femaleOnly : false,
                           }))
@@ -476,8 +499,10 @@ export default function RoomsSection({
               </div>
 
               {/* 인원 */}
-              <div className="w-full min-w-[140px] sm:max-w-[220px] md:flex-[0_1_180px]">
-                <p className="text-sm text-gray-700 mb-1">수용 인원</p>
+              <div className="w-full min-w-[240px] md:flex-[1_1_300px]">
+                <p className="text-sm text-gray-700 mb-1">
+                  {draft.roomType === "PRIVATE" ? "기준 인원" : "수용 인원"}
+                </p>
                 <input
                   type="number"
                   className="form-input min-w-0"
@@ -490,6 +515,27 @@ export default function RoomsSection({
                     }))
                   }
                 />
+                {draft.roomType === "PRIVATE" && (
+                  <>
+                    <p className="text-sm text-gray-700 mb-1 mt-3">최대 인원</p>
+                    <input
+                      type="number"
+                      className="form-input min-w-0"
+                      placeholder="예: 6"
+                      value={draft.roomMaxCapacity}
+                      onChange={(e) =>
+                        setDraft((prev) => ({
+                          ...prev,
+                          roomMaxCapacity: e.target.value,
+                        }))
+                      }
+                    />
+                    <p className="text-sm text-primary-orange break-keep whitespace-normal mt-1">
+                    일반 객실은 기준/최대 인원을 모두 입력하고, 최대 인원은 기준
+                    인원 이상이어야 합니다.
+                    </p>
+                  </>
+                )}
               </div>
 
               {/* 이용대상 */}
