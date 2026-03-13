@@ -41,9 +41,9 @@ export default function LandingPage() {
       <Intro1 />
       <Intro2 />
       <VisionMission />
-      <IntroUI1 />
-      <IntroUI2 />
       <IntroUI3 />
+      <IntroUI2 />
+      <IntroUI1 />
       <InstallBox />
       {/* 입점신청, 회원가입 모달 */}
       <RegisterModal

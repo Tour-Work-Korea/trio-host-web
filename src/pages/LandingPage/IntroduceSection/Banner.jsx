@@ -15,7 +15,7 @@ export default function Banner({ handleRegisterModal }) {
             워커웨이
           </h1>
           <h3 className="text-xl font-bold mt-[20px]">
-            게스트하우스 등록부터 일자리·모임까지
+            게스트하우스 숙박 예약과 콘텐츠 참여 관리를 
             <br className="sm:hiddne" />한 곳에서 시작하세요
           </h3>
           <div className="w-72 mt-[40px]">

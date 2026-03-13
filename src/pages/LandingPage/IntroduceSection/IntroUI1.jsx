@@ -38,12 +38,9 @@ export default function IntroUI1() {
               </div>
               <div className="w-full">
                 <div className="landing-ui-box">
-                  일정 확정 시 <b>예약금을 선 결제</b>
+                  인앱 <b>채팅방 기능</b>
+                  <span className="text-primary-orange">*</span>
                   <br />
-                  <b>
-                    스탭의 무단 불참 방지
-                    <span className="text-primary-orange">*</span>
-                  </b>
                 </div>
                 <p className="text-primary-orange font-semibold text-sm text-right">
                   *버전2 출시 기능
