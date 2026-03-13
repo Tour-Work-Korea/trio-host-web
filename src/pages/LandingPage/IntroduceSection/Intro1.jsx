@@ -13,7 +13,7 @@ export default function Intro1() {
         <div className="flex-col w-full">
           <img src={WaLogoOrange} className="w-72" />
           <p className="mt-5 font-medium text-lg">
-            편하고 의미 있는 제주도 한달 살이 체류를 가능하게 하는 로컬 워킹트립
+            편하고 의미 있는 제주도 한달 살이 체류를 가능하게 하는 게스트하우스 특화
             플랫폼
           </p>
         </div>

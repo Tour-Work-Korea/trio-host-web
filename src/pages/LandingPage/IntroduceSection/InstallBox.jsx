@@ -10,11 +10,11 @@ export default function InstallBox() {
             <br className="sm:hidden" />
             다운 받아 보세요
           </h2>
-          <h3 className="text-2xl font-semibold text-neutral-white mt-4">
+          {/* <h3 className="text-2xl font-semibold text-neutral-white mt-4">
             게스트하우스 등록부터&nbsp; <br className="sm:hidden" />
             일자리·파티 모집까지
             <br />한 곳에서 시작하세요
-          </h3>
+          </h3> */}
         </div>
         <img src={InstallCard} />
       </div>

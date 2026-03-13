@@ -1,7 +1,10 @@
 import React from "react";
 import BgWaA from "@assets/images/landing/bg_wa_a.svg";
-import UI1 from "@assets/images/landing/ui_2_1.png";
-import UI2 from "@assets/images/landing/ui_2_2.png";
+import UI1 from "@assets/images/landing/파티_1.png";
+import UI2 from "@assets/images/landing/파티_2.png";
+import UI3 from "@assets/images/landing/파티_3.png";
+import UI4 from "@assets/images/landing/파티_4.png";
+import UI5 from "@assets/images/landing/파티_5.png";
 import WaSuccessOrange from "@assets/images/wa_success_orange.svg";
 import ImageSlider from "@components/ImageSlider";
 
@@ -41,7 +44,7 @@ export default function IntroUI2() {
   const uiSection = () => {
     return (
       <div className="flex justify-center w-full">
-        <ImageSlider images={[UI1, UI2]} />
+        <ImageSlider images={[UI1, UI2, UI3, UI4, UI5]} />
       </div>
     );
   };
