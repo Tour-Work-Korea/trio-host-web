@@ -4,7 +4,7 @@ export default function VisionMission() {
   return (
     <div className="landing-container">
       <div className="flex flex-col w-full justify-center items-center">
-        <h1 className="font-bold text-[40px] text-center">Vision & Mission</h1>
+        {/* <h1 className="font-bold text-[40px] text-center">Vision</h1> */}
 
         {/* 카드 둘을 가로로 배치 + 높이 동일하게 */}
         <div className="landing-divide mt-16 flex gap-8 items-stretch w-full">
@@ -27,7 +27,7 @@ export default function VisionMission() {
           </div>
 
           {/* Mission 카드 */}
-          <div className="landing-blue-box w-full flex flex-col justify-start">
+          {/* <div className="landing-blue-box w-full flex flex-col justify-start">
             <div className="rounded-xl bg-primary-blue text-neutral-white px-5 py-2.5 text-2xl font-bold">
               Mission
             </div>
@@ -51,7 +51,7 @@ export default function VisionMission() {
                 <p>지역 인력 부족 문제를 해소합니다.</p>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
