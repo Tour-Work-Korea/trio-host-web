@@ -7,7 +7,7 @@ export default function Footer() {
         <img src={WaLogo} className="h-10 w-auto mb-4" />
         <div className="flex text-sm font-semibold">
           <p className="w-30 text-gray-400">office mail</p>
-          <p>tourworkkorea.biz@gmail.com</p>
+          <p>partners@ddakji.kr</p>
         </div>
         <div className="flex text-sm font-semibold">
           <p className="w-30 text-gray-400">office phone</p>
@@ -15,7 +15,7 @@ export default function Footer() {
         </div>
         <div className="flex text-sm font-semibold">
           <p className="w-30 text-gray-400">instagram</p>
-          <p>wa_korea_official</p>
+          <p>guesthouse_ddakji</p>
         </div>
       </div>
       <div className="text-sm font-semibold text-gray-400 pt-4">

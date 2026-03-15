@@ -1,6 +1,10 @@
 import React from "react";
-import UI1 from "@assets/images/landing/ui_3_1.png";
-import UI2 from "@assets/images/landing/ui_3_2.png";
+import UI1 from "@assets/images/landing/객실_1.png";
+import UI2 from "@assets/images/landing/객실_2.png";
+import UI3 from "@assets/images/landing/객실_3.png";
+import UI4 from "@assets/images/landing/객실_4.png";
+import UI5 from "@assets/images/landing/객실_5.png";
+import UI6 from "@assets/images/landing/객실_6.png";
 import WaEmptyBlue from "@assets/images/wa_blue_empty.svg";
 import ImageSlider from "@components/ImageSlider";
 
@@ -11,7 +15,7 @@ export default function IntroUI3() {
       <div className="landing-divide flex gap-8 items-stretch w-full">
         {/* 왼쪽 */}{" "}
         <div className="flex justify-center w-full">
-          <ImageSlider images={[UI1, UI2]} />
+          <ImageSlider images={[UI1, UI2, UI3, UI4, UI5, UI6]} />
         </div>
         {/* 오른쪽 */}
         <div className="flex justify-end w-full sm:justify-center">
@@ -28,9 +32,10 @@ export default function IntroUI3() {
                 <b>홍보</b> 해주는 단독 플랫폼 구조
               </div>
               <div className="landing-ui-box">
-                외국인 여행객 대상 온라인 소통
-                <br />
-                <b>워커웨이 대리 응대</b> 서비스 제공
+                <b>카카오톡 알림 기반 체크인</b>
+                <br />모임·파티 정보 통합 안내
+                {/* <br />
+                <b>워커웨이 대리 응대</b> 서비스 제공 */}
               </div>
             </div>
             <div className="flex justify-end w-full mt-4">
