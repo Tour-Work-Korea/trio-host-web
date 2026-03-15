@@ -620,7 +620,6 @@ export default function GuesthouseForm() {
             femaleOnly: normalizedRoom.femaleOnly,
             roomCapacity: normalizedRoom.roomCapacity,
             roomMaxCapacity: normalizedRoom.roomMaxCapacity,
-            roomDesc: normalizedRoom.roomDesc,
             roomDescription: normalizedRoom.roomDesc,
             roomPrice: normalizedRoom.roomPrice,
           };
