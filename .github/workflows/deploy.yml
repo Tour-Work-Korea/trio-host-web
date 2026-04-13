@@ -4,47 +4,50 @@ on:
   push:
     branches: [ main ]
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
-    steps:
-      # 1️⃣ 리포지토리 코드 체크아웃
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    env:
+      AWS_REGION: ap-northeast-2
+      S3_BUCKET: ddakji-react-apps
+      S3_PREFIX: host
+      CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
 
-      # 2️⃣ Node.js 환경 세팅 (버전 명시 — 없으면 npm ci 실패할 수 있음)
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18
+          cache: npm
 
-      # 3️⃣ React 빌드
-      - name: Build React app
+      - name: Install dependencies and build
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
         run: |
           npm ci
-          export VITE_API_URL=${{ secrets.VITE_API_URL }}
           npm run build
-          ls -al dist  # ✅ build 폴더 생성 확인용 (디버깅용)
+          ls -al dist
 
-      # 4️⃣ EC2로 빌드 파일 업로드
-      - name: Deploy build files to EC2
-        uses: appleboy/scp-action@v0.1.5
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
-          key: ${{ secrets.EC2_SSH_KEY }}
-          source: "dist/*"
-          target: "/var/www/host"
-          overwrite: true   # ✅ 기존 파일 덮어쓰기 허용
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
 
-      # 5️⃣ Nginx 설정 테스트 및 리로드
-      - name: Reload Nginx on EC2
-        uses: appleboy/ssh-action@v0.1.6
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            sudo nginx -t
-            sudo systemctl reload nginx
+      - name: Upload build files to S3
+        run: |
+          aws s3 sync dist/ s3://${S3_BUCKET}/${S3_PREFIX}/ --delete
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "${CLOUDFRONT_DISTRIBUTION_ID}" \
+            --paths "/*"
