@@ -25,7 +25,7 @@ const features = [
     description: "신청 현황 파악은 앱에게 맡기고, 더 즐거운 파티 분위기를 만들어보세요",
     className: "bg-muted/40 dark:bg-muted/10",
     imageBg: "bg-gradient-to-t from-muted/60 to-transparent dark:from-muted/20",
-    imageUrl: "/images/contents.svg",
+    imageUrl: "/images/contents.png",
   },
 ];
 
