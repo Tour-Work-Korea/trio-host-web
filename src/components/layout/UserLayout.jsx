@@ -14,8 +14,8 @@ export default function UserLayout() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen w-full overflow-x-hidden">
-      <header className="w-full z-10 fixed">
+    <div className="flex flex-col min-h-screen w-full overflow-x-hidden bg-background text-grayscale-900 font-sans selection:bg-primary-orange/20">
+      <header className="w-full z-50 fixed top-0 left-0 right-0">
         <Header />
       </header>
 
@@ -25,7 +25,7 @@ export default function UserLayout() {
         <button
           type="button"
           onClick={toggleSidebar}
-          className="fixed left-4 top-1/2 z-20 -translate-y-1/2 rounded-full bg-grayscale-200 shadow-md px-1 py-1"
+          className="fixed left-4 top-1/2 z-40 -translate-y-1/2 rounded-full bg-white/90 backdrop-blur-md shadow-[0_4px_20px_rgb(0,0,0,0.08)] border border-gray-100 px-2 py-2 hover:scale-110 transition-all duration-300 active:scale-95"
         >
           <img
             src={sidebarVisible ? ChevronLeft : ChevronRight}

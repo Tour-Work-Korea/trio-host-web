@@ -21,12 +21,12 @@ export default function ButtonOrange({
       type="button"
       onClick={handleClick}
       disabled={disabled}
-      className={`py-2 w-full inline-flex items-center rounded-full px-6 justify-center border-1
-        text-center text-md font-semibold 
+      className={`py-3 w-full inline-flex items-center rounded-3xl px-6 justify-center transition-all duration-300
+        text-center text-[17px] font-bold
         ${
           disabled
-            ? "bg-grayscale-200 border-grayscale-200"
-            : "bg-primary-orange hover:opacity-80 border-primary-orange"
+            ? "bg-grayscale-200 text-grayscale-400 cursor-not-allowed"
+            : "bg-[#5361DB] text-neutral-white shadow-lg shadow-[#5361DB]/30 hover:shadow-xl hover:shadow-[#5361DB]/40 hover:-translate-y-0.5 active:scale-[0.98]"
         }
         ${className}`}
     >

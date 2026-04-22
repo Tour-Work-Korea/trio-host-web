@@ -4,16 +4,12 @@ import Footer from "./Footer";
 
 export default function GuestLayout() {
   return (
-    <div className="flex flex-col min-h-screen w-full overflow-x-hidden">
-      <header className="w-full">
-        <Header />
-      </header>
-      <main className="flex flex-grow flex-col w-full ">
+    <div className="flex flex-col min-h-[100dvh] w-full overflow-x-hidden bg-background text-foreground font-sans selection:bg-primary/20">
+      <Header />
+      <main className="flex flex-grow flex-col w-full relative">
         <Outlet />
       </main>
-      <footer className="w-full">
-        <Footer />
-      </footer>
+      <Footer />
     </div>
   );
 }
