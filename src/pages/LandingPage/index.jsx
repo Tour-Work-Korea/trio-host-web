@@ -1,14 +1,10 @@
 import { useState } from "react";
 import RegisterModal from "./RegisterModal/RegisterModal";
-import Banner from "./IntroduceSection/Banner";
-import Intro1 from "./IntroduceSection/Intro1";
-import Intro2 from "./IntroduceSection/Intro2";
-import VisionMission from "./IntroduceSection/VisionMission";
-import IntroUI1 from "./IntroduceSection/IntroUI1";
-import IntroUI2 from "./IntroduceSection/IntroUI2";
-import IntroUI3 from "./IntroduceSection/IntroUI3";
-import InstallBox from "./IntroduceSection/InstallBox";
-import StoreGuesthouses from "./IntroduceSection/StoreGuesthouses";
+import { HeroSection } from "./LandingComponents/HeroSection";
+import { FeaturesSection } from "./LandingComponents/FeaturesSection";
+import { PartnersSection } from "./LandingComponents/PartnersSection";
+import { EarlyBirdSection } from "./LandingComponents/EarlyBirdSection";
+import { HostCtaSection } from "./LandingComponents/HostCtaSection";
 
 export default function LandingPage() {
   const [registerModalVisible, setRegisterModalVisible] = useState(false);
@@ -31,20 +27,19 @@ export default function LandingPage() {
     password: "", //비밀번호
     passwordConfirm: "", //비밀번호 확인
   });
+
   const handleRegisterModal = () => {
     setRegisterModalVisible(true);
   };
+
   return (
-    <div className="flex-col flex items-center">
-      <Banner handleRegisterModal={handleRegisterModal} />
-      <StoreGuesthouses />
-      <Intro1 />
-      <Intro2 />
-      <VisionMission />
-      <IntroUI3 />
-      <IntroUI2 />
-      <IntroUI1 />
-      <InstallBox />
+    <>
+      <HeroSection handleRegisterModal={handleRegisterModal} />
+      <PartnersSection />
+      <FeaturesSection />
+      <EarlyBirdSection handleRegisterModal={handleRegisterModal} />
+      <HostCtaSection handleRegisterModal={handleRegisterModal} />
+      
       {/* 입점신청, 회원가입 모달 */}
       <RegisterModal
         visible={registerModalVisible}
@@ -52,6 +47,6 @@ export default function LandingPage() {
         formData={registerForm}
         setFormData={setRegisterForm}
       />
-    </div>
+    </>
   );
 }

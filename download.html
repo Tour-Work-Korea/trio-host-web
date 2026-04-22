@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>워커웨이 | WorkAway</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Pretendard', sans-serif;
+      background: linear-gradient(180deg, #6c63ff 0%, #f9f9f9 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: white;
+      width: 360px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      object-fit: contain;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 22px;
+      margin: 0;
+      color: #222;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #777;
+      margin-bottom: 25px;
+      line-height: 1.4;
+    }
+
+    .store-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: black;
+      color: white;
+      text-decoration: none;
+      border-radius: 12px;
+      padding: 14px 20px;
+      font-weight: 500;
+      font-size: 15px;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .store-btn img {
+      width: 28px;
+      height: 25px;
+      object-fit: contain;
+    }
+
+    .google-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: black;
+      color: white;
+      text-decoration: none;
+      border-radius: 12px;
+      /* padding: 12px 20px; */
+      font-weight: 500;
+      font-size: 15px;
+      /* gap: 10px; */
+      margin-bottom: 15px;
+    }
+
+    .google-btn img {
+      width: 80px;
+      height: 55px;
+      object-fit: contain;
+    }
+
+    .link-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f4f4f4;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 14px;
+      color: #333;
+      width: 100%;
+      box-sizing: border-box;
+      text-decoration: none;
+      margin-top: 20px;
+    }
+
+    .link-box:hover {
+      background: #eee;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="https://workaway-image-bucket.s3.ap-northeast-2.amazonaws.com/logo/workaway_logo_without_text.png" 
+         alt="워커웨이 로고" class="logo">
+    
+    <h1>워커웨이</h1>
+    <p class="subtitle">Guesthouse Platform<br>운영자는 더 쉽게, 여행자는 더 즐겁게</p>
+
+    <!-- App Store Button -->
+    <a href="https://apps.apple.com/kr/app/workaway/id6746732522?l=en-GB" class="store-btn">
+      <img src="https://workaway-image-bucket.s3.ap-northeast-2.amazonaws.com/logo/apple_logo.webp" alt="Apple Logo">
+      <span>App Store에서 다운로드</span>
+    </a>
+
+    <!-- Google Play Button -->
+    <a href="https://play.google.com/store/apps/details?id=com.triofrontendapp" class="google-btn" >
+      <img src="https://workaway-image-bucket.s3.ap-northeast-2.amazonaws.com/logo/google_icon.svg" alt="Google Play Logo">
+      <span>Google Play에서 다운로드</span>
+    </a>
+
+    <!-- Host site link -->
+    <a href="https://host.workaway.kr" class="link-box">
+      🌐 <span>host.workaway.kr</span> →
+    </a>
+  </div>
+
+</body>
+</html>
