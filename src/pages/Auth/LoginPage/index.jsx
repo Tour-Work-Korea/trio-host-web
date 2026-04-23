@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import { tryLogin } from "@utils/authFlow";
 
 export default function LoginPage() {
@@ -34,7 +34,7 @@ export default function LoginPage() {
         onSubmit={onSubmit}
         className="w-full max-w-sm bg-neutral-white  p-6 space-y-4"
       >
-        <h1 className="text-3xl font-semibold mb-8">로그인해주세요</h1>
+        <h1 className="text-3xl font-bold mb-8 tracking-tight text-gray-900 text-center">게딱지 파트너센터</h1>
 
         <div className="form-group">
           <label className="form-label">이메일</label>
@@ -86,9 +86,9 @@ export default function LoginPage() {
 
         <div className="flex gap-2 text-sm justify-center">
           <p className="text-grayscale-400">계정이 없으신가요?</p>
-          <a href="/" className="hover:underline">
+          <Link to="/signup" className="hover:underline font-semibold text-primary-orange">
             회원가입하러 가기
-          </a>
+          </Link>
         </div>
       </form>
     </div>

@@ -10,6 +10,7 @@ import PageLoader from "@components/PageLoader";
 
 const LandingPage = lazy(() => import("@pages/LandingPage"));
 const LoginPage = lazy(() => import("@pages/Auth/LoginPage"));
+const SignupPage = lazy(() => import("@pages/Auth/SignupPage"));
 const FindIdPage = lazy(() => import("@pages/Auth/FindIdPage"));
 const FindPasswordPage = lazy(() => import("@pages/Auth/FindPasswordPage"));
 const ApplicantPage = lazy(() => import("@pages/Employ/ApplicantPage"));
@@ -75,6 +76,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: S(<LandingPage />) }, // /
       { path: "login", element: S(<LoginPage />) }, // /login
+      { path: "signup", element: S(<SignupPage />) }, // /signup
       { path: "find-id", element: S(<FindIdPage />) },
       { path: "find-password", element: S(<FindPasswordPage />) },
     ],
