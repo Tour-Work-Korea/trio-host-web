@@ -7,8 +7,9 @@ import { Menu, X } from "lucide-react";
 
 export default function Header() {
   const navigate = useNavigate();
-  const accessToken = useUserStore((s) => s.accessToken);
-  const isLoggedIn = !!accessToken;
+  const authenticated = useUserStore((s) => s.authenticated);
+  const sessionReady = useUserStore((s) => s.sessionReady);
+  const isLoggedIn = sessionReady && authenticated;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const onLogout = useCallback(async () => {
@@ -48,7 +49,11 @@ export default function Header() {
             <Button size="sm" variant="outline" className="hidden sm:inline-flex border-border/60 hover:bg-muted/50 font-semibold" asChild>
               <a href="/#hosts">앱 다운로드</a>
             </Button>
-            {isLoggedIn ? (
+            {!sessionReady ? (
+              <Button size="sm" variant="outline" className="hidden sm:inline-flex border-border/60 font-semibold" disabled>
+                세션 확인 중...
+              </Button>
+            ) : isLoggedIn ? (
               <>
                 <Button size="sm" className="hidden sm:inline-flex bg-[#5361DB] text-white hover:bg-[#5361DB]/90 font-bold shadow-md shadow-[#5361DB]/30" onClick={() => navigate("/guesthouse/my")}>
                   사장님 페이지
@@ -85,7 +90,7 @@ export default function Header() {
                 앱 다운로드
               </a>
               <div className="pt-4 border-t border-border flex flex-col gap-2">
-                {isLoggedIn ? (
+                {!sessionReady ? null : isLoggedIn ? (
                   <>
                     <Button size="sm" className="w-full" onClick={() => { setMobileMenuOpen(false); navigate("/guesthouse/my"); }}>
                       사장님 페이지

@@ -5,7 +5,7 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import GuestLayout from "@components/layout/GuestLayout";
 import UserLayout from "@components/layout/UserLayout";
 import useUserStore from "@stores/userStore";
-import { tryRefresh } from "@utils/authFlow";
+import { bootstrapSession } from "@utils/authFlow";
 import PageLoader from "@components/PageLoader";
 
 const LandingPage = lazy(() => import("@pages/LandingPage"));
@@ -46,26 +46,28 @@ const S = (el) => (
 );
 
 function RequireAuth({ children }) {
-  const accessToken = useUserStore((s) => s.accessToken);
-  const [checking, setChecking] = useState(!accessToken);
-  const [ok, setOk] = useState(!!accessToken);
+  const authenticated = useUserStore((s) => s.authenticated);
+  const sessionReady = useUserStore((s) => s.sessionReady);
+  const [checking, setChecking] = useState(!sessionReady);
 
   useEffect(() => {
     let mounted = true;
     (async () => {
-      if (accessToken) return; // 이미 로그인
-      const refreshed = await tryRefresh();
+      if (sessionReady) {
+        setChecking(false);
+        return;
+      }
+      const refreshed = await bootstrapSession();
       if (!mounted) return;
-      setOk(refreshed);
       setChecking(false);
     })();
     return () => {
       mounted = false;
     };
-  }, [accessToken]);
+  }, [sessionReady]);
 
   if (checking) return <div>세션 확인 중…</div>;
-  if (!ok) return <Navigate to="/login" replace />;
+  if (!authenticated) return <Navigate to="/login" replace />;
   return children;
 }
 

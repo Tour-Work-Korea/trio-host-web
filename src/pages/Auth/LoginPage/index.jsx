@@ -1,16 +1,23 @@
 import React, { useState } from "react";
-import { useLocation, useNavigate, Link } from "react-router-dom";
+import { useLocation, useNavigate, Link, Navigate } from "react-router-dom";
 import { tryLogin } from "@utils/authFlow";
+import useUserStore from "@stores/userStore";
 
 export default function LoginPage() {
   const nav = useNavigate();
   const loc = useLocation();
   const from = (loc.state && loc.state.from) || "/guesthouse/my";
+  const authenticated = useUserStore((state) => state.authenticated);
+  const sessionReady = useUserStore((state) => state.sessionReady);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [err, setErr] = useState("");
+
+  if (sessionReady && authenticated) {
+    return <Navigate to={from} replace />;
+  }
 
   const onSubmit = async (e) => {
     e.preventDefault();

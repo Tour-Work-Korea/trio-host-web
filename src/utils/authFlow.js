@@ -1,16 +1,20 @@
 import authApi from "@api/authApi";
 import useUserStore from "@stores/userStore";
 
+let pendingSessionBootstrap = null;
+
 /**
  * 로그인
  */
 export const tryLogin = async (email, password) => {
-  const { setTokens } = useUserStore.getState();
   try {
-    const res = await authApi.login(email, password);
-
-    setTokens({ accessToken: res?.data?.accessToken });
-    await updateProfile();
+    useUserStore.getState().setSessionReady(false);
+    await authApi.login(email, password);
+    useUserStore.getState().setAuthenticated(true);
+    const bootstrapped = await bootstrapSession();
+    if (!bootstrapped) {
+      throw new Error("host web session bootstrap failed");
+    }
     return true;
   } catch (err) {
     useUserStore.getState().clearUser();
@@ -23,33 +27,56 @@ export const tryLogin = async (email, password) => {
  */
 const updateProfile = async () => {
   const { setProfile } = useUserStore.getState();
-  try {
-    const res = await authApi.getMyProfile();
-    const { name, photoUrl, phone, email, businessNum } = res.data || {};
-    setProfile({
-      name: name ?? "",
-      photoUrl:
-        photoUrl && photoUrl !== "사진을 추가해주세요" ? photoUrl : null,
-      phone: phone ?? "",
-      email: email ?? "",
-      businessNum: businessNum ?? "",
-    });
-  } catch (error) {
-    console.warn(`👤 profile fetch failed(web):`, error?.message);
+  const res = await authApi.getMyProfile();
+  const { name, photoUrl, phone, email, businessNum } = res.data || {};
+  setProfile({
+    name: name ?? "",
+    photoUrl:
+      photoUrl && photoUrl !== "사진을 추가해주세요" ? photoUrl : null,
+    phone: phone ?? "",
+    email: email ?? "",
+    businessNum: businessNum ?? "",
+  });
+};
+
+/**
+ * 세션 부트스트랩
+ */
+export const bootstrapSession = async () => {
+  const { sessionReady, authenticated } = useUserStore.getState();
+  if (sessionReady) {
+    return authenticated;
   }
+
+  if (!pendingSessionBootstrap) {
+    pendingSessionBootstrap = (async () => {
+      try {
+        await updateProfile();
+        return true;
+      } catch (error) {
+        console.warn(`👤 profile bootstrap failed(web):`, error?.message);
+        if (error?.response?.status === 401 || error?.response?.status === 403) {
+          useUserStore.getState().clearUser();
+          return false;
+        }
+        useUserStore.getState().setSessionReady(true);
+        return useUserStore.getState().authenticated;
+      } finally {
+        pendingSessionBootstrap = null;
+      }
+    })();
+  }
+
+  return pendingSessionBootstrap;
 };
 
 /**
  * 토큰 리프레시
  */
 export const tryRefresh = async () => {
-  console.info("🔄 tryRefresh: start");
   try {
-    const res = await authApi.refreshToken();
-    const accessToken = res?.data?.accessToken;
-
-    useUserStore.getState().setTokens({ accessToken });
-    console.info("🔄 tryRefresh(web): new accessToken=", accessToken);
+    await authApi.refreshToken();
+    useUserStore.getState().setAuthenticated(true);
     return true;
   } catch (error) {
     console.warn(
@@ -57,9 +84,7 @@ export const tryRefresh = async () => {
       error?.response?.status,
       error?.message
     );
-    localStorage.clear();
     useUserStore.getState().clearUser();
-
     return false;
   }
 };
@@ -70,27 +95,13 @@ export const tryRefresh = async () => {
 export const logout = async () => {
   try {
     await authApi.logout();
-    useUserStore.getState().clearUser();
-    localStorage.clear();
   } catch (error) {
     console.warn(
       "logout failed:",
       error?.response?.status,
       error?.response?.data?.message
     );
+  } finally {
+    useUserStore.getState().clearUser();
   }
 };
-
-/**
- * 쿠키 조회
- */
-export function getCookie(name) {
-  const key = name + "=";
-  const arr = document.cookie.split(";");
-  for (let c of arr) {
-    c = c.trim();
-    if (c.indexOf(key) === 0)
-      return decodeURIComponent(c.substring(key.length));
-  }
-  return null;
-}

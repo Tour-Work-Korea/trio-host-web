@@ -1,43 +1,32 @@
-import { create } from "zustand"; // zustand에서 create로 store 생성
-import { persist, createJSONStorage } from "zustand/middleware"; // 스토어 상태를 localStorage나 AsyncStorage에 저장할 수 있음
+import { create } from "zustand";
 
-const useUserStore = create(
-  persist(
-    (set) => ({
-      // 초기 상태값
-      accessToken: null,
-      profile: {
-        name: "",
-        photoUrl: null,
-        phone: "",
-        email: "",
-        businessNum: "",
-      },
+const createEmptyProfile = () => ({
+  name: "",
+  photoUrl: null,
+  phone: "",
+  email: "",
+  businessNum: "",
+});
 
-      // 토큰 저장 함수
-      setTokens: ({ accessToken }) => set({ accessToken }),
+const useUserStore = create((set) => ({
+  authenticated: false,
+  sessionReady: false,
+  profile: createEmptyProfile(),
 
-      //사장 프로필 저장 함수
-      setProfile: (profile) => set({ profile: profile }),
-
-      // 전체 초기화 (로그아웃 시 사용)
-      clearUser: () =>
-        set({
-          accessToken: null,
-          profile: {
-            name: "",
-            photoUrl: null,
-            phone: "",
-            email: "",
-            businessNum: "",
-          },
-        }),
+  setAuthenticated: (authenticated) => set({ authenticated }),
+  setSessionReady: (sessionReady) => set({ sessionReady }),
+  setProfile: (profile) =>
+    set({
+      authenticated: true,
+      sessionReady: true,
+      profile,
     }),
-    {
-      name: "user-store",
-      storage: createJSONStorage(() => localStorage),
-    }
-  )
-);
+  clearUser: () =>
+    set({
+      authenticated: false,
+      sessionReady: true,
+      profile: createEmptyProfile(),
+    }),
+}));
 
 export default useUserStore;

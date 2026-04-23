@@ -20,11 +20,14 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           secure: false,
           cookieDomainRewrite: "",
-          headers: { origin: target },
           configure: (proxy) => {
             proxy.on("proxyReq", (proxyReq, req) => {
-              // 일부 서버는 origin 헤더를 직접 세팅해야 통과
-              proxyReq.setHeader("origin", target);
+              const forwardedOrigin = req.headers.origin;
+              if (forwardedOrigin) {
+                proxyReq.setHeader("origin", forwardedOrigin);
+              } else {
+                proxyReq.removeHeader("origin");
+              }
             });
           },
         },
