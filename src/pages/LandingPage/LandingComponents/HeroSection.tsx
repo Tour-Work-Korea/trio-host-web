@@ -1,6 +1,5 @@
 import React from "react";
 import { Button } from "../../../components/ui/button";
-import { Apple, Play } from "lucide-react";
 import { motion } from "framer-motion";
 
 export function HeroSection({ handleRegisterModal }) {
@@ -39,25 +38,14 @@ export function HeroSection({ handleRegisterModal }) {
             호스트님은 게스트에게만 집중하세요.
           </p>
 
-          {/* App Download Buttons */}
-          <div className="flex flex-row items-center justify-center gap-2 sm:gap-3 mb-12">
-            <Button size="lg" className="h-12 md:h-14 px-0 w-full max-w-[160px] sm:max-w-none sm:w-auto" asChild>
-              <a href="https://apps.apple.com/kr/app/%EA%B2%8C%EB%94%B1%EC%A7%80-%EA%B2%8C%EC%8A%A4%ED%8A%B8%ED%95%98%EC%9A%B0%EC%8A%A4-%EB%94%B1-%EC%A7%80%EA%B8%88/id6746732522" target="_blank" rel="noopener noreferrer" className="flex flex-row items-center justify-center gap-1.5 md:gap-3 px-3 md:px-6 w-full h-full">
-                <Apple className="h-5 w-5 md:h-6 md:w-6" />
-                <div className="flex flex-col items-start text-left">
-                  <span className="text-[9px] md:text-[10px] opacity-80 leading-none">Download on the</span>
-                  <span className="text-xs md:text-sm font-semibold leading-tight">App Store</span>
-                </div>
-              </a>
-            </Button>
-            <Button size="lg" variant="outline" className="h-12 md:h-14 px-0 w-full max-w-[160px] sm:max-w-none sm:w-auto bg-card" asChild>
-              <a href="https://play.google.com/store/apps/details?id=com.triofrontendapp" target="_blank" rel="noopener noreferrer" className="flex flex-row items-center justify-center gap-1.5 md:gap-3 px-3 md:px-6 w-full h-full text-foreground hover:text-foreground">
-                <Play className="h-5 w-5 md:h-6 md:w-6 fill-current" />
-                <div className="flex flex-col items-start text-left">
-                  <span className="text-[9px] md:text-[10px] opacity-80 leading-none">GET IT ON</span>
-                  <span className="text-xs md:text-sm font-semibold leading-tight">Google Play</span>
-                </div>
-              </a>
+          {/* CTA Button */}
+          <div className="flex justify-center mb-12 relative z-20">
+            <Button
+              size="lg"
+              className="h-14 md:h-16 px-8 md:px-10 text-base md:text-lg font-bold rounded-full w-full sm:w-auto shadow-xl shadow-primary/20 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
+              onClick={handleRegisterModal}
+            >
+              지금 바로, 게딱지 파트너 되기
             </Button>
           </div>
         </motion.div>
