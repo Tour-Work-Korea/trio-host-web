@@ -27,7 +27,7 @@ export default function MenuBar() {
 
   // 메인 카테고리 구성
   const globalNavLinks = [
-    { to: "/guesthouse/home", label: "대시보드", icon: "🏠" },
+    { to: "/guesthouse/dashboard", label: "대시보드", icon: "📊" },
     { to: "/guesthouse/my", label: "업체 정보", icon: "ℹ️" },
     { to: "/reservation", label: "예약 관리", icon: "📅" },
     { to: "/guesthouse/review", label: "리뷰 현황", icon: "📝" },
@@ -94,9 +94,8 @@ export default function MenuBar() {
                         setActiveGuesthouseId(gId);
                         setDropdownOpen(false);
                       }}
-                      className={`w-full text-left px-4 py-3 text-sm transition-colors border-b border-grayscale-100 last:border-b-0 hover:bg-grayscale-50 ${
-                        isSelected ? "text-grayscale-900 font-extrabold bg-grayscale-50" : "text-grayscale-600 font-medium"
-                      }`}
+                      className={`w-full text-left px-4 py-3 text-sm transition-colors border-b border-grayscale-100 last:border-b-0 hover:bg-grayscale-50 ${isSelected ? "text-grayscale-900 font-extrabold bg-grayscale-50" : "text-grayscale-600 font-medium"
+                        }`}
                     >
                       <div className="flex items-center gap-2">
                         {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-primary-orange inline-block" />}
@@ -115,12 +114,12 @@ export default function MenuBar() {
               <button
                 onClick={() => {
                   setDropdownOpen(false);
-                  navigate("/guesthouse/store-register");
+                  navigate("/guesthouse/store-register-form");
                 }}
                 className="flex items-center justify-center gap-2 w-full py-2 bg-primary-blue hover:bg-primary-blue/90 text-white rounded-lg text-sm font-semibold transition-colors shadow-sm"
               >
                 <Plus className="w-4 h-4" />
-                새 게스트하우스 추가
+                새 게스트하우스 등록
               </button>
             </div>
           </div>
@@ -131,18 +130,40 @@ export default function MenuBar() {
 
       {/* 2. 네비게이션 트리 */}
       <div className="flex-1 overflow-y-auto px-4 custom-scrollbar">
+        
+        {/* 전체 매장 보기 (홈) 분리 버튼 */}
+        <div className="mb-4 space-y-1">
+          <NavLink
+            to="/portal"
+            state={{ preventAutoRedirect: true }}
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-extrabold transition-all border ${
+                isActive
+                  ? "bg-grayscale-800 text-white border-grayscale-800 shadow-md"
+                  : "bg-white text-grayscale-500 border border-grayscale-200 shadow-sm hover:bg-grayscale-50 hover:text-grayscale-900"
+              }`
+            }
+          >
+            <span className="text-base leading-none">🏢</span>
+            모든 내 업체 보기
+          </NavLink>
+        </div>
+
         <nav className="space-y-1">
+          <div className="pt-2 pb-2 pl-3 text-xs font-bold text-grayscale-500 tracking-wider">
+            {activeGuesthouse ? "업체 관리" : "기본 메뉴"}
+          </div>
           {globalNavLinks.map((link) => {
             const active = isActivePath(link.to);
             return (
               <NavLink
                 key={link.to}
                 to={link.to}
-                className={`flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold transition-all ${
-                  active
+                state={link.state}
+                className={`flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold transition-all ${active
                     ? "bg-primary-blue text-white font-bold shadow-md shadow-primary-blue/20"
                     : "text-grayscale-500 hover:text-grayscale-900 hover:bg-grayscale-100"
-                }`}
+                  }`}
               >
                 <span className="text-base">{link.icon}</span>
                 {link.label}
@@ -159,11 +180,10 @@ export default function MenuBar() {
               <NavLink
                 key={link.to}
                 to={link.to}
-                className={`flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold transition-all ${
-                  active
+                className={`flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold transition-all ${active
                     ? "bg-primary-blue text-white font-bold shadow-md shadow-primary-blue/20"
                     : "text-grayscale-500 hover:text-grayscale-900 hover:bg-grayscale-100"
-                }`}
+                  }`}
               >
                 <span className="text-base">{link.icon}</span>
                 {link.label}

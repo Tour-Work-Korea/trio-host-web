@@ -6,7 +6,7 @@ import useUserStore from "@stores/userStore";
 export default function LoginPage() {
   const nav = useNavigate();
   const loc = useLocation();
-  const from = (loc.state && loc.state.from) || "/guesthouse/my";
+  const from = (loc.state && loc.state.from) || "/portal";
   const authenticated = useUserStore((state) => state.authenticated);
   const sessionReady = useUserStore((state) => state.sessionReady);
 

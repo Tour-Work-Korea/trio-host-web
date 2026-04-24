@@ -2,7 +2,7 @@ import commonApi from "@api/commonApi";
 
 const getPresignedUrl = async (filename) => {
   const response = await commonApi.getPresignedUrl(filename);
-  return response.data;
+  return response.data?.presignedUrl || response.data;
 };
 
 export const generateUniqueFilename = (extension = "jpg") => {
@@ -75,7 +75,7 @@ const uploadBlobToS3Web = (presignedUrl, blob, onProgress) => {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open("PUT", presignedUrl);
-    xhr.setRequestHeader("Content-Type", "image/*");
+    xhr.setRequestHeader("Content-Type", "image/jpeg");
 
     if (typeof onProgress === "function" && xhr.upload) {
       xhr.upload.onprogress = (e) => {
