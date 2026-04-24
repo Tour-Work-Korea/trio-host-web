@@ -1,123 +1,194 @@
-import React from "react";
+import React, { useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import useUserStore from "@stores/userStore";
-import { formatPhoneKR } from "@utils/formatPhone";
-
-const linkBase = "px-2 py-1 rounded-md transition-colors text-sm";
-const linkActive = "text-primary-orange font-semibold";
-const linkIdle = "text-grayscale-800 hover:text-primary-orange";
+import useGuesthouseStore from "@stores/guesthouseStore";
+import { ChevronDown, Plus, Settings } from "lucide-react";
 
 export default function MenuBar() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
-  //프로필 정보
+  // 사용자 상태
   const profile = useUserStore((s) => s.profile);
 
-  const guesthouseLinks = [
-    { to: "/guesthouse/my", label: "나의 게스트하우스" },
-    { to: "/reservation-calendar", label: "예약 캘린더" },
-    { to: "/reservation", label: "예약 관리" },
-    { to: "/room-management", label: "방 관리" },
-    { to: "/guesthouse/review", label: "리뷰 관리" },
-    { to: "/guesthouse/store-register", label: "입점 신청" },
-  ];
-  const employLinks = [
-    { to: "/employ/my-recruit", label: "나의 공고" },
-    { to: "/employ/applicant", label: "지원자 조회" },
-  ];
+  // 게스트하우스 상태 확인
+  const guesthouses = useGuesthouseStore((s) => s.guesthouses);
+  const activeGuesthouseId = useGuesthouseStore((s) => s.activeGuesthouseId);
+  const setActiveGuesthouseId = useGuesthouseStore(
+    (s) => s.setActiveGuesthouseId
+  );
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const activeGuesthouse = guesthouses.find(
+    (g) => (g.guesthouseId || g.id) === activeGuesthouseId
+  );
 
   const isActivePath = (to) => pathname === to || pathname.startsWith(to + "/");
 
+  // 메인 카테고리 구성
+  const globalNavLinks = [
+    { to: "/guesthouse/home", label: "대시보드", icon: "🏠" },
+    { to: "/guesthouse/my", label: "업체 정보", icon: "ℹ️" },
+    { to: "/reservation", label: "예약 관리", icon: "📅" },
+    { to: "/guesthouse/review", label: "리뷰 현황", icon: "📝" },
+  ];
+
+  const employNavLinks = [
+    { to: "/employ/my-recruit", label: "알바 채용", icon: "🧑‍💼" },
+  ];
+
   return (
-    <div className="space-y-12">
-      {/* 유저 프로필 */}
-      <div className="flex-col">
-        <div className="bg-neutral-white flex items-end gap-3">
-          <div className="bg-neutral-white flex items-center gap-3">
-            {profile.photoUrl ? (
-              <img
-                src={profile.photoUrl}
-                width={20}
-                className="w-20 min-w-20 h-20 rounded-lg object-cover"
-              />
-            ) : (
-              <div className="w-20 h-20 bg-gray-300 rounded-lg" />
-            )}
+    <div className="flex flex-col h-full text-grayscale-600">
+      {/* 1. 글로벌 게스트하우스 스위처 */}
+      <div className="px-4 py-3 relative">
+        <button
+          onClick={() => setDropdownOpen(!dropdownOpen)}
+          className="flex items-center gap-3 w-full hover:bg-grayscale-50 p-2 border border-transparent hover:border-grayscale-100/50 rounded-xl transition-all text-left"
+        >
+          {activeGuesthouse ? (
+            <>
+              {activeGuesthouse.guesthouseImageUrl ? (
+                <img
+                  src={activeGuesthouse.guesthouseImageUrl}
+                  alt={activeGuesthouse.guesthouseName}
+                  className="w-10 h-10 rounded-full object-cover bg-grayscale-100 border border-grayscale-200 shadow-sm"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-grayscale-100 flex items-center justify-center font-bold text-grayscale-600 border border-grayscale-200 shadow-sm">
+                  {activeGuesthouse.guesthouseName?.charAt(0)}
+                </div>
+              )}
+              <div className="flex-1 overflow-hidden">
+                <p className="text-grayscale-900 font-extrabold tracking-tight truncate text-[15px]">
+                  {activeGuesthouse.guesthouseName || "이름 없는 업체"}
+                </p>
+                <p className="text-[11px] text-grayscale-400 font-medium truncate mt-0.5">
+                  내 업체 관리
+                </p>
+              </div>
+              <ChevronDown className="w-4 h-4 text-grayscale-400" />
+            </>
+          ) : (
+            <>
+              <div className="w-10 h-10 rounded-full bg-grayscale-50 font-bold flex items-center justify-center text-grayscale-400 text-sm border border-grayscale-200 shadow-sm">
+                +
+              </div>
+              <div className="flex-1 overflow-hidden">
+                <p className="text-grayscale-900 font-extrabold truncate text-[15px]">업체 추가하기</p>
+              </div>
+            </>
+          )}
+        </button>
+
+        {dropdownOpen && (
+          <div className="absolute top-[70px] left-4 right-4 bg-white border border-grayscale-200 shadow-xl rounded-xl overflow-hidden z-50">
+            <div className="max-h-64 overflow-y-auto custom-scrollbar">
+              {guesthouses.length > 0 ? (
+                guesthouses.map((g) => {
+                  const gId = g.guesthouseId || g.id;
+                  const isSelected = activeGuesthouseId === gId;
+                  return (
+                    <button
+                      key={gId}
+                      onClick={() => {
+                        setActiveGuesthouseId(gId);
+                        setDropdownOpen(false);
+                      }}
+                      className={`w-full text-left px-4 py-3 text-sm transition-colors border-b border-grayscale-100 last:border-b-0 hover:bg-grayscale-50 ${
+                        isSelected ? "text-grayscale-900 font-extrabold bg-grayscale-50" : "text-grayscale-600 font-medium"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-primary-orange inline-block" />}
+                        <span className="truncate">{g.guesthouseName}</span>
+                      </div>
+                    </button>
+                  );
+                })
+              ) : (
+                <div className="p-4 text-center text-xs text-grayscale-400 font-medium">
+                  등록된 게스트하우스가 없습니다.
+                </div>
+              )}
+            </div>
+            <div className="p-2 border-t border-grayscale-200 bg-grayscale-50">
+              <button
+                onClick={() => {
+                  setDropdownOpen(false);
+                  navigate("/guesthouse/store-register");
+                }}
+                className="flex items-center justify-center gap-2 w-full py-2 bg-primary-blue hover:bg-primary-blue/90 text-white rounded-lg text-sm font-semibold transition-colors shadow-sm"
+              >
+                <Plus className="w-4 h-4" />
+                새 게스트하우스 추가
+              </button>
+            </div>
           </div>
-          <div className="flex flex-col w-full items-start gap-2">
-            <p className="font-semibold">{profile.name}</p>
-            <button
-              onClick={() => navigate("/profile")}
-              className="cursor-pointer border-1 border-grayscale-300 px-2 text-sm rounded-full text-grayscale-500"
-            >
-              프로필 수정
-            </button>
-          </div>
-        </div>
-        <div className="mt-4 space-y-1 text-sm">
-          <div className="flex gap-4">
-            <div className="text-grayscale-400">연락처</div>
-            <div>{formatPhoneKR(profile.phone)}</div>
-          </div>
-          <div className="flex gap-4">
-            <div className="text-grayscale-400">이메일</div>
-            <div>{profile.email}</div>
-          </div>
-        </div>
+        )}
       </div>
 
-      {/* 메뉴 */}
-      <div className="bg-neutral-white">
-        {/* 게스트하우스 */}
-        <div>
-          <div
-            className={`font-bold text-lg ${
-              pathname.startsWith("/guesthouse") ||
-              pathname.startsWith("/reservation")
-                ? "text-primary-blue"
-                : ""
-            }`}
-          >
-            게스트하우스
-          </div>
-          <nav className="mt-2 flex flex-col gap-1">
-            {guesthouseLinks.map((l) => (
-              <NavLink
-                key={l.to}
-                to={l.to}
-                className={`${linkBase} ${
-                  isActivePath(l.to) ? linkActive : linkIdle
-                }`}
-              >
-                {l.label}
-              </NavLink>
-            ))}
-          </nav>
-        </div>
+      <div className="px-6 my-2 border-b border-grayscale-100/60" />
 
-        {/* 채용 */}
-        <div className="mt-8">
-          <div
-            className={`font-bold text-lg ${
-              pathname.startsWith("/employ") ? "text-primary-blue" : ""
-            }`}
-          >
-            알바
-          </div>
-          <nav className="mt-2 flex flex-col gap-1">
-            {employLinks.map((l) => (
+      {/* 2. 네비게이션 트리 */}
+      <div className="flex-1 overflow-y-auto px-4 custom-scrollbar">
+        <nav className="space-y-1">
+          {globalNavLinks.map((link) => {
+            const active = isActivePath(link.to);
+            return (
               <NavLink
-                key={l.to}
-                to={l.to}
-                className={`${linkBase} ${
-                  isActivePath(l.to) ? linkActive : linkIdle
+                key={link.to}
+                to={link.to}
+                className={`flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold transition-all ${
+                  active
+                    ? "bg-primary-blue text-white font-bold shadow-md shadow-primary-blue/20"
+                    : "text-grayscale-500 hover:text-grayscale-900 hover:bg-grayscale-100"
                 }`}
               >
-                {l.label}
+                <span className="text-base">{link.icon}</span>
+                {link.label}
               </NavLink>
-            ))}
-          </nav>
+            );
+          })}
+
+          <div className="pt-6 pb-2 pl-3 text-xs font-bold text-grayscale-500 tracking-wider">
+            채용 관리
+          </div>
+          {employNavLinks.map((link) => {
+            const active = isActivePath(link.to);
+            return (
+              <NavLink
+                key={link.to}
+                to={link.to}
+                className={`flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold transition-all ${
+                  active
+                    ? "bg-primary-blue text-white font-bold shadow-md shadow-primary-blue/20"
+                    : "text-grayscale-500 hover:text-grayscale-900 hover:bg-grayscale-100"
+                }`}
+              >
+                <span className="text-base">{link.icon}</span>
+                {link.label}
+              </NavLink>
+            );
+          })}
+        </nav>
+      </div>
+
+      {/* 3. 하단 유틸리티 영역 */}
+      <div className="p-4 border-t border-grayscale-100 space-y-3 bg-grayscale-50 rounded-b-3xl">
+        <div className="flex items-center justify-between px-2 text-sm">
+          <div className="flex items-center gap-2">
+            <div className="w-9 h-9 rounded-full bg-primary-blue text-white flex items-center justify-center font-extrabold text-[13px] shadow-sm shadow-primary-blue/30">
+              {profile.name ? profile.name.charAt(0) : "사"}
+            </div>
+            <div className="text-grayscale-800 font-extrabold tracking-tight">{profile.name} <span className="font-semibold text-grayscale-500">사장님</span></div>
+          </div>
+          <button
+            onClick={() => navigate("/profile")}
+            className="p-2 rounded-xl bg-white border border-grayscale-200 hover:border-primary-orange hover:text-primary-orange hover:shadow-sm text-grayscale-400 transition-all"
+            title="계정 설정"
+          >
+            <Settings className="w-4 h-4" />
+          </button>
         </div>
       </div>
     </div>

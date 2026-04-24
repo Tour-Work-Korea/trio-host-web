@@ -1,25 +1,16 @@
 import api from "./axiosInstance";
 import { authClient } from "./axiosInstance";
-import { getCookie } from "@utils/authFlow";
 
 const authApi = {
   //로그인
   login: (email, password) =>
-    api.post(
-      "/auth/login",
-      { email, password, userRole: "HOST" },
-      { withAuth: false }
-    ),
+    authClient.post("/host/auth/login", { email, password }),
 
   //토큰 갱신
-  refreshToken: () =>
-    authClient.post("/auth/refresh", {
-      refreshToken: getCookie("refresh-token"),
-    }),
+  refreshToken: () => authClient.post("/host/auth/refresh"),
 
   //로그아웃
-  logout: () =>
-    api.post("/auth/logout", { refreshToken: getCookie("refresh-token") }),
+  logout: () => api.post("/host/auth/logout"),
 
   //프로필 조회
   getMyProfile: () => api.get("/host/my"),

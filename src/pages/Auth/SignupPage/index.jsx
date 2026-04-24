@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Eye, EyeOff, CheckCircle2 } from "lucide-react";
+import { Eye, EyeOff, CheckCircle2, AlertCircle } from "lucide-react";
 import authApi from "@api/authApi";
 import { AGREEMENT_CONTENTS } from "@data/agreeContents";
 
@@ -46,60 +46,86 @@ export default function SignupPage() {
     setModalContent(AGREEMENT_CONTENTS[key]);
   };
 
+  // 커스텀 알림 모달 상태
+  const [alertInfo, setAlertInfo] = useState({
+    visible: false,
+    message: "",
+    isSuccess: false,
+    onConfirm: null,
+  });
+
+  const showAlert = (message, isSuccess = false, onConfirm = null) => {
+    setAlertInfo({ visible: true, message, isSuccess, onConfirm });
+  };
+
+  const closeAlert = () => {
+    if (alertInfo.onConfirm) {
+      alertInfo.onConfirm();
+    }
+    setAlertInfo({ visible: false, message: "", isSuccess: false, onConfirm: null });
+  };
+
+  const isPasswordValid =
+    password.length >= 8 &&
+    password.length <= 20 &&
+    /[a-zA-Z]/.test(password) &&
+    /[0-9]/.test(password) &&
+    /[^a-zA-Z0-9]/.test(password);
+
   // 시뮬레이션 -> 실제 API 연동
   const handleEmailRequest = async () => {
-    if (!email) return alert("이메일을 입력해주세요.");
+    if (!email) return showAlert("이메일을 입력해주세요.");
     try {
       await authApi.sendEmail(email);
       setEmailRequested(true);
-      alert("이메일로 인증번호가 발송되었습니다.");
+      showAlert("이메일로 인증번호가 발송되었습니다.", true);
     } catch (error) {
-      alert(error.response?.data?.message || "이메일 인증 요청에 실패했습니다.");
+      showAlert(error.response?.data?.message || "이메일 인증 요청에 실패했습니다.");
     }
   };
 
   const handleEmailVerify = async () => {
-    if (!emailCode) return alert("인증번호를 입력해주세요.");
+    if (!emailCode) return showAlert("인증번호를 입력해주세요.");
     try {
       await authApi.verifyEmail(email, emailCode);
       setEmailVerified(true);
-      alert("이메일 인증이 완료되었습니다.");
+      showAlert("이메일 인증이 완료되었습니다.", true);
     } catch (error) {
-      alert(error.response?.data?.message || "인증번호가 올바르지 않습니다.");
+      showAlert(error.response?.data?.message || "인증번호가 올바르지 않습니다.");
     }
   };
 
   const handlePhoneRequest = async () => {
-    if (!phone) return alert("전화번호를 입력해주세요.");
+    if (!phone) return showAlert("전화번호를 입력해주세요.");
     try {
       await authApi.sendSms(phone);
       setPhoneRequested(true);
-      alert("입력하신 번호로 인증번호가 발송되었습니다.");
+      showAlert("입력하신 번호로 인증번호가 발송되었습니다.", true);
     } catch (error) {
-      alert(error.response?.data?.message || "전화번호 인증 요청에 실패했습니다.");
+      showAlert(error.response?.data?.message || "전화번호 인증 요청에 실패했습니다.");
     }
   };
 
   const handlePhoneVerify = async () => {
-    if (!phoneCode) return alert("인증번호를 입력해주세요.");
+    if (!phoneCode) return showAlert("인증번호를 입력해주세요.");
     try {
       await authApi.verifySms(phone, phoneCode);
       setPhoneVerified(true);
-      alert("전화번호 인증이 완료되었습니다.");
+      showAlert("전화번호 인증이 완료되었습니다.", true);
     } catch (error) {
-      alert(error.response?.data?.message || "인증번호가 올바르지 않습니다.");
+      showAlert(error.response?.data?.message || "인증번호가 올바르지 않습니다.");
     }
   };
 
   const handleBusinessVerify = async () => {
-    if (!businessNumber) return alert("사업자번호를 입력해주세요.");
+    if (!businessNumber) return showAlert("사업자번호를 입력해주세요.");
     try {
       await authApi.verifyBusiness(businessNumber);
       setBusinessVerified(true);
-      alert("사업자번호 인증이 완료되었습니다.");
+      showAlert("사업자번호 인증이 완료되었습니다.", true);
     } catch (error) {
       setBusinessVerified(false);
-      alert(error.response?.data?.message || "유효하지 않은 사업자번호입니다.");
+      showAlert(error.response?.data?.message || "유효하지 않은 사업자번호입니다.");
     }
   };
 
@@ -107,34 +133,41 @@ export default function SignupPage() {
     e.preventDefault();
     // 기본적인 빈값 체크
     if (!email || !phone || !name || !businessNumber || !password) {
-      return alert("모든 항목을 입력하고 인증해주세요.");
+      return showAlert("모든 항목을 입력하고 인증해주세요.");
     }
-    if (!emailVerified) return alert("이메일 인증을 완료해주세요.");
-    if (!phoneVerified) return alert("전화번호 인증을 완료해주세요.");
-    if (!businessVerified) return alert("사업자번호 인증을 완료해주세요.");
+    if (!emailVerified) return showAlert("이메일 인증을 완료해주세요.");
+    if (!phoneVerified) return showAlert("전화번호 인증을 완료해주세요.");
+    if (!businessVerified) return showAlert("사업자번호 인증을 완료해주세요.");
 
     if (password !== passwordConfirm) {
-      return alert("비밀번호가 일치하지 않습니다.");
+      return showAlert("비밀번호가 일치하지 않습니다.");
     }
     if (!allAgreed) {
-      return alert("필수 약관에 모두 동의해주세요.");
+      return showAlert("필수 약관에 모두 동의해주세요.");
     }
 
     try {
+      const mappedAgreements = [];
+      if (agreements.terms) mappedAgreements.push({ agreementType: "TERMS_OF_SERVICE", agreed: true });
+      if (agreements.privacy) mappedAgreements.push({ agreementType: "PRIVACY_POLICY", agreed: true });
+      if (agreements.age) mappedAgreements.push({ agreementType: "AGE_OVER_14_CONFIRMATION", agreed: true });
+
       const dtoObj = {
         name,
         email,
         phoneNum: phone,
         bussinessNum: businessNumber,
         password,
+        passwordConfirm,
         userRole: "HOST",
-        agreements,
+        agreements: mappedAgreements,
       };
-      await authApi.signUp(dtoObj, null);
-      alert("성공적으로 파트너 가입이 완료되었습니다!");
-      navigate("/login");
+      await authApi.signUp(dtoObj);
+      showAlert("성공적으로 파트너 가입이 완료되었습니다!", true, () => {
+        navigate("/login");
+      });
     } catch (error) {
-      alert(error.response?.data?.message || "회원가입에 실패했습니다.");
+      showAlert(error.response?.data?.message || "회원가입에 실패했습니다.");
     }
   };
 
@@ -312,7 +345,7 @@ export default function SignupPage() {
                   {showPassword ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
                 </button>
               </div>
-              <p className="text-xs text-grayscale-400 mt-1">영문 대소문자 포함 · 숫자 포함 · 특수문자 포함 · 8-20자 이내</p>
+              <p className={`text-xs mt-1 transition-colors ${isPasswordValid ? 'text-semantic-green font-medium' : 'text-grayscale-400'}`}>영문 대소문자 포함 · 숫자 포함 · 특수문자 포함 · 8-20자 이내</p>
             </div>
 
             <div className="space-y-2">
@@ -434,6 +467,27 @@ export default function SignupPage() {
                 닫기
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* 내부 커스텀 알림 모달 */}
+      {alertInfo.visible && (
+        <div className="fixed inset-0 z-[300] bg-black/40 flex items-center justify-center p-4 backdrop-blur-[2px]">
+          <div className="bg-white rounded-[24px] p-8 w-full max-w-[360px] shadow-2xl flex flex-col items-center text-center">
+            <div className={`w-14 h-14 rounded-full flex items-center justify-center mb-5 ${alertInfo.isSuccess ? 'bg-primary-orange/10 text-primary-orange' : 'bg-semantic-red/10 text-semantic-red'}`}>
+              {alertInfo.isSuccess ? <CheckCircle2 className="w-8 h-8" strokeWidth={2.5} /> : <AlertCircle className="w-8 h-8" strokeWidth={2.5} />}
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 mb-2 tracking-tight">안내</h3>
+            <p className="text-[15px] text-gray-600 mb-8 leading-relaxed whitespace-pre-wrap">
+              {alertInfo.message}
+            </p>
+            <button
+              onClick={closeAlert}
+              className="w-full h-[52px] bg-primary-orange text-white font-bold rounded-[14px] hover:bg-primary-orange/90 transition-all shadow-sm active:scale-[0.98]"
+            >
+              확인
+            </button>
           </div>
         </div>
       )}

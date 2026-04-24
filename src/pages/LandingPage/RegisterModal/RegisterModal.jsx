@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { ArrowLeft, ChevronDown, CheckCircle2, AlertCircle } from "lucide-react";
+import guesthouseApi from "../../../api/guesthouseApi";
 
 export default function RegisterModal({
   visible,
@@ -28,7 +29,7 @@ export default function RegisterModal({
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!formData.businessName || !formData.managerName || !formData.address || !formData.phone) {
       showAlert("모든 필드를 입력해주세요.");
       return;
@@ -37,7 +38,19 @@ export default function RegisterModal({
       showAlert("원활한 상담을 위해 동의에 체크해주세요.");
       return;
     }
-    showAlert("입점 신청이 정상적으로 접수되었습니다.\n24시간 이내에 담당자가 전화를 드릴 예정이니\n잠시만 기다려주세요!", true);
+
+    try {
+      await guesthouseApi.postPartnerApplication({
+        guesthouseName: formData.businessName,
+        applicantName: formData.managerName,
+        phoneNumber: formData.phone,
+        region: formData.address,
+      });
+      showAlert("입점 신청이 정상적으로 접수되었습니다.\n24시간 이내에 담당자가 전화를 드릴 예정이니\n잠시만 기다려주세요!", true);
+    } catch (error) {
+      console.error("Partner application failed:", error);
+      showAlert("입점 신청 중 오류가 발생했습니다.\n다시 시도해주세요.");
+    }
   };
 
   return (
