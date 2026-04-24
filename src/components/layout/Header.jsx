@@ -28,7 +28,14 @@ export default function Header() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo & Navigation - Grouped on the Left */}
           <div className="flex items-center gap-8 lg:gap-12">
-            <a href="/" className="flex items-center" onClick={(e) => { e.preventDefault(); navigate("/"); }}>
+            <a
+              href="/"
+              className="flex items-center"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("/");
+              }}
+            >
               <img
                 src="/images/logo.png"
                 alt="게딱지 로고"

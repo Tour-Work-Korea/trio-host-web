@@ -11,6 +11,7 @@ import PageLoader from "@components/PageLoader";
 const LandingPage = lazy(() => import("@pages/LandingPage"));
 const LoginPage = lazy(() => import("@pages/Auth/LoginPage"));
 const SignupPage = lazy(() => import("@pages/Auth/SignupPage"));
+const HostHomePage = lazy(() => import("@pages/HostHomePage"));
 const FindIdPage = lazy(() => import("@pages/Auth/FindIdPage"));
 const FindPasswordPage = lazy(() => import("@pages/Auth/FindPasswordPage"));
 const ApplicantPage = lazy(() => import("@pages/Employ/ApplicantPage"));
@@ -30,12 +31,10 @@ const StoreRegisterFormPage = lazy(() =>
 );
 const ReviewPage = lazy(() => import("@pages/Guesthouse/ReviewPage"));
 const ReservationPage = lazy(() => import("@pages/Guesthouse/ReservationPage"));
-const ReservationCalendarPage = lazy(() =>
-  import("@pages/Guesthouse/ReservationCalendarPage")
+const SalesAnalysisPage = lazy(() =>
+  import("@pages/Guesthouse/SalesAnalysisPage")
 );
-const RoomManagementPage = lazy(() =>
-  import("@pages/Guesthouse/RoomManagementPage")
-);
+const NoticePage = lazy(() => import("@pages/NoticePage"));
 const ProfilePage = lazy(() => import("@pages/ProfilePage"));
 
 // 공통 Suspense 래퍼
@@ -100,6 +99,7 @@ export const router = createBrowserRouter([
         element: S(<RecruitFormPage />),
       },
       // Guesthouse
+      { path: "guesthouse/home", element: S(<HostHomePage />) },
       { path: "guesthouse/my", element: S(<MyGuesthousePage />) },
       {
         path: "guesthouse/form/:guesthouseId",
@@ -115,14 +115,16 @@ export const router = createBrowserRouter([
         element: S(<StoreRegisterFormPage />),
       },
       { path: "guesthouse/review", element: S(<ReviewPage />) },
+      { path: "guesthouse/sales", element: S(<SalesAnalysisPage />) },
+      { path: "guesthouse/notices", element: S(<NoticePage />) },
       { path: "reservation", element: S(<ReservationPage />) },
-      { path: "reservation-calendar", element: S(<ReservationCalendarPage />) },
-      { path: "room-management", element: S(<RoomManagementPage />) },
 
       // 기타
       { path: "profile", element: S(<ProfilePage />) },
+      // Index Route for Private Area
+      { index: true, element: <Navigate to="/guesthouse/home" replace /> },
     ],
   },
 
-  { path: "*", element: <Navigate to="/" replace /> },
+  { path: "*", element: <Navigate to="/login" replace /> },
 ]);

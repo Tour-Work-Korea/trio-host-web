@@ -2,12 +2,20 @@ import { Outlet } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
 import MenuBar from "./MenuBar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import useGuesthouseStore from "@stores/guesthouseStore";
+
 import ChevronRight from "@assets/images/chevron_right_gray.svg";
 import ChevronLeft from "@assets/images/chevron_left_gray.svg";
 
 export default function UserLayout() {
   const [sidebarVisible, setSidebarVisible] = useState(true);
+  const fetchGuesthouses = useGuesthouseStore((s) => s.fetchGuesthouses);
+
+  useEffect(() => {
+    // 렌더링 시 전역으로 사용자의 게스트하우스 리스트를 로드 (컨텍스트 구성)
+    fetchGuesthouses();
+  }, [fetchGuesthouses]);
 
   const toggleSidebar = () => {
     setSidebarVisible((prev) => !prev);
@@ -19,30 +27,38 @@ export default function UserLayout() {
         <Header />
       </header>
 
-      <main className="pt-24">
-        {/* 헤더 높이만큼 여유 */}
-        {/* 사이드바 토글 버튼 */}
-        <button
-          type="button"
-          onClick={toggleSidebar}
-          className="fixed left-4 top-1/2 z-40 -translate-y-1/2 rounded-full bg-white/90 backdrop-blur-md shadow-[0_4px_20px_rgb(0,0,0,0.08)] border border-gray-100 px-2 py-2 hover:scale-110 transition-all duration-300 active:scale-95"
-        >
-          <img
-            src={sidebarVisible ? ChevronLeft : ChevronRight}
-            width={28}
-            height={28}
-            alt="toggle sidebar"
-          />
-        </button>
-        <div className="flex flex-grow min-h-screen w-full px-12 xl:px-40 py-8 gap-12 lg:gap-20">
-          {sidebarVisible && (
-            <div className="w-64 flex-shrink-0">
-              <MenuBar />
-            </div>
-          )}
+      <main className="pt-24 pb-12 w-full flex-grow bg-background">
+        <div className="max-w-[1440px] mx-auto w-full px-4 sm:px-[40px] relative">
+          
+          {/* 사이드바 토글 버튼 */}
+          <button
+            type="button"
+            onClick={toggleSidebar}
+            className="absolute -left-3 top-10 z-40 rounded-full bg-white shadow-[0_4px_20px_rgb(0,0,0,0.08)] border border-gray-100 p-1.5 hover:scale-110 transition-all duration-300 active:scale-95"
+          >
+            <img
+              src={sidebarVisible ? ChevronLeft : ChevronRight}
+              width={20}
+              height={20}
+              alt="toggle sidebar"
+            />
+          </button>
 
-          <div className="flex-1 min-w-0 overflow-x-hidden scrollbar-hide">
-            <Outlet />
+          {/* 대시보드 컨테이너 (그림자와 라운딩으로 프리미엄 룩 구현) */}
+          <div className="flex min-h-[calc(100vh-8rem)] w-full relative bg-white rounded-3xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-grayscale-100">
+            
+            {/* 밝은 사이드바 영역 */}
+            {sidebarVisible && (
+              <div className="w-[260px] flex-shrink-0 bg-white text-grayscale-800 pt-4 pb-12 z-20 shadow-sm border-r border-grayscale-100/50">
+                <MenuBar />
+              </div>
+            )}
+
+            {/* 메인 콘텐츠 영역 */}
+            <div className="flex-1 min-w-0 overflow-x-hidden bg-[#F8F9FC] p-8 lg:p-12 relative border-l border-grayscale-100">
+              <Outlet />
+            </div>
+
           </div>
         </div>
       </main>

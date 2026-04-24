@@ -161,6 +161,10 @@ const guesthouseApi = {
     api.delete(`/order/reservation/${reservationId}`, {
       data: { type: "GUESTHOUSE" },
     }),
+
+  // 파트너 입점 신청 (랜딩페이지)
+  postPartnerApplication: (payload) =>
+    api.post("/host/guesthouses/partner-applications", payload),
 };
 
 export default guesthouseApi;
