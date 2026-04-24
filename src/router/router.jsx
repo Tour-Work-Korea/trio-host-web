@@ -4,6 +4,7 @@ import { lazy, Suspense, useEffect, useState } from "react";
 
 import GuestLayout from "@components/layout/GuestLayout";
 import UserLayout from "@components/layout/UserLayout";
+import PortalLayout from "@components/layout/PortalLayout";
 import useUserStore from "@stores/userStore";
 import { bootstrapSession } from "@utils/authFlow";
 import PageLoader from "@components/PageLoader";
@@ -12,6 +13,7 @@ const LandingPage = lazy(() => import("@pages/LandingPage"));
 const LoginPage = lazy(() => import("@pages/Auth/LoginPage"));
 const SignupPage = lazy(() => import("@pages/Auth/SignupPage"));
 const HostHomePage = lazy(() => import("@pages/HostHomePage"));
+const HostDashboardPage = lazy(() => import("@pages/HostDashboardPage"));
 const FindIdPage = lazy(() => import("@pages/Auth/FindIdPage"));
 const FindPasswordPage = lazy(() => import("@pages/Auth/FindPasswordPage"));
 const ApplicantPage = lazy(() => import("@pages/Employ/ApplicantPage"));
@@ -36,6 +38,9 @@ const SalesAnalysisPage = lazy(() =>
 );
 const NoticePage = lazy(() => import("@pages/NoticePage"));
 const ProfilePage = lazy(() => import("@pages/ProfilePage"));
+const EditProfilePage = lazy(() => import("@pages/ProfilePage/EditProfile"));
+const TermsPage = lazy(() => import("@pages/LegalPage/TermsPage"));
+const PrivacyPage = lazy(() => import("@pages/LegalPage/PrivacyPage"));
 
 // 공통 Suspense 래퍼
 const S = (el) => (
@@ -80,10 +85,27 @@ export const router = createBrowserRouter([
       { path: "signup", element: S(<SignupPage />) }, // /signup
       { path: "find-id", element: S(<FindIdPage />) },
       { path: "find-password", element: S(<FindPasswordPage />) },
+      { path: "terms", element: S(<TermsPage />) },
+      { path: "privacy", element: S(<PrivacyPage />) },
     ],
   },
 
-  // 보호 라우트 (유저) — 전부 로그인 필요
+  // 포털 라우트 (유저) — 인증되었으나 특정 업체의 관리자 페이지(UserLayout) 전 단계
+  {
+    element: <RequireAuth>{S(<PortalLayout />)}</RequireAuth>,
+    children: [
+      { path: "portal", element: S(<HostHomePage />) },
+      { path: "guesthouse/store-register", element: S(<StoreRegisterPage />) },
+      {
+        path: "guesthouse/store-register-form",
+        element: S(<StoreRegisterFormPage />),
+      },
+      // Index Route for Private Area
+      { index: true, element: <Navigate to="/portal" replace /> },
+    ],
+  },
+
+  // 보호 라우트 (유저) — 개별 업체 관리자 대시보드
   {
     element: <RequireAuth>{S(<UserLayout />)}</RequireAuth>,
     children: [
@@ -98,8 +120,8 @@ export const router = createBrowserRouter([
         path: "employ/recruit-form/:recruitId",
         element: S(<RecruitFormPage />),
       },
-      // Guesthouse
-      { path: "guesthouse/home", element: S(<HostHomePage />) },
+      // Guesthouse Admin
+      { path: "guesthouse/dashboard", element: S(<HostDashboardPage />) },
       { path: "guesthouse/my", element: S(<MyGuesthousePage />) },
       {
         path: "guesthouse/form/:guesthouseId",
@@ -109,11 +131,6 @@ export const router = createBrowserRouter([
         path: "guesthouse/form/",
         element: S(<GuesthouseFormPage />),
       },
-      { path: "guesthouse/store-register", element: S(<StoreRegisterPage />) },
-      {
-        path: "guesthouse/store-register-form",
-        element: S(<StoreRegisterFormPage />),
-      },
       { path: "guesthouse/review", element: S(<ReviewPage />) },
       { path: "guesthouse/sales", element: S(<SalesAnalysisPage />) },
       { path: "guesthouse/notices", element: S(<NoticePage />) },
@@ -121,8 +138,7 @@ export const router = createBrowserRouter([
 
       // 기타
       { path: "profile", element: S(<ProfilePage />) },
-      // Index Route for Private Area
-      { index: true, element: <Navigate to="/guesthouse/home" replace /> },
+      { path: "profile/edit", element: S(<EditProfilePage />) },
     ],
   },
 

@@ -20,8 +20,7 @@ const guesthouseApi = {
     const dto = {
       name: String(formData.businessName ?? "").trim(),
       employeeCount: toInt(formData.employeeCount) ?? 0,
-      address: String(formData.address ?? "").trim(),
-      detailAddress: String(formData.detailAddress ?? "").trim(),
+      address: `${formData.address || ""} ${formData.detailAddress || ""}`.trim(),
       managerName: String(formData.managerName ?? "").trim(),
       managerEmail: String(formData.managerEmail ?? "").trim(),
       businessPhone: String(formData.businessPhone ?? "").trim(),
@@ -37,7 +36,7 @@ const guesthouseApi = {
     multipart.append("img", formData.img);
 
     return api.post("/host/my/application", multipart, {
-      headers: { "Content-Type": undefined },
+      headers: { "Content-Type": "multipart/form-data" },
     });
   },
   // 특정 게스트하우스 상세 조회
@@ -140,6 +139,10 @@ const guesthouseApi = {
   // 사장님 입점신청서 조회
   getHostApplications: () => api.get("/host/my/application"),
 
+  // 사장님 입점신청서 삭제 (모바일과 동일)
+  deleteApplication: (applicationId) =>
+    api.delete(`/host/my/application/${applicationId}`),
+
   // 사장님 입점 신청서 등록
   postHostApplication: (formData) =>
     api.post("/host/my/application", formData, {
@@ -165,6 +168,10 @@ const guesthouseApi = {
   // 파트너 입점 신청 (랜딩페이지)
   postPartnerApplication: (payload) =>
     api.post("/host/guesthouses/partner-applications", payload),
+
+  // 입점 신청서 기반 임시 게스트하우스 생성
+  tempCreateGuesthouse: (payload) =>
+    api.post("/host/guesthouses/tempCreate", payload),
 };
 
 export default guesthouseApi;
