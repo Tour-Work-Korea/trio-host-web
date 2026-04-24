@@ -12,6 +12,9 @@ const authApi = {
   //로그아웃
   logout: () => api.post("/host/auth/logout"),
 
+  //실시간 접속 heartbeat
+  heartbeat: () => authClient.post("/host/presence/heartbeat"),
+
   //프로필 조회
   getMyProfile: () => api.get("/host/my"),
 
