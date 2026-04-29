@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, Navigate } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
 import MenuBar from "./MenuBar";
@@ -10,16 +10,35 @@ import ChevronLeft from "@assets/images/chevron_left_gray.svg";
 
 export default function UserLayout() {
   const [sidebarVisible, setSidebarVisible] = useState(true);
+  const [loading, setLoading] = useState(true);
   const fetchGuesthouses = useGuesthouseStore((s) => s.fetchGuesthouses);
+  const guesthouses = useGuesthouseStore((s) => s.guesthouses);
 
   useEffect(() => {
     // 렌더링 시 전역으로 사용자의 게스트하우스 리스트를 로드 (컨텍스트 구성)
-    fetchGuesthouses();
+    const init = async () => {
+      setLoading(true);
+      await fetchGuesthouses();
+      setLoading(false);
+    };
+    init();
   }, [fetchGuesthouses]);
 
   const toggleSidebar = () => {
     setSidebarVisible((prev) => !prev);
   };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col min-h-screen w-full bg-background items-center justify-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-blue"></div>
+      </div>
+    );
+  }
+
+  if (guesthouses.length === 0) {
+    return <Navigate to="/portal" replace />;
+  }
 
   return (
     <div className="flex flex-col min-h-screen w-full overflow-x-hidden bg-background text-grayscale-900 font-sans selection:bg-primary-orange/20">

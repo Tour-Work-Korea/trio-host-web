@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
 const createEmptyProfile = () => ({
+  id: null,
   name: "",
   photoUrl: null,
   phone: "",

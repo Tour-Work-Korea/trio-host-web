@@ -5,26 +5,26 @@ import { Handshake, Megaphone, Headset, ArrowRight } from "lucide-react";
 
 const benefits = [
   {
-    icon: Handshake,
-    title: "초기 파트너 자격",
-    description: "서비스 방향에 직접 의견 반영",
-  },
-  {
     icon: Megaphone,
     title: "우선 홍보 지원",
-    description: "게딱지 공식 채널 우선 소개",
+    description: "SNS에서 게딱지 인증 숙소로\n가장 먼저 소개됩니다",
   },
   {
     icon: Headset,
     title: "1:1 셋업 지원",
-    description: "전담 담당자가 등록부터 운영까지",
+    description: "숙소 등록부터 정산까지\n전담 담당자가 직접 설정해 드립니다",
+  },
+  {
+    icon: Handshake,
+    title: "맞춤형 기능 우선 개발",
+    description: "필요한 기능을 건의하시면\n최우선으로 개발해 드립니다",
   },
 ];
 
 export function EarlyBirdSection({ handleRegisterModal }) {
   return (
     <section className="bg-gradient-to-b from-background to-primary/5 py-16 md:py-24 border-t border-border/40">
-      <div className="container mx-auto px-4 lg:px-8 max-w-5xl text-center">
+      <div className="container mx-auto px-4 lg:px-8 max-w-6xl text-center">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -37,12 +37,12 @@ export function EarlyBirdSection({ handleRegisterModal }) {
             Special Early Bird
           </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4 leading-tight tracking-tight">
-            선착순 100곳,
+            초기 파트너 100 곳 한정,
             <br />
-            <span className="text-primary">초기 파트너</span>를 모집합니다
+            <span className="text-primary">수수료 3.4%</span> 혜택
           </h2>
-          <p className="text-base md:text-lg text-muted-foreground font-medium">
-            지금 입점하시면 받을 수 있는 특별 혜택
+          <p className="text-base md:text-lg text-muted-foreground font-medium whitespace-pre-line">
+            업계상 최저 3.4%, 1년간 고정 수수료{"\n"}1년 동안 게딱지가 마진을 포기하고 함께 뜁니다.
           </p>
 
           <motion.div
@@ -97,7 +97,7 @@ export function EarlyBirdSection({ handleRegisterModal }) {
                   <h3 className="text-lg font-bold text-foreground mb-1">
                     {benefit.title}
                   </h3>
-                  <p className="text-sm md:text-base text-muted-foreground">
+                  <p className="text-sm md:text-base text-muted-foreground whitespace-pre-line break-keep">
                     {benefit.description}
                   </p>
                 </div>

@@ -1,4 +1,5 @@
 import React from "react";
+import ddakjiIcon from "@assets/images/icon.svg";
 
 const footerLinks = {
   고객지원: [
@@ -21,7 +22,7 @@ export default function Footer() {
           <div className="lg:w-2/3">
             <a href="/" className="flex items-center gap-2 mb-6 w-fit">
               <img
-                src="/images/icon.svg"
+                src={ddakjiIcon}
                 alt="게딱지 로고"
                 width={36}
                 height={36}

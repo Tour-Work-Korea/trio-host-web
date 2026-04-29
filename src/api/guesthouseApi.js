@@ -143,6 +143,10 @@ const guesthouseApi = {
   deleteApplication: (applicationId) =>
     api.delete(`/host/my/application/${applicationId}`),
 
+  // 게스트하우스 프로필 경량 수정 API
+  updateGuesthouseProfile: (guesthouseId, payload) =>
+    api.put(`/host/guesthouses/${guesthouseId}/profile`, payload),
+
   // 사장님 입점 신청서 등록
   postHostApplication: (formData) =>
     api.post("/host/my/application", formData, {

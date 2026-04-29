@@ -28,8 +28,15 @@ export const tryLogin = async (email, password) => {
 const updateProfile = async () => {
   const { setProfile } = useUserStore.getState();
   const res = await authApi.getMyProfile();
-  const { name, photoUrl, phone, email, businessNum } = res.data || {};
+  
+  // 백엔드 응답이 중첩된 형태일 수 있으므로 유연하게 추출
+  const data = res.data?.data || res.data?.result || res.data || {};
+  
+  const { id, userId, hostId, memberId, name, photoUrl, phone, email, businessNum } = data;
+  
   setProfile({
+    ...data,
+    id: id || userId || hostId || memberId || data.user_id || data.host_id || null,
     name: name ?? "",
     photoUrl:
       photoUrl && photoUrl !== "사진을 추가해주세요" ? photoUrl : null,
