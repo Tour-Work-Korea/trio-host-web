@@ -100,6 +100,7 @@ export const router = createBrowserRouter([
         path: "guesthouse/store-register-form",
         element: S(<StoreRegisterFormPage />),
       },
+      { path: "guesthouse/notices", element: S(<NoticePage />) },
       // Index Route for Private Area
       { index: true, element: <Navigate to="/portal" replace /> },
     ],
@@ -133,7 +134,6 @@ export const router = createBrowserRouter([
       },
       { path: "guesthouse/review", element: S(<ReviewPage />) },
       { path: "guesthouse/sales", element: S(<SalesAnalysisPage />) },
-      { path: "guesthouse/notices", element: S(<NoticePage />) },
       { path: "reservation", element: S(<ReservationPage />) },
 
       // 기타
