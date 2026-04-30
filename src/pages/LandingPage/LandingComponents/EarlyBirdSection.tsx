@@ -37,7 +37,7 @@ export function EarlyBirdSection({ handleRegisterModal }) {
             Special Early Bird
           </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4 leading-tight tracking-tight">
-            초기 파트너 100 곳 한정,
+            초기 파트너 50곳 한정,
             <br />
             <span className="text-primary">수수료 3.4%</span> 혜택
           </h2>
@@ -60,19 +60,19 @@ export function EarlyBirdSection({ handleRegisterModal }) {
                 </span>
                 마감 임박
               </div>
-              <span>42 / 100 곳 돌파!</span>
+              <span>37 / 50 곳 돌파!</span>
             </div>
             <div className="w-full h-3 bg-muted rounded-full overflow-hidden shadow-inner flex">
               <motion.div
                 initial={{ width: 0 }}
-                whileInView={{ width: "42%" }}
+                whileInView={{ width: "74%" }}
                 viewport={{ once: true }}
                 transition={{ duration: 1.2, delay: 0.4, ease: "easeOut" }}
                 className="h-full bg-primary rounded-full"
               />
             </div>
             <p className="mt-2 text-xs md:text-sm text-muted-foreground">
-              현재 <b className="text-foreground">40곳 이상</b>이 혜택을 받고 입점했습니다.
+              현재 <b className="text-foreground">30곳 이상</b>이 혜택을 받고 입점했습니다.
             </p>
           </motion.div>
         </motion.div>
