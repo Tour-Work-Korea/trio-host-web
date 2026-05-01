@@ -1,9 +1,14 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Button } from "../../../components/ui/button";
-import { Handshake, Megaphone, Headset, ArrowRight } from "lucide-react";
+import { Handshake, Megaphone, Headset, ArrowRight, Percent } from "lucide-react";
 
 const benefits = [
+  {
+    icon: Percent,
+    title: "1년 고정 수수료 3.4%",
+    description: "업계 최저 수준 3.4% 수수료로\n1년 동안 마진 없이 함께 뜁니다",
+  },
   {
     icon: Megaphone,
     title: "우선 홍보 지원",
@@ -39,10 +44,10 @@ export function EarlyBirdSection({ handleRegisterModal }) {
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4 leading-tight tracking-tight">
             초기 파트너 50곳 한정,
             <br />
-            <span className="text-primary">수수료 3.4%</span> 혜택
+            <span className="text-primary">예약 30건까지 수수료 무료</span>
           </h2>
           <p className="text-base md:text-lg text-muted-foreground font-medium whitespace-pre-line">
-            업계상 최저 3.4%, 1년간 고정 수수료{"\n"}1년 동안 게딱지가 마진을 포기하고 함께 뜁니다.
+            초기 입점 사장님들의 성공적인 시작을 위해{"\n"}게딱지를 통한 첫 30건의 예약 수수료를 전액 면제합니다.
           </p>
 
           <motion.div
@@ -53,32 +58,34 @@ export function EarlyBirdSection({ handleRegisterModal }) {
             className="mt-8 flex flex-col items-center justify-center max-w-sm mx-auto"
           >
             <div className="flex justify-between w-full text-sm font-bold text-foreground mb-2 px-1">
-              <div className="flex items-center gap-1.5 text-primary">
+              <div className="flex items-center gap-1.5 text-red-500">
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
                 </span>
                 마감 임박
               </div>
-              <span>37 / 50 곳 돌파!</span>
+              <span className="text-red-500">37 / 50 곳 입점 완료</span>
             </div>
             <div className="w-full h-3 bg-muted rounded-full overflow-hidden shadow-inner flex">
               <motion.div
                 initial={{ width: 0 }}
                 whileInView={{ width: "74%" }}
                 viewport={{ once: true }}
-                transition={{ duration: 1.2, delay: 0.4, ease: "easeOut" }}
-                className="h-full bg-primary rounded-full"
-              />
+                transition={{ duration: 1.5, delay: 0.4, ease: "easeOut" }}
+                className="h-full bg-red-500 rounded-full relative overflow-hidden"
+              >
+                <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+              </motion.div>
             </div>
-            <p className="mt-2 text-xs md:text-sm text-muted-foreground">
-              현재 <b className="text-foreground">30곳 이상</b>이 혜택을 받고 입점했습니다.
+            <p className="mt-2 text-sm text-red-500 font-bold animate-pulse">
+              잔여 혜택 자리가 단 13곳 남았습니다!
             </p>
           </motion.div>
         </motion.div>
 
         {/* Benefits Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-10 text-left">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 lg:gap-8 mb-10 text-left max-w-5xl mx-auto">
           {benefits.map((benefit, index) => {
             const Icon = benefit.icon;
             return (

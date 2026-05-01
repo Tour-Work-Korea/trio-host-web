@@ -13,6 +13,14 @@ const features = [
   },
   {
     icon: CheckCircle,
+    title: "자동 확정 vs 직접 승인,\n내 맘대로 선택!",
+    description: "결제 즉시 예약이 완료되는 '자동 확정' 방식과\n사장님이 내역을 확인하고 수락하는 '직접 승인' 방식!\n오버부킹 걱정 없이 우리 게하 상황에 맞게 설정하세요.",
+    className: "bg-muted/40 dark:bg-muted/10",
+    imageBg: "bg-gradient-to-t from-muted/60 to-transparent dark:from-muted/20",
+    imageUrl: "/images/select_reservation.png",
+  },
+  {
+    icon: CheckCircle,
     title: "번거로운 안내, 이제는 자동화",
     description: "당일 입실 손님에게 필요한 정보를 잊지 않고 대신 전달해 드립니다",
     className: "bg-muted/40 dark:bg-muted/10",
@@ -22,7 +30,7 @@ const features = [
   {
     icon: PartyPopper,
     title: "파티 인원도 알아서 '딱'",
-    description: "신청 현황 파악은 앱에게 맡기고, 더 즐거운 파티 분위기를 만들어보세요",
+    description: "신청 현황 파악은 앱에게 맡기고,\n더 즐거운 파티 분위기를 만들어보세요",
     className: "bg-muted/40 dark:bg-muted/10",
     imageBg: "bg-gradient-to-t from-muted/60 to-transparent dark:from-muted/20",
     imageUrl: "/images/contents.png",
@@ -41,12 +49,25 @@ export function FeaturesSection() {
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
-          <h2 className="mb-3 sm:mb-4 text-2xl sm:text-3xl font-bold text-foreground md:text-4xl text-balance">
+          <h2 className="mb-6 text-2xl sm:text-3xl md:text-4xl font-bold text-foreground tracking-tight">
             왜 게딱지인가요?
           </h2>
-          <p className="mx-auto max-w-2xl text-sm sm:text-base text-muted-foreground px-4">
-            게스트하우스를 찾는 여행자를 위해 설계된 플랫폼으로 더 재밌고, 편안한 여행을 경험하세요
-          </p>
+          <div className="mx-auto max-w-2xl space-y-5 px-4">
+            <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
+              게스트하우스는 대형 플랫폼에서 항상 불리합니다.<br className="hidden sm:block" />
+              노출은 적고, 수수료는 높고, 경쟁은 호텔과 해야 합니다.
+            </p>
+            <div className="h-1 w-10 bg-primary/20 mx-auto rounded-full" />
+            <div className="space-y-6">
+              <p className="text-lg sm:text-xl md:text-2xl font-semibold text-foreground leading-relaxed">
+                <span className="text-primary font-bold">게딱지</span>는 게스트하우스만 모아<br className="hidden sm:block" />
+                찾는 여행자에게 <span className="underline decoration-primary/30 decoration-2 underline-offset-4">집중 노출</span>하고, 실제 <span className="underline decoration-primary/30 decoration-2 underline-offset-4">예약으로 이어지게</span> 만듭니다.
+              </p>
+              <p className="text-sm sm:text-base text-muted-foreground font-medium bg-muted/50 inline-block px-5 py-2.5 rounded-full shadow-sm border border-border/50">
+                ✨ 예약은 늘리고, 맞춤형 자동화 기능으로 운영은 더 쉽게
+              </p>
+            </div>
+          </div>
         </motion.div>
 
         {/* Features Vertical Layout */}
@@ -68,7 +89,7 @@ export function FeaturesSection() {
                   <div className="mb-6 inline-flex h-12 w-12 md:h-16 md:w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary mx-auto lg:mx-0 shadow-sm border border-primary/20">
                     <feature.icon className="h-6 w-6 md:h-8 md:w-8" />
                   </div>
-                  <h3 className="mb-2 md:mb-4 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-foreground">
+                  <h3 className="mb-2 md:mb-4 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-foreground whitespace-pre-line">
                     {feature.title}
                   </h3>
                   <p className="text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed max-w-lg mx-auto lg:mx-0 whitespace-pre-line px-4 lg:px-0">

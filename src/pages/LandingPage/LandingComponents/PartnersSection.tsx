@@ -20,7 +20,7 @@ const partners = [
   { name: "백패커스홈", image: "/images/partners/backpackers.jpg" },
 ];
 
-export function PartnersSection() {
+const TickerRow = ({ items, speed = 0.5 }) => {
   const scrollRef = useRef(null);
 
   useEffect(() => {
@@ -29,7 +29,6 @@ export function PartnersSection() {
 
     let animationId;
     let scrollPosition = 0;
-    const speed = 0.5;
 
     const scroll = () => {
       scrollPosition += speed;
@@ -55,8 +54,35 @@ export function PartnersSection() {
       scrollContainer.removeEventListener("mouseenter", handleMouseEnter);
       scrollContainer.removeEventListener("mouseleave", handleMouseLeave);
     };
-  }, []);
+  }, [speed]);
 
+  return (
+    <div
+      ref={scrollRef}
+      className="flex gap-4 md:gap-6 overflow-hidden whitespace-nowrap py-1"
+    >
+      {[...items, ...items].map((partner, index) => (
+        <div
+          key={index}
+          className="group flex-shrink-0 flex items-center gap-3 px-2 py-2 pr-6 rounded-full bg-white dark:bg-card text-foreground font-medium text-sm md:text-base hover:bg-primary hover:text-primary-foreground transition-all duration-300 cursor-default border border-border/50 shadow-sm hover:shadow-md hover:-translate-y-0.5"
+        >
+          <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-muted overflow-hidden flex-shrink-0 border border-border transition-transform duration-300 group-hover:scale-110 shadow-sm">
+            <img
+              src={partner.image}
+              alt={`${partner.name} 로고`}
+              width={80}
+              height={80}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <span>{partner.name}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export function PartnersSection() {
   return (
     <section id="partners" className="border-y border-border bg-card overflow-hidden">
       <motion.div 
@@ -66,34 +92,14 @@ export function PartnersSection() {
         viewport={{ once: true, margin: "-50px" }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        <div className="container mx-auto px-4 lg:px-8 mb-6">
+        <div className="container mx-auto px-4 lg:px-8 mb-8">
           <p className="text-center text-base md:text-lg font-medium text-muted-foreground">
             게딱지와 함께하는 게스트하우스
           </p>
         </div>
 
-        <div
-          ref={scrollRef}
-          className="flex gap-8 overflow-hidden whitespace-nowrap"
-        >
-          {/* 두 번 반복해서 무한 스크롤 효과 */}
-          {[...partners, ...partners].map((partner, index) => (
-            <div
-              key={index}
-              className="group flex-shrink-0 flex items-center gap-3 px-2 py-2 pr-6 rounded-full bg-white dark:bg-card text-foreground font-medium text-sm md:text-base hover:bg-primary hover:text-primary-foreground transition-all duration-300 cursor-default border border-border/50 shadow-sm hover:shadow-md hover:-translate-y-0.5"
-            >
-              <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-muted overflow-hidden flex-shrink-0 border border-border transition-transform duration-300 group-hover:scale-110 shadow-sm">
-                <img
-                  src={partner.image}
-                  alt={`${partner.name} 로고`}
-                  width={80}
-                  height={80}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <span>{partner.name}</span>
-            </div>
-          ))}
+        <div className="flex flex-col mt-2">
+          <TickerRow items={partners} speed={0.5} />
         </div>
       </motion.div>
     </section>
