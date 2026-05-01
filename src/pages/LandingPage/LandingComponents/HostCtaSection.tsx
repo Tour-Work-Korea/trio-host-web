@@ -18,15 +18,16 @@ export function HostCtaSection() {
         </div>
 
         {/* Heading */}
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-foreground mb-4 tracking-tight leading-tight">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-foreground mb-4 tracking-tight leading-tight break-keep">
           언제 어디서나 간편하게,
-          <br className="hidden md:block" />
-          <span className="text-primary"> 게딱지 앱</span>으로 운영하세요
+          <br />
+          <span className="text-primary">게딱지 앱</span>으로 운영하세요
         </h2>
 
         {/* Subtitle */}
-        <p className="text-base md:text-lg text-muted-foreground mb-10 md:mb-14 max-w-2xl leading-relaxed">
-          웹페이지뿐만 아니라 모바일에서도 강력한 호스트 기능을 완벽하게 지원합니다!<br />
+        <p className="text-[13px] sm:text-base md:text-lg text-muted-foreground mb-10 md:mb-14 max-w-2xl leading-relaxed break-keep px-4 sm:px-0">
+          웹페이지뿐만 아니라 모바일에서도<br className="block sm:hidden" />
+          강력한 호스트 기능을 완벽하게 지원합니다!<br />
           스마트폰 하나로 예약부터 스탭 관리까지 한 번에 끝내세요.
         </p>
 
@@ -42,9 +43,9 @@ export function HostCtaSection() {
             </a>
           </Button>
 
-          <Button 
-            variant="outline" 
-            className="h-14 md:h-16 w-full flex-1 rounded-2xl bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-md hover:border-primary/50 hover:bg-white hover:text-primary transition-all border-border/80" 
+          <Button
+            variant="outline"
+            className="h-14 md:h-16 w-full flex-1 rounded-2xl bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-md hover:border-primary/50 hover:bg-white hover:text-primary transition-all border-border/80"
             onClick={() => setIsModalOpen(true)}
           >
             <div className="flex flex-row items-center justify-center gap-3 px-6 w-full h-full text-foreground hover:text-primary cursor-pointer">
@@ -69,7 +70,7 @@ export function HostCtaSection() {
                 onClick={() => setIsModalOpen(false)}
                 className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm"
               />
-              
+
               {/* Modal Box */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.95, x: "-50%", y: "-40%" }}
@@ -92,7 +93,7 @@ export function HostCtaSection() {
                     안드로이드 앱은 현재 출시 준비 중입니다.<br />
                     최대한 빠르게 플레이 스토어에서 뵙겠습니다!
                   </p>
-                  <Button 
+                  <Button
                     className="w-full rounded-xl h-12 bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-base shadow-md shadow-primary/20"
                     onClick={() => setIsModalOpen(false)}
                   >

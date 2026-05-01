@@ -22,7 +22,11 @@ const features = [
   {
     icon: CheckCircle,
     title: "번거로운 안내, 이제는 자동화",
-    description: "당일 입실 손님에게 필요한 정보를 잊지 않고 대신 전달해 드립니다",
+    description: (
+      <>
+        당일 입실 손님에게 필요한 정보를 잊지 않고<br className="block sm:hidden" /> 대신 전달해 드립니다
+      </>
+    ),
     className: "bg-muted/40 dark:bg-muted/10",
     imageBg: "bg-gradient-to-t from-muted/60 to-transparent dark:from-muted/20",
     imageUrl: "/images/checkin.png",
@@ -53,18 +57,18 @@ export function FeaturesSection() {
             왜 게딱지인가요?
           </h2>
           <div className="mx-auto max-w-2xl space-y-5 px-4">
-            <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
-              게스트하우스는 대형 플랫폼에서 항상 불리합니다.<br className="hidden sm:block" />
+            <p className="text-[14px] sm:text-lg text-muted-foreground leading-relaxed break-keep">
+              게스트하우스는 대형 플랫폼에서 항상 불리합니다.<br />
               노출은 적고, 수수료는 높고, 경쟁은 호텔과 해야 합니다.
             </p>
             <div className="h-1 w-10 bg-primary/20 mx-auto rounded-full" />
             <div className="space-y-6">
-              <p className="text-lg sm:text-xl md:text-2xl font-semibold text-foreground leading-relaxed">
-                <span className="text-primary font-bold">게딱지</span>는 게스트하우스만 모아<br className="hidden sm:block" />
-                찾는 여행자에게 <span className="underline decoration-primary/30 decoration-2 underline-offset-4">집중 노출</span>하고, 실제 <span className="underline decoration-primary/30 decoration-2 underline-offset-4">예약으로 이어지게</span> 만듭니다.
+              <p className="text-base sm:text-xl md:text-2xl font-semibold text-foreground leading-relaxed break-keep">
+                <span className="text-primary font-bold">게딱지</span>는 게스트하우스만 모아<br />
+                찾는 여행자에게 <span className="underline decoration-primary/30 decoration-2 underline-offset-4">집중 노출</span>하고,<br className="block sm:hidden" /> 실제 <span className="underline decoration-primary/30 decoration-2 underline-offset-4">예약으로 이어지게</span> 만듭니다.
               </p>
-              <p className="text-sm sm:text-base text-muted-foreground font-medium bg-muted/50 inline-block px-5 py-2.5 rounded-full shadow-sm border border-border/50">
-                ✨ 예약은 늘리고, 맞춤형 자동화 기능으로 운영은 더 쉽게
+              <p className="text-sm sm:text-base text-muted-foreground font-medium bg-muted/50 inline-block px-5 py-3 sm:py-2.5 rounded-2xl sm:rounded-full shadow-sm border border-border/50 break-keep leading-relaxed sm:leading-normal">
+                ✨ 예약은 늘리고, 맞춤형 자동화 기능으로<br className="block sm:hidden" /> 운영은 더 쉽게
               </p>
             </div>
           </div>
