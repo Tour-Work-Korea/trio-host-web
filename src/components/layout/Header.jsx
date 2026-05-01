@@ -74,7 +74,7 @@ export default function Header() {
                 </Button>
               </>
             ) : (
-              <Button size="sm" className="px-4 sm:px-6 font-bold bg-[#5361DB] text-white hover:bg-[#5361DB]/90 shadow-md shadow-[#5361DB]/30" onClick={() => navigate("/login")}>
+              <Button size="sm" className="hidden sm:inline-flex px-4 sm:px-6 font-bold bg-[#5361DB] text-white hover:bg-[#5361DB]/90 shadow-md shadow-[#5361DB]/30" onClick={() => navigate("/login")}>
                 로그인
               </Button>
             )}

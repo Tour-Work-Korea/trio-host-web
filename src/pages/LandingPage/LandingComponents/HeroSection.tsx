@@ -33,8 +33,8 @@ export function HeroSection({ handleRegisterModal }) {
           </h1>
 
           {/* Subheadline */}
-          <p className="mb-8 mx-auto max-w-xl text-pretty text-base sm:text-lg text-muted-foreground md:text-xl">
-            운영은 게딱지에 맡기고,
+          <p className="mb-8 mx-auto max-w-xl text-pretty text-base sm:text-lg text-muted-foreground md:text-xl break-keep">
+            운영은 게딱지에 맡기고,<br className="block sm:hidden" />
             호스트님은 게스트에게만 집중하세요.
           </p>
 
