@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://host.ddakji.kr/sitemap.xml
