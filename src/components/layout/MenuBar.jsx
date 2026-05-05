@@ -2,7 +2,20 @@ import React, { useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import useUserStore from "@stores/userStore";
 import useGuesthouseStore from "@stores/guesthouseStore";
-import { ChevronDown, Plus, Settings } from "lucide-react";
+import { useGuesthouseProfiles } from "@profile/useGuesthouseProfiles";
+import { 
+  ChevronDown, 
+  Plus, 
+  Settings, 
+  LayoutDashboard, 
+  Info, 
+  CalendarCheck, 
+  MessageSquare, 
+  Users, 
+  Building2,
+  PartyPopper,
+  CalendarDays
+} from "lucide-react";
 
 export default function MenuBar() {
   const { pathname } = useLocation();
@@ -12,29 +25,32 @@ export default function MenuBar() {
   const profile = useUserStore((s) => s.profile);
 
   // 게스트하우스 상태 확인
-  const guesthouses = useGuesthouseStore((s) => s.guesthouses);
+  const { guesthouseProfiles } = useGuesthouseProfiles();
+  const activeGuesthouses = guesthouseProfiles.filter(p => p.isApproved);
+  
   const activeGuesthouseId = useGuesthouseStore((s) => s.activeGuesthouseId);
   const setActiveGuesthouseId = useGuesthouseStore(
     (s) => s.setActiveGuesthouseId
   );
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const activeGuesthouse = guesthouses.find(
-    (g) => (g.guesthouseId || g.id) === activeGuesthouseId
+  const activeGuesthouse = activeGuesthouses.find(
+    (g) => String(g.guesthouseId) === String(activeGuesthouseId)
   );
 
   const isActivePath = (to) => pathname === to || pathname.startsWith(to + "/");
 
   // 메인 카테고리 구성
   const globalNavLinks = [
-    { to: "/guesthouse/dashboard", label: "대시보드", icon: "📊" },
-    { to: "/guesthouse/my", label: "업체 정보", icon: "ℹ️" },
-    { to: "/reservation", label: "예약 관리", icon: "📅" },
-    { to: "/guesthouse/review", label: "리뷰 현황", icon: "📝" },
+    { to: "/guesthouse/dashboard", label: "대시보드", icon: <LayoutDashboard className="w-4 h-4" /> },
+    { to: "/guesthouse/my", label: "게하 정보", icon: <Info className="w-4 h-4" /> },
+    { to: "/reservation", label: "객실 예약", icon: <CalendarCheck className="w-4 h-4" /> },
+    { to: "/party/info", label: "파티 정보", icon: <PartyPopper className="w-4 h-4" /> },
+    { to: "/party/reservation", label: "파티 예약", icon: <CalendarDays className="w-4 h-4" /> },
   ];
 
   const employNavLinks = [
-    { to: "/employ/my-recruit", label: "알바 채용", icon: "🧑‍💼" },
+    { to: "/employ/my-recruit", label: "스탭", icon: <Users className="w-4 h-4" /> },
   ];
 
   return (
@@ -47,23 +63,23 @@ export default function MenuBar() {
         >
           {activeGuesthouse ? (
             <>
-              {activeGuesthouse.guesthouseImageUrl ? (
+              {activeGuesthouse.photoUrl ? (
                 <img
-                  src={activeGuesthouse.guesthouseImageUrl}
-                  alt={activeGuesthouse.guesthouseName}
+                  src={activeGuesthouse.photoUrl}
+                  alt={activeGuesthouse.name}
                   className="w-10 h-10 rounded-full object-cover bg-grayscale-100 border border-grayscale-200 shadow-sm"
                 />
               ) : (
                 <div className="w-10 h-10 rounded-full bg-grayscale-100 flex items-center justify-center font-bold text-grayscale-600 border border-grayscale-200 shadow-sm">
-                  {activeGuesthouse.guesthouseName?.charAt(0)}
+                  {activeGuesthouse.name?.charAt(0)}
                 </div>
               )}
               <div className="flex-1 overflow-hidden">
                 <p className="text-grayscale-900 font-extrabold tracking-tight truncate text-[15px]">
-                  {activeGuesthouse.guesthouseName || "이름 없는 업체"}
+                  {activeGuesthouse.name || "이름 없는 업체"}
                 </p>
                 <p className="text-[11px] text-grayscale-400 font-medium truncate mt-0.5">
-                  내 업체 관리
+                  내 게하 관리
                 </p>
               </div>
               <ChevronDown className="w-4 h-4 text-grayscale-400" />
@@ -83,10 +99,10 @@ export default function MenuBar() {
         {dropdownOpen && (
           <div className="absolute top-[70px] left-4 right-4 bg-white border border-grayscale-200 shadow-xl rounded-xl overflow-hidden z-50">
             <div className="max-h-64 overflow-y-auto custom-scrollbar">
-              {guesthouses.length > 0 ? (
-                guesthouses.map((g) => {
-                  const gId = g.guesthouseId || g.id;
-                  const isSelected = activeGuesthouseId === gId;
+              {activeGuesthouses.length > 0 ? (
+                activeGuesthouses.map((g) => {
+                  const gId = String(g.guesthouseId);
+                  const isSelected = String(activeGuesthouseId) === gId;
                   return (
                     <button
                       key={gId}
@@ -94,12 +110,12 @@ export default function MenuBar() {
                         setActiveGuesthouseId(gId);
                         setDropdownOpen(false);
                       }}
-                      className={`w-full text-left px-4 py-3 text-sm transition-colors border-b border-grayscale-100 last:border-b-0 hover:bg-grayscale-50 ${isSelected ? "text-grayscale-900 font-extrabold bg-grayscale-50" : "text-grayscale-600 font-medium"
+                      className={`w-full text-left px-4 py-3 text-[15px] transition-colors border-b border-grayscale-100 last:border-b-0 hover:bg-grayscale-50 ${isSelected ? "text-grayscale-900 font-extrabold bg-grayscale-50" : "text-grayscale-600 font-medium"
                         }`}
                     >
                       <div className="flex items-center gap-2">
                         {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-primary-orange inline-block" />}
-                        <span className="truncate">{g.guesthouseName}</span>
+                        <span className="truncate">{g.name}</span>
                       </div>
                     </button>
                   );
@@ -116,7 +132,7 @@ export default function MenuBar() {
                   setDropdownOpen(false);
                   navigate("/guesthouse/store-register-form");
                 }}
-                className="flex items-center justify-center gap-2 w-full py-2 bg-primary-blue hover:bg-primary-blue/90 text-white rounded-lg text-sm font-semibold transition-colors shadow-sm"
+                className="flex items-center justify-center gap-2 w-full py-2 bg-primary-blue hover:bg-primary-blue/90 text-white rounded-lg text-[15px] font-semibold transition-colors shadow-sm"
               >
                 <Plus className="w-4 h-4" />
                 새 게스트하우스 등록
@@ -137,22 +153,19 @@ export default function MenuBar() {
             to="/portal"
             state={{ preventAutoRedirect: true }}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-extrabold transition-all border ${
+              `flex items-center gap-3 px-3 py-2.5 rounded-xl text-[15px] font-extrabold transition-all border ${
                 isActive
                   ? "bg-grayscale-800 text-white border-grayscale-800 shadow-md"
                   : "bg-white text-grayscale-500 border border-grayscale-200 shadow-sm hover:bg-grayscale-50 hover:text-grayscale-900"
               }`
             }
           >
-            <span className="text-base leading-none">🏢</span>
+            <span className="flex items-center justify-center w-5 h-5"><Building2 className="w-4 h-4" /></span>
             모든 내 업체 보기
           </NavLink>
         </div>
 
         <nav className="space-y-1">
-          <div className="pt-2 pb-2 pl-3 text-xs font-bold text-grayscale-500 tracking-wider">
-            {activeGuesthouse ? "업체 관리" : "기본 메뉴"}
-          </div>
           {globalNavLinks.map((link) => {
             const active = isActivePath(link.to);
             return (
@@ -160,32 +173,29 @@ export default function MenuBar() {
                 key={link.to}
                 to={link.to}
                 state={link.state}
-                className={`flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold transition-all ${active
+                className={`flex items-center gap-3 px-3 py-3 rounded-xl text-[15px] font-semibold transition-all ${active
                     ? "bg-primary-blue text-white font-bold shadow-md shadow-primary-blue/20"
                     : "text-grayscale-500 hover:text-grayscale-900 hover:bg-grayscale-100"
                   }`}
               >
-                <span className="text-base">{link.icon}</span>
+                <span className="flex items-center justify-center w-5 h-5">{link.icon}</span>
                 {link.label}
               </NavLink>
             );
           })}
 
-          <div className="pt-6 pb-2 pl-3 text-xs font-bold text-grayscale-500 tracking-wider">
-            채용 관리
-          </div>
           {employNavLinks.map((link) => {
             const active = isActivePath(link.to);
             return (
               <NavLink
                 key={link.to}
                 to={link.to}
-                className={`flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold transition-all ${active
+                className={`flex items-center gap-3 px-3 py-3 rounded-xl text-[15px] font-semibold transition-all ${active
                     ? "bg-primary-blue text-white font-bold shadow-md shadow-primary-blue/20"
                     : "text-grayscale-500 hover:text-grayscale-900 hover:bg-grayscale-100"
                   }`}
               >
-                <span className="text-base">{link.icon}</span>
+                <span className="flex items-center justify-center w-5 h-5">{link.icon}</span>
                 {link.label}
               </NavLink>
             );

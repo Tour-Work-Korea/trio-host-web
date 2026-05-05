@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import useUserStore from "@stores/userStore";
 import { logout } from "@utils/authFlow";
 import { Button } from "../ui/button"; // Corrected relative path
-import { Menu, X } from "lucide-react";
+import { Menu, X, ChevronDown, Check } from "lucide-react";
+import useGuesthouseStore from "@stores/guesthouseStore";
+import { useGuesthouseProfiles } from "@profile/useGuesthouseProfiles";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -11,6 +13,22 @@ export default function Header() {
   const sessionReady = useUserStore((s) => s.sessionReady);
   const isLoggedIn = sessionReady && authenticated;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const { guesthouseProfiles } = useGuesthouseProfiles();
+  const { activeGuesthouseId, setActiveGuesthouseId } = useGuesthouseStore();
+
+  const activeProfile = guesthouseProfiles.find(p => String(p.guesthouseId) === String(activeGuesthouseId)) || guesthouseProfiles[0];
+
+  const handleSelectGuesthouse = (profile) => {
+    setDropdownOpen(false);
+    if (profile.isApproved) {
+      setActiveGuesthouseId(profile.guesthouseId);
+      navigate("/guesthouse/dashboard");
+    } else {
+      alert("현재 심사 중인 게스트하우스입니다.");
+    }
+  };
 
   const onLogout = useCallback(async () => {
     try {
@@ -65,6 +83,9 @@ export default function Header() {
                 <Button size="sm" className="hidden sm:inline-flex bg-[#5361DB] text-white hover:bg-[#5361DB]/90 font-bold shadow-md shadow-[#5361DB]/30" onClick={() => navigate("/guesthouse/my")}>
                   사장님 페이지
                 </Button>
+                
+
+
                 <Button size="sm" variant="outline" className="hidden sm:inline-flex border-[#5361DB]/50 text-[#5361DB] hover:text-[#5361DB] hover:bg-[#5361DB]/10 font-semibold" onClick={onLogout}>
                   로그아웃
                 </Button>

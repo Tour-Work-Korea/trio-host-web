@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import useGuesthouseStore from "@stores/guesthouseStore";
 import { ChevronLeft, ChevronRight, HelpCircle, TrendingUp, Users, BadgePercent, CreditCard } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import InactiveGuard from "@components/InactiveGuard";
 
 export default function SalesAnalysisPage() {
   const { activeGuesthouseId, guesthouses } = useGuesthouseStore();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("count"); // count | guests
 
-  const activeGh = guesthouses.find((g) => (g.guesthouseId || g.id) === activeGuesthouseId);
+  const activeGh = guesthouses.find((g) => String(g.guesthouseId || g.id) === String(activeGuesthouseId));
 
   if (!activeGuesthouseId || !activeGh) {
     return (
@@ -37,6 +38,7 @@ export default function SalesAnalysisPage() {
         </div>
       </div>
 
+      <InactiveGuard>
       {/* 2. 순매출 (Net Revenue) */}
       <div className="space-y-4 relative">
         <div className="absolute -inset-4 bg-gradient-to-b from-blue-50/50 to-transparent blur-3xl -z-10 rounded-3xl"></div>
@@ -219,6 +221,7 @@ export default function SalesAnalysisPage() {
           ))}
         </div>
       </div>
+      </InactiveGuard>
 
     </div>
   );

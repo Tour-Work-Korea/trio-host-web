@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import React from "react";
 
-import CheckOrange from "@assets/images/check_orange.svg";
+import CheckBlue from "@assets/images/check_blue.svg";
 import ChevronBlack from "@assets/images/chevron_right_black.svg";
 
 export default function DetailInfoSection({
@@ -16,7 +16,7 @@ export default function DetailInfoSection({
       <button type="button" className="form-title-box" onClick={onToggle}>
         <span className="form-title-text">상세 정보</span>
         {valid ? (
-          <img src={CheckOrange} width={24} height={24} alt="완료" />
+          <img src={CheckBlue} width={24} height={24} alt="완료" />
         ) : (
           <img src={ChevronBlack} width={24} height={24} alt="펼치기" />
         )}
@@ -45,13 +45,15 @@ export default function DetailInfoSection({
                 handleInputChange("guesthouseLongDesc", e.target.value)
               }
             />
-            <button
-              type="button"
-              className="mt-1 text-sm text-gray-400 underline"
-              onClick={() => handleInputChange("guesthouseLongDesc", "")}
-            >
-              다시쓰기
-            </button>
+            <div className="flex justify-end mt-1">
+              <button
+                type="button"
+                className="text-sm text-gray-400 hover:text-gray-600 underline"
+                onClick={() => handleInputChange("guesthouseLongDesc", "")}
+              >
+                다시쓰기
+              </button>
+            </div>
           </div>
         </div>
       )}

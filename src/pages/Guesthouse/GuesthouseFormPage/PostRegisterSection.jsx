@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import React from "react";
 
-import CheckOrange from "@assets/images/check_orange.svg";
+import CheckBlue from "@assets/images/check_blue.svg";
 import ChevronBlack from "@assets/images/chevron_right_black.svg";
 import DisabledRadioButton from "@assets/images/radio_button_disabled.svg";
 import EnabledRadioButton from "@assets/images/radio_button_enabled.svg";
@@ -19,7 +19,7 @@ export default function PostRegisterSection({
       <button type="button" className="form-title-box" onClick={onToggle}>
         <span className="form-title-text">입점신청서 선택</span>
         {valid ? (
-          <img src={CheckOrange} width={24} height={24} alt="완료" />
+          <img src={CheckBlue} width={24} height={24} alt="완료" />
         ) : (
           <img src={ChevronBlack} width={24} height={24} alt="펼치기" />
         )}

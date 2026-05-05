@@ -22,9 +22,11 @@ import DetailInfoSection from "./DetailInfoSection";
 import RulesSection from "./RulesSection";
 import AmenitiesSection from "./AmenitiesSection";
 import RoomsSection from "./RoomsSection";
+import RefundPolicySection from "./RefundPolicySection";
 
 // 임시저장 import
 import { createDraftStore } from "@utils/draftStorage";
+import { updateProfile } from "@utils/authFlow";
 
 // ===== 유틸 =====
 const isNonEmpty = (v) =>
@@ -72,7 +74,6 @@ const normalizeRoomForPayload = (room) => {
     roomMaxCapacity,
     roomDesc: room.roomDesc,
     roomPrice: Number(room.roomPrice),
-    roomExtraFees: room.roomExtraFees ?? [],
     roomImages:
       room.roomImages?.map((img) => ({
         roomImageUrl: img.roomImageUrl,
@@ -102,7 +103,6 @@ const computeValidSections = (formData, { isEditMode = false } = {}) => {
   const postRegister = isEditMode ? true : Boolean(applicationId);
 
   const info =
-    isNonEmpty(guesthouseName) &&
     isNonEmpty(guesthouseAddress) &&
     isNonEmpty(guesthousePhone) &&
     isNonEmpty(checkIn) &&
@@ -120,6 +120,7 @@ const computeValidSections = (formData, { isEditMode = false } = {}) => {
   const rulesValid = isNonEmpty(rules);
   const amenitiesValid = Array.isArray(amenities) && amenities.length > 0;
   const roomsValid = Array.isArray(roomInfos) && roomInfos.length > 0;
+  const refundPolicyValid = true; // optional
 
   return {
     postRegister,
@@ -129,8 +130,18 @@ const computeValidSections = (formData, { isEditMode = false } = {}) => {
     rules: rulesValid,
     amenities: amenitiesValid,
     rooms: roomsValid,
+    refundPolicy: refundPolicyValid,
   };
 };
+
+const defaultRefundPolicies = [
+  { daysBeforeCheckin: 1, refundRate: 0 },
+  { daysBeforeCheckin: 2, refundRate: 0 },
+  { daysBeforeCheckin: 3, refundRate: 30 },
+  { daysBeforeCheckin: 4, refundRate: 40 },
+  { daysBeforeCheckin: 5, refundRate: 50 },
+  { daysBeforeCheckin: 6, refundRate: 60 },
+];
 
 export default function GuesthouseForm() {
   const navigate = useNavigate();
@@ -140,6 +151,7 @@ export default function GuesthouseForm() {
 
   const [formData, setFormData] = useState({
     applicationId: null,
+    status: null,
     guesthouseName: "",
     guesthouseAddress: "",
     guesthouseDetailAddress: "",
@@ -151,6 +163,8 @@ export default function GuesthouseForm() {
     guesthouseImages: [], // { serverUrl, previewUrl, isThumbnail }
     hashtagIds: [],
     rules: "",
+    refundExtraInfo: "",
+    refundPolicies: defaultRefundPolicies,
     amenities: [], // [{ amenityId, count }]
     roomInfos: [], //
   });
@@ -168,6 +182,7 @@ export default function GuesthouseForm() {
     info: false,
     introSummary: false,
     rooms: false,
+    refundPolicy: false,
     detailInfo: false,
     rules: false,
     amenities: false,
@@ -179,6 +194,7 @@ export default function GuesthouseForm() {
     info: false,
     introSummary: false,
     rooms: false,
+    refundPolicy: true,
     detailInfo: false,
     rules: false,
     amenities: false,
@@ -216,12 +232,20 @@ export default function GuesthouseForm() {
 
   //임시저장 namespace 정의
   const draftStore = createDraftStore(
-    isEditMode ? "guesthouse:edit" : "guesthouse:new"
+    isEditMode ? `guesthouse:edit:${numericGuesthouseId}` : "guesthouse:new"
   );
   useEffect(() => {
     const loaded = draftStore.load();
     if (loaded.exists) {
-      setFormData(loaded.data);
+      const loadedPolicies = loaded.data.refundPolicies;
+      const validPolicies = Array.isArray(loadedPolicies) && loadedPolicies.length > 0 && loadedPolicies[0].daysBeforeCheckin !== undefined
+        ? loadedPolicies
+        : defaultRefundPolicies;
+
+      setFormData({
+        ...loaded.data,
+        refundPolicies: validPolicies
+      });
     }
   }, []);
 
@@ -304,17 +328,18 @@ export default function GuesthouseForm() {
               })) ??
               (room.thumbnailImg
                 ? [
-                    {
-                      roomImageUrl: room.thumbnailImg,
-                      isThumbnail: true,
-                    },
-                  ]
+                  {
+                    roomImageUrl: room.thumbnailImg,
+                    isThumbnail: true,
+                  },
+                ]
                 : []),
           })) ??
           [];
 
         const mapped = {
           applicationId: data.applicationId ?? null,
+          status: data.status ?? null,
           guesthouseName: data.guesthouseName ?? "",
           guesthouseAddress: data.guesthouseAddress ?? "",
           guesthouseDetailAddress: data.guesthouseDetailAddress ?? "",
@@ -332,6 +357,10 @@ export default function GuesthouseForm() {
             })) ?? [],
           hashtagIds: mappedHashtagIds,
           rules: data.rules ?? "",
+          refundExtraInfo: data.refundExtraInfo ?? "",
+          refundPolicies: Array.isArray(data.refundPolicies) && data.refundPolicies.length > 0 && data.refundPolicies[0].daysBefore !== undefined
+            ? data.refundPolicies
+            : defaultRefundPolicies,
           amenities: mappedAmenities,
           roomInfos: mappedRooms,
         };
@@ -533,22 +562,30 @@ export default function GuesthouseForm() {
       const amenitiesPayload = formData.amenities ?? [];
       const hashtagIdsPayload = formData.hashtagIds ?? [];
 
-      if (!isEditMode) {
+      const isFinalizing = formData.status === "INACTIVE";
+
+      if (!isEditMode || isFinalizing) {
         // =========================
-        // 🚩 등록 모드
+        // 🚩 등록 모드 (또는 임시 생성 후 최종 등록)
         // =========================
         const roomInfosPayload =
           formData.roomInfos?.map((room) => normalizeRoomForPayload(room)) ??
           [];
 
+        const toLocalTime = (timeStr) => {
+          if (typeof timeStr !== 'string') return timeStr;
+          const [h = '0', m = '0', s = '0'] = timeStr.split(':');
+          const pad = (v) => String(v).padStart(2, '0');
+          return `${pad(h)}:${pad(m)}:${pad(s)}`;
+        };
+
         const payload = {
           applicationId: formData.applicationId,
-          guesthouseName: formData.guesthouseName,
           guesthouseAddress: formData.guesthouseAddress,
           guesthouseDetailAddress: formData.guesthouseDetailAddress,
           guesthousePhone: formData.guesthousePhone,
-          checkIn: formData.checkIn,
-          checkOut: formData.checkOut,
+          checkIn: toLocalTime(formData.checkIn),
+          checkOut: toLocalTime(formData.checkOut),
           guesthouseShortIntro: formData.guesthouseShortIntro,
           guesthouseLongDesc: formData.guesthouseLongDesc,
           rules: formData.rules,
@@ -556,9 +593,24 @@ export default function GuesthouseForm() {
           amenities: amenitiesPayload,
           guesthouseImages: guesthouseImagesPayload,
           roomInfos: roomInfosPayload,
+          refundPolicies: formData.refundPolicies,
+          refundPolicyAdditionalNotice: formData.refundExtraInfo,
         };
 
-        await guesthouseApi.registerGuesthouse(payload);
+        if (isFinalizing) {
+          const finalizePayload = { ...payload };
+          delete finalizePayload.applicationId;
+          delete finalizePayload.guesthouseName;
+          await guesthouseApi.finalizeGuesthouse(numericGuesthouseId, finalizePayload);
+        } else {
+          await guesthouseApi.registerGuesthouse(payload);
+        }
+
+        try {
+          await updateProfile();
+        } catch (e) {
+          console.error("프로필 갱신 실패:", e);
+        }
 
         setErrorModal({
           visible: true,
@@ -578,7 +630,6 @@ export default function GuesthouseForm() {
         // ✏️ 수정 모드
         // =========================
         const basicPayload = {
-          guesthouseName: formData.guesthouseName,
           guesthouseAddress: formData.guesthouseAddress,
           guesthouseDetailAddress: formData.guesthouseDetailAddress,
           guesthousePhone: formData.guesthousePhone,
@@ -692,8 +743,8 @@ export default function GuesthouseForm() {
 
   return (
     <div className="container">
-      <div className="page-title">
-        {isEditMode ? "게스트하우스 수정" : "나의 게스트하우스"}
+      <div className="text-2xl font-extrabold text-grayscale-900 mb-6 tracking-tight">
+        {isEditMode && formData.status !== "INACTIVE" ? "게스트하우스 수정" : "게스트하우스 등록"}
       </div>
       <div className="flex flex-col">
         <div className="flex-1 overflow-y-auto">
@@ -742,6 +793,14 @@ export default function GuesthouseForm() {
               onImageUploadError={handleImageUploadError}
             />
 
+            <RefundPolicySection
+              open={visible.refundPolicy}
+              onToggle={() => toggleSection("refundPolicy")}
+              valid={valid.refundPolicy}
+              formData={formData}
+              handleInputChange={handleInputChange}
+            />
+
             <DetailInfoSection
               open={visible.detailInfo}
               onToggle={() => toggleSection("detailInfo")}
@@ -771,12 +830,12 @@ export default function GuesthouseForm() {
 
             <p className="text-sm text-primary-blue mt-2 text-right">
               모든 항목을 입력하셔야{" "}
-              {isEditMode ? "수정이 완료됩니다" : "등록이 완료됩니다"}
+              {isEditMode && formData.status !== "INACTIVE" ? "수정이 완료됩니다" : "등록이 완료됩니다"}
             </p>
 
             <div className="mt-4 flex justify-center">
               <ButtonOrange
-                title={isEditMode ? "수정하기" : "등록하기"}
+                title={isEditMode && formData.status !== "INACTIVE" ? "수정하기" : "등록하기"}
                 onPress={handleSubmit}
                 disabled={!isAllValid}
               />

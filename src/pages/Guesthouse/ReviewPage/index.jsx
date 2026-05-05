@@ -8,8 +8,9 @@ import StarIcon from "@assets/images/star_filled.svg";
 import SendIcon from "@assets/images/send_filled.svg";
 import ReviewDeleteModal from "./ReviewDeleteModal";
 import { ChevronRight } from "lucide-react";
+import InactiveGuard from "@components/InactiveGuard";
 
-export default function ReviewPage() {
+export default function ReviewPage({ embed = false }) {
   const { activeGuesthouseId, guesthouses } = useGuesthouseStore();
   const [reviews, setReviews] = useState([]);
   const [errorModal, setErrorModal] = useState({ visible: false, title: "", message: null, buttonText: "확인" });
@@ -20,7 +21,7 @@ export default function ReviewPage() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  const activeGh = guesthouses.find((g) => (g.guesthouseId || g.id) === activeGuesthouseId);
+  const activeGh = guesthouses.find((g) => String(g.guesthouseId || g.id) === String(activeGuesthouseId));
 
   useEffect(() => {
     if (activeGuesthouseId) {
@@ -87,11 +88,14 @@ export default function ReviewPage() {
   }
 
   return (
-    <div className="max-w-5xl w-full text-grayscale-900 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex items-center gap-2 text-sm text-grayscale-500 mb-6 font-semibold">
-        <span>리뷰 현황</span> <ChevronRight className="w-4 h-4" /> <span className="text-primary-blue">{activeGh.guesthouseName}</span>
-      </div>
+    <div className={`w-full text-grayscale-900 animate-in fade-in ${!embed ? "max-w-5xl slide-in-from-bottom-4 duration-500" : ""}`}>
+      {!embed && (
+        <div className="flex items-center gap-2 text-sm text-grayscale-500 mb-6 font-semibold">
+          <span>리뷰 현황</span> <ChevronRight className="w-4 h-4" /> <span className="text-primary-blue">{activeGh.guesthouseName}</span>
+        </div>
+      )}
 
+      <InactiveGuard>
       <div className="mb-8 border-b-2 border-primary-blue pb-4">
         <h1 className="text-2xl font-bold">작성된 리뷰 <span className="text-primary-blue">{pageInfo.totalElements}</span>개</h1>
       </div>
@@ -176,6 +180,7 @@ export default function ReviewPage() {
           )}
         </div>
       )}
+      </InactiveGuard>
 
       <ErrorModal visible={errorModal.visible} title={errorModal.title} message={errorModal.message} buttonText={errorModal.buttonText} onPress={() => setErrorModal((p) => ({ ...p, visible: false }))} />
       <ReviewDeleteModal id={deleteModal.id} visible={deleteModal.visible} onClose={() => setDeleteModal({ visible: false, id: null })} setErrorModal={setErrorModal} />
