@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import React, { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
-import CheckOrange from "@assets/images/check_orange.svg";
+import CheckBlue from "@assets/images/check_blue.svg";
 import ChevronBlack from "@assets/images/chevron_right_black.svg";
 import RefundPolicyModal from "./RefundPolicyModal";
 
@@ -45,7 +45,7 @@ export default function RefundPolicySection({
     if (parsed !== "" && parsed < 0) parsed = 0;
     if (parsed !== "" && parsed > 100) parsed = 100;
 
-    const newPolicies = (formData.refundPolicies || []).map(p => 
+    const newPolicies = (formData.refundPolicies || []).map(p =>
       p.daysBefore === daysBefore ? { ...p, refundPercentage: parsed } : p
     );
     handleInputChange("refundPolicies", newPolicies);
@@ -56,7 +56,7 @@ export default function RefundPolicySection({
       <button type="button" className="form-title-box" onClick={onToggle}>
         <span className="form-title-text">취소 및 환불규정</span>
         {valid ? (
-          <img src={CheckOrange} width={24} height={24} alt="완료" />
+          <img src={CheckBlue} width={24} height={24} alt="완료" />
         ) : (
           <img src={ChevronBlack} width={24} height={24} alt="펼치기" />
         )}
@@ -97,8 +97,8 @@ export default function RefundPolicySection({
           <div>
             <h3 className="text-base font-bold text-gray-800 mb-2">환불기준 설정</h3>
             <p className="text-sm text-gray-600 mb-6 break-keep">
-              환불기준을 입력해주세요. 해당 기준에 의해 환불 처리 됩니다.<br />
-              설정하시지 않은 날짜는 <span className="text-red-500 font-bold">100% 환불</span> 됩니다.
+              환불기준을 입력해주세요. 해당 기준에 의해 환불 처리 됩니다.
+              (설정하시지 않은 날짜는 <span className="text-red-500 font-bold">100% 환불</span> 됩니다.)
             </p>
 
             <div className="flex flex-col gap-4">
