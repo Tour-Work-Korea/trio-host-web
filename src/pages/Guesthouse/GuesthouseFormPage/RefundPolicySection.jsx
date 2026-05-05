@@ -22,7 +22,7 @@ export default function RefundPolicySection({
   const handleAddPolicy = (newPolicy) => {
     const currentPolicies = formData.refundPolicies || [];
     // If it already exists, update it, or just append
-    const existingIndex = currentPolicies.findIndex(p => p.daysBefore === newPolicy.daysBefore);
+    const existingIndex = currentPolicies.findIndex(p => p.daysBeforeCheckin === newPolicy.daysBeforeCheckin);
     let newPolicies;
     if (existingIndex >= 0) {
       newPolicies = [...currentPolicies];
@@ -30,23 +30,23 @@ export default function RefundPolicySection({
     } else {
       newPolicies = [...currentPolicies, newPolicy];
     }
-    // Sort by daysBefore ascending
-    newPolicies.sort((a, b) => a.daysBefore - b.daysBefore);
+    // Sort by daysBeforeCheckin ascending
+    newPolicies.sort((a, b) => a.daysBeforeCheckin - b.daysBeforeCheckin);
     handleInputChange("refundPolicies", newPolicies);
   };
 
-  const handleDeletePolicy = (daysBefore) => {
-    const newPolicies = (formData.refundPolicies || []).filter(p => p.daysBefore !== daysBefore);
+  const handleDeletePolicy = (daysBeforeCheckin) => {
+    const newPolicies = (formData.refundPolicies || []).filter(p => p.daysBeforeCheckin !== daysBeforeCheckin);
     handleInputChange("refundPolicies", newPolicies);
   };
 
-  const handleUpdatePolicyPercentage = (daysBefore, newPercentage) => {
+  const handleUpdatePolicyPercentage = (daysBeforeCheckin, newPercentage) => {
     let parsed = newPercentage === "" ? "" : Number(newPercentage);
     if (parsed !== "" && parsed < 0) parsed = 0;
     if (parsed !== "" && parsed > 100) parsed = 100;
 
     const newPolicies = (formData.refundPolicies || []).map(p =>
-      p.daysBefore === daysBefore ? { ...p, refundPercentage: parsed } : p
+      p.daysBeforeCheckin === daysBeforeCheckin ? { ...p, refundRate: parsed } : p
     );
     handleInputChange("refundPolicies", newPolicies);
   };
@@ -110,9 +110,9 @@ export default function RefundPolicySection({
 
               {/* 추가된 환불기준 리스트 */}
               {(formData.refundPolicies || []).map((policy) => (
-                <div key={policy.daysBefore} className="flex items-center justify-between py-2 border-b border-gray-100">
+                <div key={policy.daysBeforeCheckin} className="flex items-center justify-between py-2 border-b border-gray-100">
                   <span className="text-base font-medium text-gray-800 w-24">
-                    방문 {policy.daysBefore}일전
+                    방문 {policy.daysBeforeCheckin}일전
                   </span>
                   <div className="flex items-center gap-3">
                     <span className="text-base text-gray-800">총금액의</span>
@@ -121,8 +121,8 @@ export default function RefundPolicySection({
                       min="0"
                       max="100"
                       className="w-16 border border-gray-200 rounded-xl px-2 py-2 text-center text-gray-900 bg-white focus:border-primary-blue focus:outline-none font-bold"
-                      value={policy.refundPercentage}
-                      onChange={(e) => handleUpdatePolicyPercentage(policy.daysBefore, e.target.value)}
+                      value={policy.refundRate}
+                      onChange={(e) => handleUpdatePolicyPercentage(policy.daysBeforeCheckin, e.target.value)}
                       onKeyDown={(e) => {
                         if (['-', 'e', 'E', '+', '.'].includes(e.key)) {
                           e.preventDefault();
@@ -132,7 +132,7 @@ export default function RefundPolicySection({
                     <span className="text-base text-gray-800 mr-2">% 환불</span>
                     <button
                       type="button"
-                      onClick={() => handleDeletePolicy(policy.daysBefore)}
+                      onClick={() => handleDeletePolicy(policy.daysBeforeCheckin)}
                       className="p-1 text-gray-400 hover:text-primary-blue transition-colors"
                     >
                       <Trash2 size={20} />

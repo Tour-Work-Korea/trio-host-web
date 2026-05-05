@@ -10,7 +10,7 @@ export default function RefundPolicyModal({ isOpen, onClose, onAdd }) {
 
   const handleAdd = () => {
     if (!days || !percentage) return;
-    onAdd({ daysBefore: Number(days), refundPercentage: Number(percentage) });
+    onAdd({ daysBeforeCheckin: Number(days), refundRate: Number(percentage) });
     setDays("");
     setPercentage("");
     onClose();
