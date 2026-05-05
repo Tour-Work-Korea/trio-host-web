@@ -35,9 +35,13 @@ export const updateProfile = async () => {
 
   const { id, userId, hostId, memberId, name, photoUrl, phone, email, businessNum } = data;
 
-  // 웹은 /host/my 에 게스트하우스 리스트가 안 들어있으므로 직접 호출해서 붙여줍니다.
+  // 백엔드 구조가 업데이트되어 /host/my 에 applications로 포함되어 올 수 있음
   try {
-    data.guesthouseProfiles = await guesthouseApi.getMyGuesthouseProfiles();
+    if (Array.isArray(data.applications)) {
+      data.guesthouseProfiles = data.applications;
+    } else {
+      data.guesthouseProfiles = await guesthouseApi.getMyGuesthouseProfiles();
+    }
     // 일괄처리를 위해 객실 정보가 포함된 guesthouseStore의 데이터도 항상 최신화
     import("@stores/guesthouseStore").then(({ default: useGuesthouseStore }) => {
       useGuesthouseStore.getState().fetchGuesthouses();
