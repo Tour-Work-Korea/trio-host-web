@@ -30,21 +30,6 @@ export default function InfoSection({
       {open && (
         <div className="form-body-container">
           <div className="flex flex-col gap-6">
-            {/* 이름 */}
-            <div>
-              <p className="form-body-label">게스트하우스 이름</p>
-              <input
-                type="text"
-                className="form-input"
-                placeholder="게스트하우스 이름을 입력해 주세요"
-                value={formData.guesthouseName}
-                maxLength={50}
-                onChange={(e) =>
-                  handleInputChange("guesthouseName", e.target.value)
-                }
-              />
-            </div>
-
             {/* 주소 -> 위치 */}
             <div>
               <div className="mb-2">
