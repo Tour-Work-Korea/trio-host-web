@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { Check } from "lucide-react";
 import { uploadSingleImageToS3Web } from "@utils/s3ImageWeb";
 import useUserStore from "@stores/userStore";
+import { updateProfile } from "@utils/authFlow";
 
 // 임시저장 import
 import { createDraftStore } from "@utils/draftStorage";
@@ -28,11 +29,9 @@ export default function RegisterFormPage() {
 
   const [formData, setFormData] = useState({
     businessName: "", // 상호명
-    businessType: "", // 사업장 유형
-    businessPhone: "", // 사업장 전화번호
-    address: "", // 사업자 주소
-    detailAddress: "", // 사업자 상세 주소
     img: null, // 사업자 등록증 이미지
+    bankBook: null, // 통장 사본
+    businessLicense: null, // 영업 신고증
     agreeService: false, // 서비스 이용약관 동의
     agreePrivacy: false, // 개인정보 수집 및 이용 동의
     guesthouseName: "", // 게스트하우스 명
@@ -47,6 +46,8 @@ export default function RegisterFormPage() {
       setFormData({
         ...loaded.data,
         img: null, // File 객체는 localStorage에 저장될 수 없으므로 초기화
+        bankBook: null,
+        businessLicense: null,
         guesthouseImg: null,
       });
     }
@@ -64,9 +65,9 @@ export default function RegisterFormPage() {
 
     if (!result.allValid) {
       let title = "입력값을 확인해주세요.";
-      if (!result.business) title = "상호명과 사업자 유형을 입력해주세요.";
-      else if (!result.contact) title = "사업장 전화번호와 주소를 확인해주세요.";
+      if (!result.business) title = "상호명을 입력해주세요.";
       else if (!result.image) title = "사업자 등록증 이미지를 첨부해주세요.";
+      else if (!result.docs) title = "통장 사본과 영업 신고증을 첨부해주세요.";
       else if (!result.agreements) title = "필수 이용약관에 모두 동의해주세요.";
       else if (!result.guesthouse) title = "게스트하우스 명과 프로필 사진을 추가해주세요.";
 
@@ -89,7 +90,7 @@ export default function RegisterFormPage() {
         managerEmail: profile?.email || "host@ddakji.com",    // 임시 이메일
       };
 
-      // 1. 기존 사업자 입점 신청 API (사업자 정보 + 등록증 이미지)
+      // 1. 사업자 입점 신청 API (사업자 정보 + 등록증 이미지 + 통장사본 + 영업신고증)
       const applicationResponse = await guesthouseApi.postApplication(payload);
 
       applicationId = applicationResponse?.data?.applicationId || applicationResponse?.applicationId;
@@ -129,7 +130,9 @@ export default function RegisterFormPage() {
           </div>
         ),
         buttonText: "확인",
-        onPress: () => {
+        onPress: async () => {
+          // 새로 등록된 게스트하우스를 전역 상태에 반영하기 위해 프로필 업데이트 실행
+          await updateProfile();
           navigate("/portal");
         }
       });
@@ -204,77 +207,8 @@ export default function RegisterFormPage() {
               </div>
 
               <div className="form-group w-full">
-                <label htmlFor="businessType" className="form-label font-bold">
-                  사업자 유형
-                </label>
-                <div className="form-input-wrap">
-                  <input
-                    id="businessType"
-                    type="text"
-                    className="form-input bg-white border border-grayscale-200 focus:border-primary-blue transition-colors rounded-xl px-4 py-3.5"
-                    placeholder="예) 숙박업 / 서비스업"
-                    value={formData.businessType ?? ""}
-                    onChange={(e) => handleInputChange("businessType", e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="form-group w-full">
-                <label htmlFor="businessPhone" className="form-label font-bold">
-                  사업장 전화번호
-                </label>
-                <div className="form-input-wrap">
-                  <input
-                    id="businessPhone"
-                    type="tel"
-                    inputMode="tel"
-                    className="form-input bg-white border border-grayscale-200 focus:border-primary-blue transition-colors rounded-xl px-4 py-3.5"
-                    placeholder="-없이 숫자만 입력해주세요"
-                    value={formData.businessPhone ?? ""}
-                    onChange={(e) => handleInputChange("businessPhone", onlyDigits(e.target.value))}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="form-group w-full">
-                <label htmlFor="address" className="form-label font-bold">
-                  사업장 주소
-                </label>
-                <div className="form-input-wrap flex gap-3">
-                  <input
-                    id="address"
-                    type="text"
-                    className="flex-1 form-input bg-white border border-grayscale-200 focus:border-primary-blue transition-colors rounded-xl px-4 py-3.5"
-                    placeholder="주소를 검색해주세요"
-                    value={formData.address ?? ""}
-                    readOnly
-                  />
-                  <button
-                    type="button"
-                    className="bg-primary-blue text-white font-bold px-6 rounded-xl hover:bg-blue-600 transition-colors whitespace-nowrap"
-                    onClick={() => handleSearchAddress((v) => handleInputChange("address", v))}
-                  >
-                    주소 검색
-                  </button>
-                </div>
-
-                <div className="form-input-wrap mt-3">
-                  <input
-                    id="detailAddress"
-                    type="text"
-                    className="form-input bg-white border border-grayscale-200 focus:border-primary-blue transition-colors rounded-xl px-4 py-3.5"
-                    placeholder="상세 주소를 입력해주세요"
-                    value={formData.detailAddress ?? ""}
-                    onChange={(e) => handleInputChange("detailAddress", e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="form-group w-full">
-                <div className="form-label font-bold mb-2">사업자 등록증 사본</div>
+                <div className="form-label font-bold mb-1">사업자 등록증 사본</div>
+                <p className="text-xs text-grayscale-500 mb-3">주민등록번호 등 민감한 개인정보는 가리고 업로드해주세요.</p>
                 <div className="bg-white rounded-xl max-w-[200px] border border-dashed border-grayscale-300 hover:border-primary-blue transition-colors overflow-hidden">
                   <ImageDropzone
                     sensitive
@@ -292,6 +226,54 @@ export default function RegisterFormPage() {
                 {formData.img && (
                   <div className="mt-3 max-w-[200px] shadow-sm rounded-lg overflow-hidden border border-grayscale-200">
                     <BizCertPreview img={formData.img} />
+                  </div>
+                )}
+              </div>
+
+              <div className="form-group w-full">
+                <div className="form-label font-bold mb-1">통장 사본</div>
+                <p className="text-xs text-grayscale-500 mb-3">정산을 지급받으실 계좌의 통장 사본을 업로드해주세요.</p>
+                <div className="bg-white rounded-xl max-w-[200px] border border-dashed border-grayscale-300 hover:border-primary-blue transition-colors overflow-hidden">
+                  <ImageDropzone
+                    sensitive
+                    onUploadedFile={(file) => handleInputChange("bankBook", file)}
+                    onError={(msg) =>
+                      setErrorModal({
+                        ...errorModal,
+                        visible: true,
+                        title: "이미지 업로드 실패",
+                        message: msg,
+                      })
+                    }
+                  />
+                </div>
+                {formData.bankBook && (
+                  <div className="mt-3 max-w-[200px] shadow-sm rounded-lg overflow-hidden border border-grayscale-200">
+                    <BizCertPreview img={formData.bankBook} />
+                  </div>
+                )}
+              </div>
+
+              <div className="form-group w-full">
+                <div className="form-label font-bold mb-1">영업 신고증</div>
+                <p className="text-xs text-grayscale-500 mb-3">최근 발급된 유효한 영업 신고증 사본을 업로드해주세요.</p>
+                <div className="bg-white rounded-xl max-w-[200px] border border-dashed border-grayscale-300 hover:border-primary-blue transition-colors overflow-hidden">
+                  <ImageDropzone
+                    sensitive
+                    onUploadedFile={(file) => handleInputChange("businessLicense", file)}
+                    onError={(msg) =>
+                      setErrorModal({
+                        ...errorModal,
+                        visible: true,
+                        title: "이미지 업로드 실패",
+                        message: msg,
+                      })
+                    }
+                  />
+                </div>
+                {formData.businessLicense && (
+                  <div className="mt-3 max-w-[200px] shadow-sm rounded-lg overflow-hidden border border-grayscale-200">
+                    <BizCertPreview img={formData.businessLicense} />
                   </div>
                 )}
               </div>
