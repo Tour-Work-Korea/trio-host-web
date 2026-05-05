@@ -45,13 +45,15 @@ export default function DetailInfoSection({
                 handleInputChange("guesthouseLongDesc", e.target.value)
               }
             />
-            <button
-              type="button"
-              className="mt-1 text-sm text-gray-400 underline"
-              onClick={() => handleInputChange("guesthouseLongDesc", "")}
-            >
-              다시쓰기
-            </button>
+            <div className="flex justify-end mt-1">
+              <button
+                type="button"
+                className="text-sm text-gray-400 hover:text-gray-600 underline"
+                onClick={() => handleInputChange("guesthouseLongDesc", "")}
+              >
+                다시쓰기
+              </button>
+            </div>
           </div>
         </div>
       )}
