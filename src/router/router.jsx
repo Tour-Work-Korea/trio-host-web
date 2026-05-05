@@ -12,7 +12,7 @@ import PageLoader from "@components/PageLoader";
 const LandingPage = lazy(() => import("@pages/LandingPage"));
 const LoginPage = lazy(() => import("@pages/Auth/LoginPage"));
 const SignupPage = lazy(() => import("@pages/Auth/SignupPage"));
-const HostHomePage = lazy(() => import("@pages/HostHomePage"));
+const MyGuesthouseList = lazy(() => import("@pages/MyGuesthouseList"));
 const HostDashboardPage = lazy(() => import("@pages/HostDashboardPage"));
 const FindIdPage = lazy(() => import("@pages/Auth/FindIdPage"));
 const FindPasswordPage = lazy(() => import("@pages/Auth/FindPasswordPage"));
@@ -94,7 +94,7 @@ export const router = createBrowserRouter([
   {
     element: <RequireAuth>{S(<PortalLayout />)}</RequireAuth>,
     children: [
-      { path: "portal", element: S(<HostHomePage />) },
+      { path: "portal", element: S(<MyGuesthouseList />) },
       { path: "guesthouse/store-register", element: S(<StoreRegisterPage />) },
       {
         path: "guesthouse/store-register-form",
