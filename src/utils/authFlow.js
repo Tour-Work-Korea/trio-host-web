@@ -1,4 +1,5 @@
 import authApi from "@api/authApi";
+import guesthouseApi from "@api/guesthouseApi";
 import useUserStore from "@stores/userStore";
 
 let pendingSessionBootstrap = null;
@@ -8,13 +9,13 @@ let pendingSessionBootstrap = null;
  */
 export const tryLogin = async (email, password) => {
   try {
-    useUserStore.getState().setSessionReady(false);
+    // 1. 로그인 요청으로 쿠키 생성
     await authApi.login(email, password);
-    useUserStore.getState().setAuthenticated(true);
-    const bootstrapped = await bootstrapSession();
-    if (!bootstrapped) {
-      throw new Error("host web session bootstrap failed");
-    }
+
+    // 2. 로그인 성공 시 즉시 프로필(게스트하우스 목록 포함) 새로 조회 및 스토어 갱신
+    // (setProfile 내부에서 sessionReady, authenticated 모두 true로 변경됨)
+    await updateProfile();
+
     return true;
   } catch (err) {
     useUserStore.getState().clearUser();
@@ -25,16 +26,28 @@ export const tryLogin = async (email, password) => {
 /**
  * 로그인 후 프로필 업데이트
  */
-const updateProfile = async () => {
+export const updateProfile = async () => {
   const { setProfile } = useUserStore.getState();
   const res = await authApi.getMyProfile();
-  
+
   // 백엔드 응답이 중첩된 형태일 수 있으므로 유연하게 추출
   const data = res.data?.data || res.data?.result || res.data || {};
-  
+
   const { id, userId, hostId, memberId, name, photoUrl, phone, email, businessNum } = data;
-  
-  setProfile({
+
+  // 웹은 /host/my 에 게스트하우스 리스트가 안 들어있으므로 직접 호출해서 붙여줍니다.
+  try {
+    data.guesthouseProfiles = await guesthouseApi.getMyGuesthouseProfiles();
+    // 일괄처리를 위해 객실 정보가 포함된 guesthouseStore의 데이터도 항상 최신화
+    import("@stores/guesthouseStore").then(({ default: useGuesthouseStore }) => {
+      useGuesthouseStore.getState().fetchGuesthouses();
+    });
+  } catch (error) {
+    console.error("Failed to fetch guesthouses for hostProfile", error);
+    data.guesthouseProfiles = [];
+  }
+
+  const parsedProfile = {
     ...data,
     id: id || userId || hostId || memberId || data.user_id || data.host_id || null,
     name: name ?? "",
@@ -43,7 +56,9 @@ const updateProfile = async () => {
     phone: phone ?? "",
     email: email ?? "",
     businessNum: businessNum ?? "",
-  });
+  };
+
+  setProfile(parsedProfile, data);
 };
 
 /**

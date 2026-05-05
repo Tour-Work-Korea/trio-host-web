@@ -28,7 +28,7 @@ const useGuesthouseStore = create(
           // 만약 선택된 게하가 없고 가져온 리스트가 있다면 첫번째 값을 디폴트로 선택
           if (!currentActive && list.length > 0) {
             set({ activeGuesthouseId: list[0].guesthouseId || list[0].id });
-          } else if (currentActive && !list.find(g => (g.guesthouseId || g.id) === currentActive)) {
+          } else if (currentActive && !list.find(g => String(g.guesthouseId || g.id) === String(currentActive))) {
             set({ activeGuesthouseId: list.length > 0 ? (list[0].guesthouseId || list[0].id) : null });
           }
         } catch (error) {
