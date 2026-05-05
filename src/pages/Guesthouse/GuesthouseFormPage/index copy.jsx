@@ -13,7 +13,7 @@ import {
 } from "@data/guesthouseOptions";
 import { guesthouseTags } from "@data/guesthouseTags";
 
-import CheckOrange from "@assets/images/check_orange.svg";
+import CheckBlue from "@assets/images/check_blue.svg";
 import ChevronBlack from "@assets/images/chevron_right_black.svg";
 import DisabledRadioButton from "@assets/images/radio_button_disabled.svg";
 import EnabledRadioButton from "@assets/images/radio_button_enabled.svg";
@@ -390,7 +390,7 @@ export default function GuesthouseForm() {
               >
                 <span className="form-title-text">입점신청서 선택</span>
                 {valid.postRegister ? (
-                  <img src={CheckOrange} width={24} height={24} alt="완료" />
+                  <img src={CheckBlue} width={24} height={24} alt="완료" />
                 ) : (
                   <img src={ChevronBlack} width={24} height={24} alt="펼치기" />
                 )}
@@ -458,7 +458,7 @@ export default function GuesthouseForm() {
               >
                 <span className="form-title-text">기본 정보</span>
                 {valid.info ? (
-                  <img src={CheckOrange} width={24} height={24} alt="완료" />
+                  <img src={CheckBlue} width={24} height={24} alt="완료" />
                 ) : (
                   <img src={ChevronBlack} width={24} height={24} alt="펼치기" />
                 )}
@@ -597,7 +597,7 @@ export default function GuesthouseForm() {
               >
                 <span className="form-title-text">소개 요약</span>
                 {valid.introSummary ? (
-                  <img src={CheckOrange} width={24} height={24} alt="완료" />
+                  <img src={CheckBlue} width={24} height={24} alt="완료" />
                 ) : (
                   <img src={ChevronBlack} width={24} height={24} alt="펼치기" />
                 )}
@@ -727,7 +727,7 @@ export default function GuesthouseForm() {
               >
                 <span className="form-title-text">상세 정보</span>
                 {valid.detailInfo ? (
-                  <img src={CheckOrange} width={24} height={24} alt="완료" />
+                  <img src={CheckBlue} width={24} height={24} alt="완료" />
                 ) : (
                   <img src={ChevronBlack} width={24} height={24} alt="펼치기" />
                 )}
@@ -784,7 +784,7 @@ export default function GuesthouseForm() {
               >
                 <span className="form-title-text">이용 규칙 및 환불 규정</span>
                 {valid.rules ? (
-                  <img src={CheckOrange} width={24} height={24} alt="완료" />
+                  <img src={CheckBlue} width={24} height={24} alt="완료" />
                 ) : (
                   <img src={ChevronBlack} width={24} height={24} alt="펼치기" />
                 )}
@@ -839,7 +839,7 @@ export default function GuesthouseForm() {
               >
                 <span className="form-title-text">편의시설 및 서비스</span>
                 {valid.amenities ? (
-                  <img src={CheckOrange} width={24} height={24} alt="완료" />
+                  <img src={CheckBlue} width={24} height={24} alt="완료" />
                 ) : (
                   <img src={ChevronBlack} width={24} height={24} alt="펼치기" />
                 )}

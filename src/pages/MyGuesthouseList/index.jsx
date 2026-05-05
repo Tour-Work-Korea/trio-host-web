@@ -131,12 +131,12 @@ export default function MyGuesthouseList() {
     try {
       // 백엔드 구조에 따라 심사중이든 승인완료(운영중)이든 모두 applicationId를 사용해 deleteApplication API로 삭제/취소 처리
       await guesthouseApi.deleteApplication(deleteTarget.id);
-      
-      setResultModal({ 
-        visible: true, 
-        title: deleteTarget.isApp ? "취소 완료" : "삭제 완료", 
-        message: deleteTarget.isApp ? "입점 신청이 안전하게 취소되었습니다." : "게스트하우스가 안전하게 삭제되었습니다.", 
-        isSuccess: true 
+
+      setResultModal({
+        visible: true,
+        title: deleteTarget.isApp ? "취소 완료" : "삭제 완료",
+        message: deleteTarget.isApp ? "입점 신청이 안전하게 취소되었습니다." : "게스트하우스가 안전하게 삭제되었습니다.",
+        isSuccess: true
       });
     } catch (error) {
       console.error("삭제 실패:", error);
@@ -490,7 +490,7 @@ export default function MyGuesthouseList() {
                 {deleteTarget.isApp ? "신청을 취소하시겠습니까?" : "삭제하시겠습니까?"}
               </h3>
               <p className="text-sm text-grayscale-500 leading-relaxed mb-8">
-                {deleteTarget.isApp 
+                {deleteTarget.isApp
                   ? <>취소하시면 복구되지 않으며, <br />새롭게 입점 신청을 진행하셔야 합니다.</>
                   : <>삭제하시면 복구되지 않으며, <br />새롭게 게스트하우스 등록을 진행하셔야 합니다.</>
                 }

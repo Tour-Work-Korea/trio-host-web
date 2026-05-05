@@ -1,13 +1,16 @@
 import React from "react";
 import useGuesthouseStore from "@stores/guesthouseStore";
+import { useGuesthouseProfiles } from "@profile/useGuesthouseProfiles";
 import { ChevronRight, TrendingUp, AlertCircle, CalendarClock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import InactiveGuard from "@components/InactiveGuard";
 
 export default function HostDashboardPage() {
-  const { activeGuesthouseId, guesthouses } = useGuesthouseStore();
+  const { activeGuesthouseId } = useGuesthouseStore();
+  const { guesthouseProfiles } = useGuesthouseProfiles();
   const navigate = useNavigate();
 
-  const activeGh = guesthouses.find((g) => (g.guesthouseId || g.id) === activeGuesthouseId);
+  const activeGh = guesthouseProfiles.find((g) => String(g.guesthouseId) === String(activeGuesthouseId));
 
   if (!activeGuesthouseId || !activeGh) {
     return (
@@ -22,7 +25,7 @@ export default function HostDashboardPage() {
     <div className="max-w-5xl w-full text-grayscale-900 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       
       <div className="flex items-center gap-2 text-sm text-grayscale-500 font-semibold mb-2">
-        <span>대시보드</span> <ChevronRight className="w-4 h-4" /> <span className="text-primary-blue">{activeGh.guesthouseName}</span>
+        <span>대시보드</span> <ChevronRight className="w-4 h-4" /> <span className="text-primary-blue">{activeGh.name}</span>
       </div>
 
       <div className="flex items-center justify-between mb-8">
@@ -30,10 +33,11 @@ export default function HostDashboardPage() {
           <span className="w-8 h-8 rounded-full bg-primary-blue/10 flex items-center justify-center text-primary-blue">
             🏠
           </span>
-          {activeGh.guesthouseName} 대시보드
+          {activeGh.name} 대시보드
         </h1>
       </div>
 
+      <InactiveGuard>
       {/* 상단 1: 마케팅 배너 / 공지사항 연결 */}
       <div 
         onClick={() => navigate("/guesthouse/notices")} 
@@ -145,6 +149,7 @@ export default function HostDashboardPage() {
         </div>
 
       </div>
+      </InactiveGuard>
     </div>
   );
 }
