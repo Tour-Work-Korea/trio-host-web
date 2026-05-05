@@ -6,39 +6,36 @@ function toInt(v) {
 }
 
 const guesthouseApi = {
+
+  // 내 게스트하우스 목록 조회 (입점신청서 API를 기반으로 통합 조회) -> 내가 가진 게스트하우스 목록 조회하는 것!
+  getMyGuesthouseProfiles: async () => {
+    try {
+      const response = await api.get("/host/my/application");
+      const list = Array.isArray(response.data) ? response.data : (response.data?.content || []);
+
+      // 최신순 정렬
+      return list.sort((a, b) => {
+        const dateA = new Date(a.createdAt || a.updatedAt || 0);
+        const dateB = new Date(b.createdAt || b.updatedAt || 0);
+        return dateB - dateA;
+      });
+    } catch (error) {
+      console.error("Failed to fetch my guesthouse profiles", error);
+      return [];
+    }
+  },
+  // 내 게스트하우스 삭제 (정보 삭제가 아닌 게스트하우스 자체 삭제) 
+  deleteApplication: (applicationId) =>
+    api.delete(`/host/my/application/${applicationId}`),
+
   // 사장님 전체 게스트하우스 조회
   getMyGuesthouses: () => api.get("/host/guesthouses"),
   // 사장님 전체 게스트하우스 조회 - 방정보 포함
   getMyGuesthousesWithRooms: () => api.get("/host/guesthouses/with-rooms"),
   // 사장님 입점신청서 조회
   getMyApplications: () => api.get("/host/my/application"),
-  // 사장님 입점 신청서 등록
-  postApplication: (formData) => {
-    if (!(formData.img instanceof File)) {
-      throw new Error("img는 File이어야 합니다. (URL이 아니라 파일)");
-    }
-    const dto = {
-      name: String(formData.businessName ?? "").trim(),
-      employeeCount: toInt(formData.employeeCount) ?? 0,
-      address: `${formData.address || ""} ${formData.detailAddress || ""}`.trim(),
-      managerName: String(formData.managerName ?? "").trim(),
-      managerEmail: String(formData.managerEmail ?? "").trim(),
-      businessPhone: String(formData.businessPhone ?? "").trim(),
-      businessType: String(formData.businessType ?? "").trim(),
-    };
 
-    const multipart = new FormData();
 
-    multipart.append(
-      "dto",
-      new Blob([JSON.stringify(dto)], { type: "application/json" })
-    );
-    multipart.append("img", formData.img);
-
-    return api.post("/host/my/application", multipart, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-  },
   // 특정 게스트하우스 상세 조회
   getGuesthouseDetail: (guesthouseId) =>
     api.get(`/host/guesthouses/${guesthouseId}`),
@@ -139,9 +136,7 @@ const guesthouseApi = {
   // 사장님 입점신청서 조회
   getHostApplications: () => api.get("/host/my/application"),
 
-  // 사장님 입점신청서 삭제 (모바일과 동일)
-  deleteApplication: (applicationId) =>
-    api.delete(`/host/my/application/${applicationId}`),
+
 
   // 게스트하우스 프로필 경량 수정 API
   updateGuesthouseProfile: (guesthouseId, payload) =>
@@ -173,7 +168,41 @@ const guesthouseApi = {
   postPartnerApplication: (payload) =>
     api.post("/host/guesthouses/partner-applications", payload),
 
-  // 입점 신청서 기반 임시 게스트하우스 생성
+
+  // 사장님 입점 신청서 등록 (= 게스트하우스 등록 시 필요한 첫번째 api)
+  postApplication: (formData) => {
+    if (!(formData.img instanceof File)) {
+      throw new Error("img는 File이어야 합니다. (URL이 아니라 파일)");
+    }
+    const dto = {
+      name: String(formData.businessName ?? "").trim(),
+    };
+
+    const multipart = new FormData();
+
+    multipart.append(
+      "dto",
+      new Blob([JSON.stringify(dto)], { type: "application/json" })
+    );
+    // 사업자 등록증 (백엔드 요구사항: businessCertificate)
+    multipart.append("businessCertificate", formData.img);
+
+    // 통장 사본 추가 (백엔드 요구사항: bankbookCopy)
+    if (formData.bankBook) {
+      multipart.append("bankbookCopy", formData.bankBook);
+    }
+
+    // 영업 신고증 추가 (백엔드 요구사항: businessReportCertificate)
+    if (formData.businessLicense) {
+      multipart.append("businessReportCertificate", formData.businessLicense);
+    }
+
+    return api.post("/host/my/application", multipart, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
+
+  // 입점 신청서 기반 임시 게스트하우스 생성 (= 게스트하우스 등록 시 필요한 두번째 api)
   tempCreateGuesthouse: (payload) =>
     api.post("/host/guesthouses/tempCreate", payload),
 };
