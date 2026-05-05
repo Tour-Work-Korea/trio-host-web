@@ -79,7 +79,7 @@ export default function MenuBar() {
                   {activeGuesthouse.name || "이름 없는 업체"}
                 </p>
                 <p className="text-[11px] text-grayscale-400 font-medium truncate mt-0.5">
-                  내 업체 관리
+                  내 게하 관리
                 </p>
               </div>
               <ChevronDown className="w-4 h-4 text-grayscale-400" />
