@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import React from "react";
 
-import CheckOrange from "@assets/images/check_orange.svg";
+import CheckBlue from "@assets/images/check_blue.svg";
 import ChevronBlack from "@assets/images/chevron_right_black.svg";
 import StarFilled from "@assets/images/star_filled.svg";
 import StarEmpty from "@assets/images/star_white.svg";
@@ -24,7 +24,7 @@ export default function IntroSummarySection({
       <button type="button" className="form-title-box" onClick={onToggle}>
         <span className="form-title-text">소개 요약</span>
         {valid ? (
-          <img src={CheckOrange} width={24} height={24} alt="완료" />
+          <img src={CheckBlue} width={24} height={24} alt="완료" />
         ) : (
           <img src={ChevronBlack} width={24} height={24} alt="펼치기" />
         )}
@@ -120,13 +120,15 @@ export default function IntroSummarySection({
                 handleInputChange("guesthouseShortIntro", e.target.value)
               }
             />
-            <button
-              type="button"
-              className="mt-1 text-sm text-gray-400 underline"
-              onClick={() => handleInputChange("guesthouseShortIntro", "")}
-            >
-              다시쓰기
-            </button>
+            <div className="flex justify-end mt-1">
+              <button
+                type="button"
+                className="text-sm text-gray-400 hover:text-gray-600 underline"
+                onClick={() => handleInputChange("guesthouseShortIntro", "")}
+              >
+                다시쓰기
+              </button>
+            </div>
           </div>
         </div>
       )}
