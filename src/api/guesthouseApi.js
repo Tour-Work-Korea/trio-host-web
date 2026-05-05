@@ -44,6 +44,10 @@ const guesthouseApi = {
   registerGuesthouse: (guesthouseData) =>
     api.post("/host/guesthouses", guesthouseData),
 
+  // 게스트하우스 최종 등록 (-> 게스트하우스 정보 입력 부분!)
+  finalizeGuesthouse: (guesthouseId, dto) =>
+    api.post(`/host/guesthouses/${guesthouseId}/finalize`, dto),
+
   // 게스트하우스 수정
 
   /** 게스트하우스 기본정보 수정 (이름/주소/전화/소개/체크인아웃/규칙)
